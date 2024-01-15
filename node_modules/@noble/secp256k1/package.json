@@ -1,0 +1,62 @@
+{
+  "name": "@noble/secp256k1",
+  "version": "2.0.0",
+  "description": "Fastest 4KB JS implementation of secp256k1 elliptic curve. Auditable, high-security, 0-dependency ECDH & ECDSA signatures compliant with RFC6979",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "index.ts"
+  ],
+  "type": "module",
+  "main": "index.js",
+  "module": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:release": "rollup -c rollup.config.js",
+    "test": "node test/secp256k1.test.mjs",
+    "bench": "node test/benchmark.js",
+    "min": "cd test/build; npm install; npm run terser",
+    "loc": "echo \"`npm run --silent min | wc -c` symbols `wc -l < index.ts` LOC, `npm run --silent min | gzip -c8 | wc -c`B gzipped\""
+  },
+  "author": "Paul Miller (https://paulmillr.com)",
+  "homepage": "https://paulmillr.com/noble/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paulmillr/noble-secp256k1.git"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@noble/hashes": "1.3.0",
+    "fast-check": "3.0.0",
+    "micro-bmark": "0.3.0",
+    "micro-should": "0.4.0",
+    "typescript": "5.0.2"
+  },
+  "keywords": [
+    "secp256k1",
+    "rfc6979",
+    "signature",
+    "ecdsa",
+    "noble",
+    "cryptography",
+    "elliptic curve",
+    "ecc",
+    "curve",
+    "schnorr",
+    "bitcoin",
+    "ethereum"
+  ],
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
+  },
+  "funding": [
+    {
+      "type": "individual",
+      "url": "https://paulmillr.com/funding/"
+    }
+  ]
+}
