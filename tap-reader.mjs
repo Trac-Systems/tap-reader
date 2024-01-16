@@ -135,6 +135,7 @@ let queue = 0;
 
 async function enter_queue()
 {
+  /* TODO: not working correctly and can be removed anyway upon release.
   let wait = 0;
 
   if(queue > 99)
@@ -155,6 +156,7 @@ async function enter_queue()
   }
 
   queue++;
+  */
 
   return '';
 }
@@ -1408,6 +1410,9 @@ function sleep(ms) {
 
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+
+console.log(await getSentList(38636, 41));
 
 //console.log(await getTransferAmountByInscription('1b8e21761557bbf66c06ae3d8109764d0d8ec5d431b8291160b59ef28ffaab7ai0'));
 
