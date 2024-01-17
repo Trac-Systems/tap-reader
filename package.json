@@ -32,6 +32,7 @@
     "b4a": "^1.6.4",
     "buff-utils": "^0.0.1",
     "cheerio": "^1.0.0-rc.12",
+    "config": "^3.3.10",
     "corestore": "6.8.3",
     "crypto": "^1.0.1",
     "crypto-utils": "^0.1.3",
