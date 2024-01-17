@@ -49,5 +49,8 @@
     "secp256k1": "^5.0.0",
     "sha256": "^0.2.0",
     "socket.io": "^4.6.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0"
   }
 }
