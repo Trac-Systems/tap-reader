@@ -28,7 +28,7 @@
     "@stdlib/assert-is-hex-string": "^0.1.1",
     "async-await-mutex-lock": "^1.0.10",
     "async-key-mutex": "^0.0.4",
-    "axios": "^1.4.0",
+    "axios": "^1.6.5",
     "b4a": "^1.6.4",
     "buff-utils": "^0.0.1",
     "cheerio": "^1.0.0-rc.12",
