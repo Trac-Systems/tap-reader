@@ -1,26 +1,30 @@
 {
-  "name": "single-page-walkthrough",
-  "version": "1.0.0",
-  "description": "An introduction to the Holepunch module ecosystem",
-  "main": "index.js",
+  "name": "@trac-systems/tap-reader",
+  "version": "0.13.37",
+  "description": "decentralized trac core module",
+  "main": "src/index.mjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start":"node src/index.mjs",
     "postinstall": "patch-package"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/holepunchto/quick-start.git"
+    "url": "git+https://github.com/Trac-Systems/tap-reader.git"
   },
   "keywords": [
     "holepunch",
-    "hypercore"
+    "hypercore",
+    "tap",
+    "ordinals",
+    "indexer"
   ],
   "author": "Holepunch",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/holepunchto/quick-start/issues"
+    "url": "https://github.com/Trac-Systems/tap-reader/issues"
   },
-  "homepage": "https://github.com/holepunchto/quick-start#readme",
+  "homepage": "https://github.com/Trac-Systems/tap-reader#readme",
   "dependencies": {
     "@cmdcode/crypto-utils": "^2.2.12",
     "@cmdcode/tapscript": "1.4.0",
@@ -31,13 +35,12 @@
     "axios": "^1.6.5",
     "b4a": "^1.6.4",
     "buff-utils": "^0.0.1",
-    "cheerio": "^1.0.0-rc.12",
     "config": "^3.3.10",
     "corestore": "6.8.3",
     "crypto": "^1.0.1",
     "crypto-utils": "^0.1.3",
     "debounceify": "^1.0.0",
-    "discord.js": "^14.11.0",
+    "figlet": "^1.7.0",
     "graceful-fs": "^4.2.11",
     "graceful-goodbye": "^1.2.1",
     "hyperbee": "2.13.1",

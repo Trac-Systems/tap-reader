@@ -5,20 +5,16 @@ import goodbye from "graceful-goodbye";
 import b4a from "b4a";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import config  from 'config';
+import config from "config";
+import figlet from "figlet";
+console.log(figlet.textSync("Trac Core Reader"));
 
 let httpServer, io;
-let socket_port = config.get('websocketPort');
+let socket_port = config.get("websocketPort");
 
 process.on("uncaughtException", function (err) {
   console.log("UNCAUGHT EXCEPTION", err);
 });
-
-function newStoreSwarm(storage_location) {
-  const store = new Corestore(storage_location);
-  const swarm = new Hyperswarm();
-  return { store: store, swarm: swarm };
-}
 
 let bee = null;
 let reader_trac = null;
@@ -109,13 +105,20 @@ async function createTrac(
 }
 
 ////////////   TRAC BASE   //////////////
+const store = new Corestore("./tap-reader");
+const swarm = new Hyperswarm();
 
-const base_store_swarm = newStoreSwarm("./tap-reader");
+// const base_store_swarm = newStoreSwarm();
 
 createTrac(
-  base_store_swarm.store,
-  base_store_swarm.swarm,
-  { key: process.argv[2] ? b4a.from(process.argv[2], "hex") : b4a.from(config.get('channel'), 'hex'), sparse: true },
+  store,
+  swarm,
+  {
+    key: process.argv[2]
+      ? b4a.from(process.argv[2], "hex")
+      : b4a.from(config.get("channel"), "hex"),
+    sparse: true,
+  },
   true,
   true,
   -1,
@@ -129,11 +132,9 @@ while (bee === null) {
 reader_trac = bee;
 bee = null;
 
-
-if(config.get("enableWebsockets")) startWs();
+if (config.get("enableWebsockets")) startWs();
 
 console.log("Reader is wired up...");
-
 
 let queue = 0;
 
@@ -1014,7 +1015,7 @@ async function startWs() {
   httpServer.maxConnections = 1000;
   io = new Server(httpServer, {
     cors: {
-      origin: config.get('websocketCORS'),
+      origin: config.get("websocketCORS"),
     },
   }).listen(socket_port);
 
@@ -1595,21 +1596,6 @@ function validCmd(cmd, socket) {
   }
 
   return true;
-}
-
-function formatNumberString(string, decimals) {
-  let pos = string.length - decimals;
-
-  if (decimals == 0) {
-    // nothing
-  } else if (pos > 0) {
-    string =
-      string.substring(0, pos) + "." + string.substring(pos, string.length);
-  } else {
-    string = "0." + "0".repeat(decimals - string.length) + string;
-  }
-
-  return string;
 }
 
 function sleep(ms) {
