@@ -1412,7 +1412,7 @@ function sleep(ms) {
 }
 
 
-console.log(await getSentList(38636, 41));
+//console.log(await getSentList(38636, 41));
 
 //console.log(await getTransferAmountByInscription('1b8e21761557bbf66c06ae3d8109764d0d8ec5d431b8291160b59ef28ffaab7ai0'));
 
@@ -1420,12 +1420,12 @@ console.log(await getSentList(38636, 41));
 //console.log(await getDmtElementsList(0, 500));
 
 //console.log(await getTickerTradesList('nat'));
-/*
-let res = await getAccountTransferList('bc1p7gnye6jllrxz5f0qz4pfwypkwww5hdstnhfsppr4gz4dvpyltdys8y5gdp', 'dmt-nat');
+
+let res = await getAccountTransferList('bc1pprhs5m9fxsuxylew9f0hy6plglz48h92uzjnqt557t0rceeltd3szj98km', '-tap');
 for(let i = 0; i < res.length; i++)
 {
   console.log(res[i]);
-}*/
+}
 /*
 let res = await getAccountMintList('bc1p7gnye6jllrxz5f0qz4pfwypkwww5hdstnhfsppr4gz4dvpyltdys8y5gdp', 'dmt-nat');
 for(let i = 0; i < res.length; i++)

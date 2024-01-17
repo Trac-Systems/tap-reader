@@ -23,6 +23,8 @@
   "dependencies": {
     "@cmdcode/crypto-utils": "^2.2.12",
     "@cmdcode/tapscript": "^1.4.0",
+    "@noble/secp256k1": "^2.0.0",
+    "@stdlib/assert-is-hex-string": "^0.1.1",
     "async-await-mutex-lock": "^1.0.10",
     "async-key-mutex": "^0.0.4",
     "axios": "^1.4.0",
@@ -42,6 +44,8 @@
     "hyperdrive": "11.2.0",
     "hyperswarm": "4.5.1",
     "localdrive": "1.7.1",
+    "secp256k1": "^5.0.0",
+    "sha256": "^0.2.0",
     "socket.io": "^4.6.2"
   }
 }
