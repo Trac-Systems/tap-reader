@@ -4,7 +4,8 @@
   "description": "An introduction to the Holepunch module ecosystem",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "patch-package"
   },
   "repository": {
     "type": "git",
@@ -44,6 +45,7 @@
     "hyperdrive": "11.2.0",
     "hyperswarm": "4.5.1",
     "localdrive": "1.7.1",
+    "patch-package": "^8.0.0",
     "secp256k1": "^5.0.0",
     "sha256": "^0.2.0",
     "socket.io": "^4.6.2"
