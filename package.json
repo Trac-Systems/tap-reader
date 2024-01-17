@@ -4,7 +4,8 @@
   "description": "An introduction to the Holepunch module ecosystem",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "patch-package"
   },
   "repository": {
     "type": "git",
@@ -27,10 +28,11 @@
     "@stdlib/assert-is-hex-string": "^0.1.1",
     "async-await-mutex-lock": "^1.0.10",
     "async-key-mutex": "^0.0.4",
-    "axios": "^1.4.0",
+    "axios": "^1.6.5",
     "b4a": "^1.6.4",
     "buff-utils": "^0.0.1",
     "cheerio": "^1.0.0-rc.12",
+    "config": "^3.3.10",
     "corestore": "6.8.3",
     "crypto": "^1.0.1",
     "crypto-utils": "^0.1.3",
@@ -44,8 +46,12 @@
     "hyperdrive": "11.2.0",
     "hyperswarm": "4.5.1",
     "localdrive": "1.7.1",
+    "patch-package": "^8.0.0",
     "secp256k1": "^5.0.0",
     "sha256": "^0.2.0",
     "socket.io": "^4.6.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0"
   }
 }
