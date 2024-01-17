@@ -5,9 +5,10 @@ import goodbye from "graceful-goodbye";
 import b4a from "b4a";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import config  from 'config';
 
 let httpServer, io;
-let socket_port = 5095;
+let socket_port = config.get('websocketPort');
 
 process.on("uncaughtException", function (err) {
   console.log("UNCAUGHT EXCEPTION", err);
@@ -114,7 +115,7 @@ const base_store_swarm = newStoreSwarm("./tap-reader");
 createTrac(
   base_store_swarm.store,
   base_store_swarm.swarm,
-  { key: b4a.from(process.argv[2], "hex"), sparse: true },
+  { key: process.argv[2] ? b4a.from(process.argv[2], "hex") : b4a.from(config.get('channel'), 'hex'), sparse: true },
   true,
   true,
   -1,
@@ -128,7 +129,11 @@ while (bee === null) {
 reader_trac = bee;
 bee = null;
 
+
+if(config.get("enableWebsockets")) startWs();
+
 console.log("Reader is wired up...");
+
 
 let queue = 0;
 
@@ -1009,7 +1014,7 @@ async function startWs() {
   httpServer.maxConnections = 1000;
   io = new Server(httpServer, {
     cors: {
-      origin: "*",
+      origin: config.get('websocketCORS'),
     },
   }).listen(socket_port);
 
@@ -1592,8 +1597,6 @@ function validCmd(cmd, socket) {
   return true;
 }
 
-startWs();
-
 function formatNumberString(string, decimals) {
   let pos = string.length - decimals;
 
@@ -1622,13 +1625,13 @@ function sleep(ms) {
 
 //console.log(await getTickerTradesList('nat'));
 
-let res = await getAccountTransferList(
-  "bc1pprhs5m9fxsuxylew9f0hy6plglz48h92uzjnqt557t0rceeltd3szj98km",
-  "-tap"
-);
-for (let i = 0; i < res.length; i++) {
-  console.log(res[i]);
-}
+// let res = await getAccountTransferList(
+//   "bc1pprhs5m9fxsuxylew9f0hy6plglz48h92uzjnqt557t0rceeltd3szj98km",
+//   "-tap"
+// );
+// for (let i = 0; i < res.length; i++) {
+//   console.log(res[i]);
+// }
 /*
 let res = await getAccountMintList('bc1p7gnye6jllrxz5f0qz4pfwypkwww5hdstnhfsppr4gz4dvpyltdys8y5gdp', 'dmt-nat');
 for(let i = 0; i < res.length; i++)
