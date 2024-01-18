@@ -2,11 +2,13 @@ import Corestore from "corestore";
 import Hyperswarm from "hyperswarm";
 import Hyperbee from "hyperbee";
 import goodbye from "graceful-goodbye";
+import b4a from "b4a";
+import config from "config";
 
 // import WebsocketModule from './WebsocketModule
 export default class TracManager {
   constructor() {
-    this.store = new Corestore();
+    this.store = new Corestore("./tapstore");
     this.swarm = new Hyperswarm();
     this.bee = null;
 
@@ -23,25 +25,27 @@ export default class TracManager {
     rangeEnd = -1
   ) {
     // Initialize Corestore and Hyperswarm
-    this.initCorestore(coreSetup);
-    this.initHyperswarm(server, client);
+    this.core = this.store.get({
+      key: process.argv[2]
+        ? b4a.from(process.argv[2], "hex")
+        : b4a.from(config.get("channel"), "hex"),
+      sparse: true,
+    });
+    await this.core.ready();
+    console.log("Corestore key:", this.core.key.toString("hex"));
 
-    // Additional setup steps...
-    await this.startRangeDownload(rangeStart, rangeEnd);
+    await this.initHyperswarm(server, client);
 
+    if (rangeStart > -1) {
+      this.startRangeDownload(rangeStart, rangeEnd);
+    }
+  
     this.bee = new Hyperbee(this.core, {
       keyEncoding: "utf-8",
       valueEncoding: "utf-8",
     });
 
     await this.sleep(30 * 1000);
-  }
-
-  async initCorestore(coreSetup) {
-    this.core = this.store.get(coreSetup);
-    await this.core.ready();
-    console.log("Corestore key:", this.core.key.toString("hex"));
-    // Additional Corestore setup logic as needed
   }
 
   async initHyperswarm(server, client) {
