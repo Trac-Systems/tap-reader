@@ -8,6 +8,7 @@ import config from "config";
 // import WebsocketModule from './WebsocketModule
 export default class TracManager {
   constructor() {
+    this.isConnected = false;
     this.store = new Corestore("./tapstore");
     this.swarm = new Hyperswarm();
     this.bee = null;
@@ -31,15 +32,17 @@ export default class TracManager {
         : b4a.from(config.get("channel"), "hex"),
       sparse: true,
     });
-    await this.core.ready();
+
     console.log("Corestore key:", this.core.key.toString("hex"));
 
+    await this.core.ready();
     await this.initHyperswarm(server, client);
 
     if (rangeStart > -1) {
+      // TODO: is this needed?
       this.startRangeDownload(rangeStart, rangeEnd);
     }
-  
+
     this.bee = new Hyperbee(this.core, {
       keyEncoding: "utf-8",
       valueEncoding: "utf-8",
@@ -47,19 +50,9 @@ export default class TracManager {
 
     await this.sleep(30 * 1000);
   }
-
   async initHyperswarm(server, client) {
-    const discovery = this.swarm.join(this.core.discoveryKey, {
-      server: server,
-      client: client,
-    });
-
-    await discovery.flushed();
-    const foundPeers = this.store.findingPeers();
-    await this.swarm.flush();
-    await foundPeers();
-
     this.swarm.on("connection", (connection) => {
+      this.isConnected = true;
       console.log(
         "Connected to peer:",
         connection.remotePublicKey.toString("hex")
@@ -79,8 +72,16 @@ export default class TracManager {
         )
       );
     });
-  }
 
+    const discovery = this.swarm.join(this.core.discoveryKey, {
+      server: server,
+      client: client,
+    });
+    await discovery.flushed();
+    const foundPeers = this.store.findingPeers();
+    await this.swarm.flush();
+    await foundPeers();
+  }
   async startRangeDownload(start, end) {
     console.log("Starting chunk download. Core length:", this.core.length);
 
@@ -109,7 +110,6 @@ export default class TracManager {
       this.startRangeDownload(start, end);
     }
   }
-
   sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
