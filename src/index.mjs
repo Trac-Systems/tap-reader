@@ -100,7 +100,6 @@ async function createTrac(
   });
 
   await sleep(30 * 1000);
-
   bee = _bee;
 }
 
