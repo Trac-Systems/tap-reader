@@ -4,6 +4,7 @@ import Hyperbee from "hyperbee";
 import goodbye from "graceful-goodbye";
 import b4a from "b4a";
 import config from "config";
+import figlet from "figlet";
 
 // import WebsocketModule from './WebsocketModule
 export default class TracManager {
@@ -26,6 +27,8 @@ export default class TracManager {
     rangeEnd = -1
   ) {
     // Initialize Corestore and Hyperswarm
+    console.log(figlet.textSync("Trac Core Reader"));
+    
     this.core = this.store.get({
       key: process.argv[2]
         ? b4a.from(process.argv[2], "hex")
