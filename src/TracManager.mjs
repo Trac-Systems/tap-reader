@@ -2,9 +2,10 @@ import Corestore from "corestore";
 import Hyperswarm from "hyperswarm";
 import Hyperbee from "hyperbee";
 import goodbye from "graceful-goodbye";
-import b4a from "b4a";
+// import b4a from "b4a";
 import config from "config";
 import figlet from "figlet";
+import WebsocketModule from "./WebsocketModule.mjs";
 
 // import WebsocketModule from './WebsocketModule
 export default class TracManager {
@@ -30,8 +31,8 @@ export default class TracManager {
 
     this.core = this.store.get({
       key: process.argv[2]
-        ? b4a.from(process.argv[2], "hex")
-        : b4a.from(config.get("channel"), "hex"),
+        ? Buffer.from(process.argv[2], "hex")
+        : Buffer.from(config.get("channel"), "hex"),
       sparse: true,
     });
 
@@ -50,7 +51,14 @@ export default class TracManager {
       valueEncoding: "utf-8",
     });
 
-    await this.sleep(30 * 1000);
+    await this.bee.ready();
+
+    if(config.get('enableWebsockets')){
+      console.log('Enabling websocket');
+      this.websocketServer = new WebsocketModule(this)
+    }
+
+    // await this.sleep(30 * 1000);
   }
   async initHyperswarm(server, client) {
     this.swarm.on("connection", (connection) => {
