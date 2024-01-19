@@ -29,70 +29,70 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getDeployments(cmd.args[0], cmd.args[1]);
+                  result = await this.tracManager.tapProtocol.getDeployments(cmd.args[0], cmd.args[1]);
                   break;
                 case "deployment":
                   if (cmd.args.length != 1) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getDeployment(cmd.args[0]);
+                  result = await this.tracManager.tapProtocol.getDeployment(cmd.args[0]);
                   break;
                 case "deploymentsLength":
                   if (cmd.args.length != 0) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getDeploymentsLength();
+                  result = await this.tracManager.tapProtocol.getDeploymentsLength();
                   break;
                 case "mintTokensLeft":
                   if (cmd.args.length != 1) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getMintTokensLeft(cmd.args[0]);
+                  result = await this.tracManager.tapProtocol.getMintTokensLeft(cmd.args[0]);
                   break;
                 case "balance":
                   if (cmd.args.length != 2) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getBalance(cmd.args[0], cmd.args[1]);
+                  result = await this.tracManager.tapProtocol.getBalance(cmd.args[0], cmd.args[1]);
                   break;
                 case "transferable":
                   if (cmd.args.length != 2) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTransferable(cmd.args[0], cmd.args[1]);
+                  result = await this.tracManager.tapProtocol.getTransferable(cmd.args[0], cmd.args[1]);
                   break;
                 case "holdersLength":
                   if (cmd.args.length != 1) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getHoldersLength(cmd.args[0]);
+                  result = await this.tracManager.tapProtocol.getHoldersLength(cmd.args[0]);
                   break;
                 case "holders":
                   if (cmd.args.length != 3) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getHolders(cmd.args[0], cmd.args[1], cmd.args[2]);
+                  result = await this.tracManager.tapProtocol.getHolders(cmd.args[0], cmd.args[1], cmd.args[2]);
                   break;
                 case "accountTokensLength":
                   if (cmd.args.length != 1) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountTokensLength(cmd.args[0]);
+                  result = await this.tracManager.tapProtocol.getAccountTokensLength(cmd.args[0]);
                   break;
                 case "accountTokens":
                   if (cmd.args.length != 3) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountTokens(
+                  result = await this.tracManager.tapProtocol.getAccountTokens(
                     cmd.args[0],
                     cmd.args[1],
                     cmd.args[2]
@@ -103,7 +103,7 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountMintList(
+                  result = await this.tracManager.tapProtocol.getAccountMintList(
                     cmd.args[0],
                     cmd.args[1],
                     cmd.args[2],
@@ -115,14 +115,14 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountMintListLength(cmd.args[0], cmd.args[1]);
+                  result = await this.tracManager.tapProtocol.getAccountMintListLength(cmd.args[0], cmd.args[1]);
                   break;
                 case "tickerMintList":
                   if (cmd.args.length != 3) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTickerMintList(
+                  result = await this.tracManager.tapProtocol.getTickerMintList(
                     cmd.args[0],
                     cmd.args[1],
                     cmd.args[2]
@@ -133,28 +133,28 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTickerMintListLength(cmd.args[0]);
+                  result = await this.tracManager.tapProtocol.getTickerMintListLength(cmd.args[0]);
                   break;
                 case "mintList":
                   if (cmd.args.length != 2) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getMintList(cmd.args[0], cmd.args[1]);
+                  result = await this.tracManager.tapProtocol.getMintList(cmd.args[0], cmd.args[1]);
                   break;
                 case "mintListLength":
                   if (cmd.args.length != 0) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getMintListLength();
+                  result = await this.tracManager.tapProtocol.getMintListLength();
                   break;
                 case "accountTransferList":
                   if (cmd.args.length != 4) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountTransferList(
+                  result = await this.tracManager.tapProtocol.getAccountTransferList(
                     cmd.args[0],
                     cmd.args[1],
                     cmd.args[2],
@@ -166,7 +166,7 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountTransferListLength(
+                  result = await this.tracManager.tapProtocol.getAccountTransferListLength(
                     cmd.args[0],
                     cmd.args[1]
                   );
@@ -176,7 +176,7 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTickerTransferList(
+                  result = await this.tracManager.tapProtocol.getTickerTransferList(
                     cmd.args[0],
                     cmd.args[1],
                     cmd.args[2]
@@ -187,28 +187,28 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTickerTransferListLength(cmd.args[0]);
+                  result = await this.tracManager.tapProtocol.getTickerTransferListLength(cmd.args[0]);
                   break;
                 case "transferList":
                   if (cmd.args.length != 2) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTransferList(cmd.args[0], cmd.args[1]);
+                  result = await this.tracManager.tapProtocol.getTransferList(cmd.args[0], cmd.args[1]);
                   break;
                 case "transferListLength":
                   if (cmd.args.length != 0) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTransferListLength();
+                  result = await this.tracManager.tapProtocol.getTransferListLength();
                   break;
                 case "accountSentList":
                   if (cmd.args.length != 4) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountSentList(
+                  result = await this.tracManager.tapProtocol.getAccountSentList(
                     cmd.args[0],
                     cmd.args[1],
                     cmd.args[2],
@@ -220,14 +220,14 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountSentListLength(cmd.args[0], cmd.args[1]);
+                  result = await this.tracManager.tapProtocol.getAccountSentListLength(cmd.args[0], cmd.args[1]);
                   break;
                 case "tickerSentList":
                   if (cmd.args.length != 3) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTickerSentList(
+                  result = await this.tracManager.tapProtocol.getTickerSentList(
                     cmd.args[0],
                     cmd.args[1],
                     cmd.args[2]
@@ -238,28 +238,28 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTickerSentListLength(cmd.args[0]);
+                  result = await this.tracManager.tapProtocol.getTickerSentListLength(cmd.args[0]);
                   break;
                 case "sentList":
                   if (cmd.args.length != 2) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getSentList(cmd.args[0], cmd.args[1]);
+                  result = await this.tracManager.tapProtocol.getSentList(cmd.args[0], cmd.args[1]);
                   break;
                 case "sentListLength":
                   if (cmd.args.length != 0) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getSentListLength();
+                  result = await this.tracManager.tapProtocol.getSentListLength();
                   break;
                 case "accountReceiveList":
                   if (cmd.args.length != 4) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountReceiveList(
+                  result = await this.tracManager.tapProtocol.getAccountReceiveList(
                     cmd.args[0],
                     cmd.args[1],
                     cmd.args[2],
@@ -271,7 +271,7 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountReceiveListLength(
+                  result = await this.tracManager.tapProtocol.getAccountReceiveListLength(
                     cmd.args[0],
                     cmd.args[1]
                   );
@@ -281,14 +281,14 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccumulator(cmd.args[0]);
+                  result = await this.tracManager.tapProtocol.getAccumulator(cmd.args[0]);
                   break;
                 case "accountAccumulatorList":
                   if (cmd.args.length != 3) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountAccumulatorList(
+                  result = await this.tracManager.tapProtocol.getAccountAccumulatorList(
                     cmd.args[0],
                     cmd.args[1],
                     cmd.args[2]
@@ -299,28 +299,28 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountAccumulatorListLength(cmd.args[0]);
+                  result = await this.tracManager.tapProtocol.getAccountAccumulatorListLength(cmd.args[0]);
                   break;
                 case "accumulatorList":
                   if (cmd.args.length != 2) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccumulatorList(cmd.args[0], cmd.args[1]);
+                  result = await this.tracManager.tapProtocol.getAccumulatorList(cmd.args[0], cmd.args[1]);
                   break;
                 case "getAccumulatorListLength":
                   if (cmd.args.length != 0) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccumulatorListLength();
+                  result = await this.tracManager.tapProtocol.getAccumulatorListLength();
                   break;
                 case "accountTradesList":
                   if (cmd.args.length != 4) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountTradesList(
+                  result = await this.tracManager.tapProtocol.getAccountTradesList(
                     cmd.args[0],
                     cmd.args[1],
                     cmd.args[2],
@@ -332,14 +332,14 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountTradesListLength(cmd.args[0], cmd.args[1]);
+                  result = await this.tracManager.tapProtocol.getAccountTradesListLength(cmd.args[0], cmd.args[1]);
                   break;
                 case "tickerTradesList":
                   if (cmd.args.length != 3) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTickerTradesList(
+                  result = await this.tracManager.tapProtocol.getTickerTradesList(
                     cmd.args[0],
                     cmd.args[2],
                     cmd.args[3]
@@ -350,28 +350,28 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTickerTradesListLength(cmd.args[0]);
+                  result = await this.tracManager.tapProtocol.getTickerTradesListLength(cmd.args[0]);
                   break;
                 case "tradesList":
                   if (cmd.args.length != 2) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTradesList(cmd.args[0], cmd.args[1]);
+                  result = await this.tracManager.tapProtocol.getTradesList(cmd.args[0], cmd.args[1]);
                   break;
                 case "tradesListLength":
                   if (cmd.args.length != 0) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTradesListLength();
+                  result = await this.tracManager.tapProtocol.getTradesListLength();
                   break;
                 case "accountReceiveTradesFilledList":
                   if (cmd.args.length != 4) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountReceiveTradesFilledList(
+                  result = await this.tracManager.tapProtocol.getAccountReceiveTradesFilledList(
                     cmd.args[0],
                     cmd.args[1],
                     cmd.args[2],
@@ -383,7 +383,7 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountReceiveTradesFilledListLength(
+                  result = await this.tracManager.tapProtocol.getAccountReceiveTradesFilledListLength(
                     cmd.args[0],
                     cmd.args[1]
                   );
@@ -393,7 +393,7 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountTradesFilledList(
+                  result = await this.tracManager.tapProtocol.getAccountTradesFilledList(
                     cmd.args[0],
                     cmd.args[1],
                     cmd.args[2],
@@ -405,7 +405,7 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountTradesFilledListLength(
+                  result = await this.tracManager.tapProtocol.getAccountTradesFilledListLength(
                     cmd.args[0],
                     cmd.args[1]
                   );
@@ -415,7 +415,7 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTickerTradesFilledList(
+                  result = await this.tracManager.tapProtocol.getTickerTradesFilledList(
                     cmd.args[0],
                     cmd.args[2],
                     cmd.args[3]
@@ -426,35 +426,35 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTickerTradesFilledListLength(cmd.args[0]);
+                  result = await this.tracManager.tapProtocol.getTickerTradesFilledListLength(cmd.args[0]);
                   break;
                 case "tradesFilledList":
                   if (cmd.args.length != 2) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTradesFilledList(cmd.args[0], cmd.args[1]);
+                  result = await this.tracManager.tapProtocol.getTradesFilledList(cmd.args[0], cmd.args[1]);
                   break;
                 case "tradesFilledListLength":
                   if (cmd.args.length != 0) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTradesFilledListLength();
+                  result = await this.tracManager.tapProtocol.getTradesFilledListLength();
                   break;
                 case "trade":
                   if (cmd.args.length != 1) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTrade(cmd.args[0]);
+                  result = await this.tracManager.tapProtocol.getTrade(cmd.args[0]);
                   break;
                 case "accountAuthList":
                   if (cmd.args.length != 3) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountAuthList(
+                  result = await this.tracManager.tapProtocol.getAccountAuthList(
                     cmd.args[0],
                     cmd.args[1],
                     cmd.args[2]
@@ -465,28 +465,28 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountAuthListLength(cmd.args[0]);
+                  result = await this.tracManager.tapProtocol.getAccountAuthListLength(cmd.args[0]);
                   break;
                 case "authList":
                   if (cmd.args.length != 2) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAuthList(cmd.args[0], cmd.args[1]);
+                  result = await this.tracManager.tapProtocol.getAuthList(cmd.args[0], cmd.args[1]);
                   break;
                 case "authListLength":
                   if (cmd.args.length != 0) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAuthListLength();
+                  result = await this.tracManager.tapProtocol.getAuthListLength();
                   break;
                 case "accountRedeemList":
                   if (cmd.args.length != 3) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountRedeemList(
+                  result = await this.tracManager.tapProtocol.getAccountRedeemList(
                     cmd.args[0],
                     cmd.args[1],
                     cmd.args[2]
@@ -497,56 +497,56 @@ export default class WebsocketModule{
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAccountRedeemListLength(cmd.args[0]);
+                  result = await this.tracManager.tapProtocol.getAccountRedeemListLength(cmd.args[0]);
                   break;
                 case "redeemList":
                   if (cmd.args.length != 2) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getRedeemList(cmd.args[0], cmd.args[1]);
+                  result = await this.tracManager.tapProtocol.getRedeemList(cmd.args[0], cmd.args[1]);
                   break;
                 case "redeemListLength":
                   if (cmd.args.length != 0) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getRedeemListLength();
+                  result = await this.tracManager.tapProtocol.getRedeemListLength();
                   break;
                 case "authHashExists":
                   if (cmd.args.length != 1) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAuthHashExists(cmd.args[0]);
+                  result = await this.tracManager.tapProtocol.getAuthHashExists(cmd.args[0]);
                   break;
                 case "authCancelled":
                   if (cmd.args.length != 1) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getAuthCancelled(cmd.args[0]);
+                  result = await this.tracManager.tapProtocol.getAuthCancelled(cmd.args[0]);
                   break;
                 case "dmtElementsList":
                   if (cmd.args.length != 2) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getDmtElementsList(cmd.args[0], cmd.args[1]);
+                  result = await this.tracManager.tapProtocol.getDmtElementsList(cmd.args[0], cmd.args[1]);
                   break;
                 case "dmtElementsListLength":
                   if (cmd.args.length != 0) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getDmtElementsListLength();
+                  result = await this.tracManager.tapProtocol.getDmtElementsListLength();
                   break;
                 case "transferAmountByInscription":
                   if (cmd.args.length != 1) {
                     this.invalidCmd(cmd, socket);
                     return;
                   }
-                  result = await getTransferAmountByInscription(cmd.args[0]);
+                  result = await this.tracManager.tapProtocol.getTransferAmountByInscription(cmd.args[0]);
                   break;
               }
             } catch (e) {

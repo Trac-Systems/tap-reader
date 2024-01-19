@@ -3,6 +3,14 @@ export default class TapProtocol {
     this.tracManager = tracManager;
   }
 
+  async getTransferAmountByInscription(inscription_id) {
+    let amount = await this.tracManager.bee.get("tamt/" + inscription_id);
+    if (amount !== null) {
+      return amount.value;
+    }
+    return null;
+  }
+  
   async getListRecords(length_key, iterator_key, offset, max, return_json) {
     // const queue_result = await enter_queue();
     // if (queue_result !== "") {

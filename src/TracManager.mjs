@@ -6,6 +6,7 @@ import goodbye from "graceful-goodbye";
 import config from "config";
 import figlet from "figlet";
 import WebsocketModule from "./WebsocketModule.mjs";
+import TapProtocol from "./TapProtocol.mjs";
 
 // import WebsocketModule from './WebsocketModule
 export default class TracManager {
@@ -14,6 +15,7 @@ export default class TracManager {
     this.store = new Corestore("./tapstore");
     this.swarm = new Hyperswarm();
     this.bee = null;
+    this.tapProtocol = new TapProtocol(this);
 
     goodbye(() => {
       this.swarm.destroy();
