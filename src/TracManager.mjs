@@ -14,11 +14,10 @@ export default class TracManager {
     this.swarm = new Hyperswarm();
     this.bee = null;
 
-    goodbye(function () {
+    goodbye(() => {
       this.swarm.destroy();
     });
   }
-
   async initReader(
     coreSetup,
     server = true,
@@ -28,7 +27,7 @@ export default class TracManager {
   ) {
     // Initialize Corestore and Hyperswarm
     console.log(figlet.textSync("TAP Protocol Reader"));
-    
+
     this.core = this.store.get({
       key: process.argv[2]
         ? b4a.from(process.argv[2], "hex")
