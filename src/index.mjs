@@ -7,7 +7,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import config from "config";
 import figlet from "figlet";
-console.log(figlet.textSync("Trac Core Reader"));
+console.log(figlet.textSync("TAP Protocol Reader"));
 
 let httpServer, io;
 let socket_port = config.get("websocketPort");

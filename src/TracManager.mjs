@@ -27,7 +27,7 @@ export default class TracManager {
     rangeEnd = -1
   ) {
     // Initialize Corestore and Hyperswarm
-    console.log(figlet.textSync("Trac Core Reader"));
+    console.log(figlet.textSync("TAP Protocol Reader"));
     
     this.core = this.store.get({
       key: process.argv[2]
