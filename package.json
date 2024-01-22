@@ -2,7 +2,7 @@
   "name": "@trac-systems/tap-reader",
   "version": "0.13.37",
   "description": "decentralized trac core module",
-  "main": "src/index.mjs",
+  "main": "src/main.mjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start":"node src/main.mjs",

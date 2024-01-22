@@ -5,7 +5,7 @@
 ```bash
 npm start 
 # or
-node src/index.mjs [channel]
+node src/main.mjs [channel]
 # channel pubkey parameter is optional, uses config/default.json 
 ```
 
