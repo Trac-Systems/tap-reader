@@ -18,6 +18,10 @@ export default class TracManager {
    * Creates an instance of TracManager.
    * Sets up Corestore and Hyperswarm and prepares for data synchronization.
    */
+  /**
+   * @property {TapProtocol} tapProtocol - Instance of TapProtocol to manage TAP interactions and data streams.
+   */
+  tapProtocol;
   constructor() {
     this.isConnected = false;
     this.store = new Corestore("./tapstore");
