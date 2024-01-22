@@ -2,5 +2,5 @@
     "enableWebsockets": true,
     "websocketPort": 5095,
     "websocketCORS": "*",
-    "channel": "729c91276e20b8e270ea589ac437f24e6c7c66c969b4acfe99bd82faab391e68"
+    "channel": "53d2e64fa7a09e9dc74fc52ee9e9feb9d59b3e2cff4a25dfb543ec3b0bf4b281"
 }
