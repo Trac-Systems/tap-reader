@@ -1,17 +1,36 @@
 # Trac Core Tap-Reader
 
-## Instructions
+## API Usage
 
-```bash
-npm start 
-# or
-node src/main.mjs [channel]
-# channel pubkey parameter is optional, uses config/default.json 
+```js
+import TracManager from "./TracManager.mjs";
+
+// Create an instance of TracManager
+let tracCore = new TracManager();
+
+// Initialize the reader for the TAP Protocol
+await tracCore.initReader(true, true, -1, -1);
+
+// Example: Retrieve transfer amount by inscription
+let amount = await tracCore.tapProtocol.getTransferAmountByInscription('1b8e21761557bbf66c06ae3d8109764d0d8ec5d431b8291160b59ef28ffaab7ai0');
+
 ```
 
-> Channel "53d2e64fa7a09e9dc74fc52ee9e9feb9d59b3e2cff4a25dfb543ec3b0bf4b281" is the currently active one for TAP Protocol.
+## Configuration File
+> Defaults to ./config/default.json file, enabling websocket server if needed.
 
-## Note
+```json
+{
+    "enableWebsockets": true,
+    "websocketPort": 5095,
+    "websocketCORS": "*",
+    "channel": "53d2e64fa7a09e9dc74fc52ee9e9feb9d59b3e2cff4a25dfb543ec3b0bf4b281"
+}
+```
+
+> Distributed Data Channel "53d2e64fa7a09e9dc74fc52ee9e9feb9d59b3e2cff4a25dfb543ec3b0bf4b281" is the currently active one for TAP Protocol.  
+
+## Important note
 
 Installing with `npm i` triggers the postinstall script, which patches hypercore library.
 
