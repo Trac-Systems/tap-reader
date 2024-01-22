@@ -6,6 +6,7 @@ import goodbye from "graceful-goodbye";
 import config from "config";
 import figlet from "figlet";
 import WebsocketModule from "./WebsocketModule.mjs";
+import RestModule from "./RestModule.mjs";
 import TapProtocol from "./TapProtocol.mjs";
 
 /**
@@ -79,6 +80,12 @@ export default class TracManager {
     if (config.get("enableWebsockets")) {
       console.log("Enabling websocket");
       this.websocketServer = new WebsocketModule(this);
+    }
+
+    if(config.get("enableRest")) {
+      console.log('Enabling REST endpoint');
+      this.restServer = new RestModule(this);
+      this.restServer.start();
     }
 
     // await this.sleep(30 * 1000);

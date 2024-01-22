@@ -1,5 +1,5 @@
 {
-    "enableREST": true,
+    "enableRest": true,
     "restPort": 5099,
     "enableWebsockets": true,
     "websocketPort": 5095,
