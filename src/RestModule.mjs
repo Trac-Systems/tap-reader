@@ -21,6 +21,28 @@ export default class RestModule {
     initializeRoutes() {
         this.fastify.get(
             "/getTransferAmountByInscription/:inscription_id",
+            {
+                schema: {
+                    description: 'Get transfer amount by inscription ID',
+                    tags: ['Transfers'],
+                    summary: 'Retrieve transfer amount for a given inscription ID',
+                    params: {
+                        type: 'object',
+                        properties: {
+                            inscription_id: { type: 'string' }
+                        }
+                    },
+                    response: {
+                        200: {
+                            description: 'Successful response',
+                            type: 'object',
+                            properties: {
+                                result: { type: 'string' }
+                            }
+                        }
+                    }
+                }
+            },
             async (request, reply) => {
                 // /getTransferAmountByInscription/1b8e21761557bbf66c06ae3d8109764d0d8ec5d431b8291160b59ef28ffaab7ai0
                 try {
