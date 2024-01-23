@@ -101,7 +101,7 @@ export default class RestModule {
                 {
                     schema: {
                         description: "Get the length of deployments",
-                        tags: ["TracManager"],
+                        tags: ["Lengths"],
                         response: {
                             200: {
                                 type: "object",
@@ -139,7 +139,7 @@ export default class RestModule {
                 {
                     schema: {
                         description: "Get a list of deployments",
-                        tags: ["TracManager"],
+                        // tags: ["TracManager"],
                         querystring: {
                             type: "object",
                             properties: {
@@ -454,6 +454,24 @@ export default class RestModule {
                     }
                 }
             );
+
+            fastify.get("/getTickerMintListLength/:ticker", async (request, reply) => {
+                // /getTickerMintListLength/gib
+                try {
+                    const result =
+                        await this.tracManager.tapProtocol.getTickerMintListLength(
+                            request.params.ticker
+                        );
+                    reply.send({ result });
+                    /*
+                                {
+                                    "result": "0"
+                                }
+                            */
+                } catch (e) {
+                    reply.status(500).send({ error: "Internal Server Error" });
+                }
+            });
 
             done();
         });
