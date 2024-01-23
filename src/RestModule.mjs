@@ -35,6 +35,20 @@ export default class RestModule {
             }
         });
 
+        this.fastify.get('/getDeploymentsLength', async (request, reply) => {
+            try {
+                const result = await this.tracManager.tapProtocol.getDeploymentsLength();
+                reply.send({ result });
+                /*
+                    {
+                        "result": 14881
+                    }
+                */
+            } catch (e) {
+                reply.status(500).send({ error: 'Internal Server Error' });
+            }
+        });
+
         this.fastify.get('/getDeployments', async (request, reply) => {
             // getDeployments/?offset=0&max=2
             try {
