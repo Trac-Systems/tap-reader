@@ -266,7 +266,6 @@ export default class TapProtocol {
    * @param {string} ticker - The ticker of the token.
    * @returns {Promise<number>} A promise that resolves with the length of the mint list.
    */
-
   async getTickerMintListLength(ticker) {
     return this.getLength("fml/" + JSON.stringify(ticker.toLowerCase()));
   }
