@@ -22,8 +22,10 @@
     "ordinals",
     "indexer"
   ],
-  "author": "Holepunch",
-  "license": "MIT",
+  "jest": {
+    "transform": {}
+  },
+  "license": "WTFPL",
   "bugs": {
     "url": "https://github.com/Trac-Systems/tap-reader/issues"
   },
@@ -36,7 +38,6 @@
     "async-await-mutex-lock": "^1.0.10",
     "async-key-mutex": "^0.0.4",
     "axios": "^1.6.5",
-    "b4a": "^1.6.4",
     "buff-utils": "^0.0.1",
     "config": "^3.3.10",
     "corestore": "6.8.3",
@@ -59,7 +60,9 @@
     "socket.io": "^4.6.2"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "eslint": "^8.56.0",
+    "jest": "^29.7.0",
     "jsdoc-to-markdown": "^8.0.0"
   }
 }

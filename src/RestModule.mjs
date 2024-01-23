@@ -7,6 +7,10 @@ export default class RestModule {
     * @property {TracManager} tracManager - Instance of TracManager
     */
     tracManager;
+    /**
+    * @property {Fastify} fastify - Instance of Fastify
+    */
+    fastify;
     constructor(tracManager) {
         this.tracManager = tracManager;
         this.fastify = Fastify({ logger: false });
@@ -15,8 +19,24 @@ export default class RestModule {
     }
 
     initializeRoutes() {
-        // Define all your routes here
-        this.fastify.get('/getDeployments/', async (request, reply) => {
+
+        this.fastify.get('/getTransferAmountByInscription/:inscription_id', async (request, reply) => {
+            // getTransferAmountByInscription/1b8e21761557bbf66c06ae3d8109764d0d8ec5d431b8291160b59ef28ffaab7ai0
+            try {
+                const result = await this.tracManager.tapProtocol.getTransferAmountByInscription(request.params.inscription_id);
+                reply.send({ result });
+                /*
+                    {
+                        "result": "10000000000"
+                    }
+                */
+            } catch (e) {
+                reply.status(500).send({ error: 'Internal Server Error' });
+            }
+        });
+
+        this.fastify.get('/getDeployments', async (request, reply) => {
+            // getDeployments/?offset=0&max=2
             try {
                 let { offset, max } = request.query;
                 offset = offset ? offset : 0;
@@ -99,8 +119,72 @@ export default class RestModule {
                     max
                 );
                 reply.send({ result });
+                /*
+                    {
+                        "result": [
+                            "gib"
+                        ]
+                    }
+                */
             } catch (e) {
                 console.error(e)
+                reply.status(500).send({ error: 'Internal Server Error' });
+            }
+        });
+
+        this.fastify.get('/getDmtElementsList', async (request, reply) => {
+            try {
+                let { offset, max } = request.query;
+                offset = offset ? offset : 0; max = max ? max : 500;
+                const result = await this.tracManager.tapProtocol.getDmtElementsList(
+                    offset,
+                    max
+                );
+                reply.send({ result });
+                /*
+                    {
+                        "result": [
+                            {
+                                "tick": "dmt",
+                                "blck": 817706,
+                                "tx": "63b5bd2e28c043c4812981718e65d202ab8f68c0f6a1834d9ebea49d8fac7e62",
+                                "ins": "63b5bd2e28c043c4812981718e65d202ab8f68c0f6a1834d9ebea49d8fac7e62i0",
+                                "num": 42405438,
+                                "ts": 1700512915,
+                                "addr": "bc1qxz9nmfg3czfpm6ml025xfsuwx7sa8nlslpwa4f",
+                                "pat": null,
+                                "fld": 11
+                            },
+                            {
+                                "tick": "love",
+                                "blck": 818010,
+                                "tx": "baee41cfce1c66397a0e9c6fcfd9afa196b0a9299471f54d4a5e16918c8a1cb5",
+                                "ins": "baee41cfce1c66397a0e9c6fcfd9afa196b0a9299471f54d4a5e16918c8a1cb5i0",
+                                "num": 42972363,
+                                "ts": 1700688957,
+                                "addr": "bc1pcdt0fre9gne6x0mcy2q627trjrhdd992v0j8dx0ddz7z53y4xqkq0z69mv",
+                                "pat": "1314",
+                                "fld": 11
+                            },
+
+                */
+            } catch (e) {
+                reply.status(500).send({ error: 'Internal Server Error' });
+            }
+        });
+
+        this.fastify.get('/getTickerMintList/:address/:ticker', async (request, reply) => {
+            try {
+                let { offset, max } = request.query;
+                offset = offset ? offset : 0; max = max ? max : 500;
+                const result = await this.tracManager.tapProtocol.getTickerMintList(
+                    request.params.address,
+                    request.params.ticker,
+                    offset,
+                    max
+                );
+                reply.send({ result });
+            } catch (e) {
                 reply.status(500).send({ error: 'Internal Server Error' });
             }
         });
