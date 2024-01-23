@@ -1,15 +1,15 @@
 import config from "config";
-import Fastify from 'fastify';
+import Fastify from "fastify";
 import TracManager from "./TracManager.mjs";
 
 export default class RestModule {
     /**
-    * @property {TracManager} tracManager - Instance of TracManager
-    */
+     * @property {TracManager} tracManager - Instance of TracManager
+     */
     tracManager;
     /**
-    * @property {Fastify} fastify - Instance of Fastify
-    */
+     * @property {Fastify} fastify - Instance of Fastify
+     */
     fastify;
     constructor(tracManager) {
         this.tracManager = tracManager;
@@ -19,25 +19,31 @@ export default class RestModule {
     }
 
     initializeRoutes() {
-
-        this.fastify.get('/getTransferAmountByInscription/:inscription_id', async (request, reply) => {
-            // getTransferAmountByInscription/1b8e21761557bbf66c06ae3d8109764d0d8ec5d431b8291160b59ef28ffaab7ai0
-            try {
-                const result = await this.tracManager.tapProtocol.getTransferAmountByInscription(request.params.inscription_id);
-                reply.send({ result });
-                /*
-                    {
-                        "result": "10000000000"
-                    }
-                */
-            } catch (e) {
-                reply.status(500).send({ error: 'Internal Server Error' });
+        this.fastify.get(
+            "/getTransferAmountByInscription/:inscription_id",
+            async (request, reply) => {
+                // /getTransferAmountByInscription/1b8e21761557bbf66c06ae3d8109764d0d8ec5d431b8291160b59ef28ffaab7ai0
+                try {
+                    const result =
+                        await this.tracManager.tapProtocol.getTransferAmountByInscription(
+                            request.params.inscription_id
+                        );
+                    reply.send({ result });
+                    /*
+                          {
+                              "result": "10000000000"
+                          }
+                      */
+                } catch (e) {
+                    reply.status(500).send({ error: "Internal Server Error" });
+                }
             }
-        });
+        );
 
-        this.fastify.get('/getDeploymentsLength', async (request, reply) => {
+        this.fastify.get("/getDeploymentsLength", async (request, reply) => {
             try {
-                const result = await this.tracManager.tapProtocol.getDeploymentsLength();
+                const result =
+                    await this.tracManager.tapProtocol.getDeploymentsLength();
                 reply.send({ result });
                 /*
                     {
@@ -45,12 +51,12 @@ export default class RestModule {
                     }
                 */
             } catch (e) {
-                reply.status(500).send({ error: 'Internal Server Error' });
+                reply.status(500).send({ error: "Internal Server Error" });
             }
         });
 
-        this.fastify.get('/getDeployments', async (request, reply) => {
-            // getDeployments/?offset=0&max=2
+        this.fastify.get("/getDeployments", async (request, reply) => {
+            // /getDeployments/?offset=0&max=2
             try {
                 let { offset, max } = request.query;
                 offset = offset ? offset : 0;
@@ -83,14 +89,83 @@ export default class RestModule {
                             },
                 */
             } catch (e) {
-                reply.status(500).send({ error: 'Internal Server Error' });
+                reply.status(500).send({ error: "Internal Server Error" });
             }
         });
 
-        this.fastify.get('/getHolders/:ticker', async (request, reply) => {
+        this.fastify.get("/getDeployment/:ticker", async (request, reply) => {
+            // /getDeployment/gib
+            try {
+                const result = await this.tracManager.tapProtocol.getDeployment(
+                    request.params.ticker
+                );
+                reply.send({ result });
+                /*
+                    {
+                        "result": {
+                            "tick": "gib",
+                            "max": "666111888000000000000000000",
+                            "lim": "666111888000000000000000000",
+                            "dec": 18,
+                            "blck": 808111,
+                            "tx": "c2eec0b30a242605c156408d7bff8081acf5fb0d5afd7937eacfeda41bddd07b",
+                            "ins": "c2eec0b30a242605c156408d7bff8081acf5fb0d5afd7937eacfeda41bddd07bi0",
+                            "num": 32519992,
+                            "ts": 1694944888,
+                            "addr": "bc1ph7qm5zpwr29v0dyh4v2rhs44gdftfr0mz54gln44g5s0wq9hnmhqeszaea",
+                            "crsd": false,
+                            "dmt": false,
+                            "elem": null,
+                            "prj": null,
+                            "dim": null,
+                            "dt": null
+                        }
+                    }
+                */
+            } catch (e) {
+                reply.status(500).send({ error: "Internal Server Error" });
+            }
+        });
+
+        this.fastify.get("/getMintTokensLeft/:ticker", async (request, reply) => {
+            // /getMintTokensLeft/gib
+            try {
+                const result = await this.tracManager.tapProtocol.getMintTokensLeft(
+                    request.params.ticker
+                );
+                reply.send({ result });
+                /*
+                    {
+                        "result": "0"
+                    }
+                */
+            } catch (e) {
+                reply.status(500).send({ error: "Internal Server Error" });
+            }
+        });
+
+        this.fastify.get("/getBalance/:address/:ticker", async (request, reply) => {
+            // /getBalance/bc1pccu8444ay68zltcdjzrdelpnf26us7ywg9pvwl7nkrjgrkz8rlvqe6f880/gib
+            try {
+                const result = await this.tracManager.tapProtocol.getBalance(
+                    request.params.address,
+                    request.params.ticker
+                );
+                reply.send({ result });
+                /*
+                    {
+                        "result": "261000000000000000000"
+                    }
+                */
+            } catch (e) {
+                reply.status(500).send({ error: "Internal Server Error" });
+            }
+        });
+
+        this.fastify.get("/getHolders/:ticker", async (request, reply) => {
             try {
                 let { offset, max } = request.query;
-                offset = offset ? offset : 0; 
+                offset = offset ? offset : 0;
                 max = max ? max : 100;
                 const result = await this.tracManager.tapProtocol.getHolders(
                     request.params.ticker,
@@ -116,17 +191,20 @@ export default class RestModule {
                                 "balance": "3509000000000000000000",
                                 "transferable": "1000000000000000000"
                             },
+                        }
+                    }
                 */
             } catch (e) {
-                console.error(e)
-                reply.status(500).send({ error: 'Internal Server Error' });
+                console.error(e);
+                reply.status(500).send({ error: "Internal Server Error" });
             }
         });
 
-        this.fastify.get('/getAccountTokens/:address', async (request, reply) => {
+        this.fastify.get("/getAccountTokens/:address", async (request, reply) => {
             try {
                 let { offset, max } = request.query;
-                offset = offset ? offset : 0; max = max ? max : 500;
+                offset = offset ? offset : 0;
+                max = max ? max : 500;
                 const result = await this.tracManager.tapProtocol.getAccountTokens(
                     request.params.address,
                     offset,
@@ -141,15 +219,16 @@ export default class RestModule {
                     }
                 */
             } catch (e) {
-                console.error(e)
-                reply.status(500).send({ error: 'Internal Server Error' });
+                console.error(e);
+                reply.status(500).send({ error: "Internal Server Error" });
             }
         });
 
-        this.fastify.get('/getDmtElementsList', async (request, reply) => {
+        this.fastify.get("/getDmtElementsList", async (request, reply) => {
             try {
                 let { offset, max } = request.query;
-                offset = offset ? offset : 0; max = max ? max : 500;
+                offset = offset ? offset : 0;
+                max = max ? max : 500;
                 const result = await this.tracManager.tapProtocol.getDmtElementsList(
                     offset,
                     max
@@ -180,35 +259,39 @@ export default class RestModule {
                                 "pat": "1314",
                                 "fld": 11
                             },
-
+                        }
+                    }
                 */
             } catch (e) {
-                reply.status(500).send({ error: 'Internal Server Error' });
+                reply.status(500).send({ error: "Internal Server Error" });
             }
         });
 
-        this.fastify.get('/getTickerMintList/:address/:ticker', async (request, reply) => {
-            try {
-                let { offset, max } = request.query;
-                offset = offset ? offset : 0; max = max ? max : 500;
-                const result = await this.tracManager.tapProtocol.getTickerMintList(
-                    request.params.address,
-                    request.params.ticker,
-                    offset,
-                    max
-                );
-                reply.send({ result });
-            } catch (e) {
-                reply.status(500).send({ error: 'Internal Server Error' });
+        this.fastify.get(
+            "/getTickerMintList/:address/:ticker",
+            async (request, reply) => {
+                try {
+                    let { offset, max } = request.query;
+                    offset = offset ? offset : 0;
+                    max = max ? max : 500;
+                    const result = await this.tracManager.tapProtocol.getTickerMintList(
+                        request.params.address,
+                        request.params.ticker,
+                        offset,
+                        max
+                    );
+                    reply.send({ result });
+                } catch (e) {
+                    reply.status(500).send({ error: "Internal Server Error" });
+                }
             }
-        });
-
+        );
     }
 
     async start() {
         try {
             const port = config.get("restPort") || 3000; // Defaulting to 3000 if not configured
-            await this.fastify.listen({port});
+            await this.fastify.listen({ port });
             console.log(`TRAC REST server listening on port ${port}`);
         } catch (err) {
             this.fastify.log.error(err);
