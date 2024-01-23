@@ -22,8 +22,8 @@ export default class RestModule {
             routePrefix: "/docs",
             swagger: {
                 info: {
-                    title: "Trac Core API",
-                    description: "API documentation for Trac Core",
+                    title: "TAP Protocol API",
+                    description: "API documentation for TAP Protocol",
                     version: "1.0.0",
                 },
                 // host: "localhost:5099",
@@ -40,19 +40,6 @@ export default class RestModule {
                 //   docExpansion: 'full',
                 //   deepLinking: false
             },
-            uiHooks: {
-                onRequest: function (request, reply, next) {
-                    next();
-                },
-                preHandler: function (request, reply, next) {
-                    next();
-                },
-            },
-            // staticCSP: true,
-            // transformStaticCSP: (header) => header,
-            // transformSpecification: (swaggerObject) => {
-            //     return swaggerObject;
-            // },
             transformSpecificationClone: true,
         });
         self = this; // i kno..
