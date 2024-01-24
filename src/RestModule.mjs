@@ -313,10 +313,10 @@ export default class RestModule {
           );
           reply.send({ result });
           /*
-                                {
-                                    "result": "0"
-                                }
-                            */
+                                    {
+                                        "result": "0"
+                                    }
+                                */
         } catch (e) {
           reply.status(500).send({ error: "Internal Server Error" });
         }
@@ -543,6 +543,82 @@ export default class RestModule {
           reply.status(500).send({ error: "Internal Server Error" });
         }
       });
+
+      fastify.get("/getMintListLength", async (request, reply) => {
+        // /getMintListLength
+        try {
+          const result = await this.tracManager.tapProtocol.getMintListLength();
+          reply.send({ result });
+          /*
+                                {
+                                    "result": "0"
+                                }
+                            */
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
+
+      fastify.get("/getMintList", async (request, reply) => {
+        // /getMintList
+        try {
+          let { offset, max } = request.query;
+          offset = offset ? offset : 0;
+          max = max ? max : 500;
+          const result = await this.tracManager.tapProtocol.getMintList(
+            offset,
+            max
+          );
+          reply.send({ result });
+          /*
+                                {
+                                    "result": "0"
+                                }
+                            */
+        } catch (e) {
+            console.log(e)
+            reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
+
+      fastify.get("/getTrade/:inscription_id", async (request, reply) => {
+        // /getTrade/c2eec0b30a242605c156408d7bff8081acf5fb0d5afd7937eacfeda41bddd07bi0
+        try {
+          const result = await this.tracManager.tapProtocol.getTrade(
+            request.params.inscription_id
+          );
+
+          reply.send({ result });
+          /* TODO:
+                                {
+                            */
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
+
+      fastify.get(
+        "/getAccountTradesListLength/:address/:ticker",
+        async (request, reply) => {
+          // /getAccountTradesListLength
+          try {
+            const result =
+              await this.tracManager.tapProtocol.getAccountTradesListLength(
+                request.params.address,
+                request.params.ticker
+              );
+
+            reply.send({ result });
+            /*
+                                {
+                                    "result": "0"
+                                }
+                            */
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+      );
 
       done();
     });
