@@ -601,6 +601,107 @@ export default class RestModule {
         }
       });
 
+      // getRedeemList
+      fastify.get("/getRedeemList", async (request, reply) => {
+        let { offset, max } = request.query;
+        try {
+          const result = await this.tracManager.tapProtocol.getRedeemList(
+            offset,
+            max
+          );
+          reply.send({ result });
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
+
+      // getAccountRedeemListLength
+      fastify.get(
+        "/getAccountRedeemListLength/:address",
+        async (request, reply) => {
+          try {
+            const result =
+              await this.tracManager.tapProtocol.getAccountRedeemListLength(
+                request.params.address
+              );
+            reply.send({ result });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+      );
+
+      // getAccountRedeemList
+      fastify.get("/getAccountRedeemList/:address", async (request, reply) => {
+        let { offset, max } = request.query;
+        try {
+          const result =
+            await this.tracManager.tapProtocol.getAccountRedeemList(
+              request.params.address,
+              offset,
+              max
+            );
+          reply.send({ result });
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
+
+      // getAccountAuthListLength
+      fastify.get(
+        "/getAccountAuthListLength/:address",
+        async (request, reply) => {
+          try {
+            const result =
+              await this.tracManager.tapProtocol.getAccountAuthListLength(
+                request.params.address
+              );
+            reply.send({ result });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+      );
+
+      // getAccountAuthList
+      fastify.get("/getAccountAuthList/:address", async (request, reply) => {
+        let { offset, max } = request.query;
+        try {
+          const result = await this.tracManager.tapProtocol.getAccountAuthList(
+            request.params.address,
+            offset,
+            max
+          );
+          reply.send({ result });
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
+
+      // getAuthListLength
+      fastify.get("/getAuthListLength", async (request, reply) => {
+        try {
+          const result = await this.tracManager.tapProtocol.getAuthListLength();
+          reply.send({ result });
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
+
+      // getAuthList
+      fastify.get("/getAuthList", async (request, reply) => {
+        let { offset, max } = request.query;
+        try {
+          const result = await this.tracManager.tapProtocol.getAuthList(
+            offset,
+            max
+          );
+          reply.send({ result });
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
+
       done();
     });
   }
