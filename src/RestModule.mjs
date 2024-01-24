@@ -5,186 +5,189 @@ import swagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
 
 export default class RestModule {
-    /**
-     * @property {TracManager} tracManager - Instance of TracManager
-     */
-    tracManager;
-    /**
-     * @property {Fastify} fastify - Instance of Fastify
-     */
-    fastify;
-    constructor(tracManager) {
-        this.tracManager = tracManager;
-        this.fastify = Fastify({ logger: false });
-        // Initialize routes
-        this.fastify.register(swagger, {
-            routePrefix: "/docs",
-            swagger: {
-                info: {
-                    title: "TAP Protocol API",
-                    description: "API documentation for TAP Protocol",
-                    version: "1.0.1",
+  /**
+   * @property {TracManager} tracManager - Instance of TracManager
+   */
+  tracManager;
+  /**
+   * @property {Fastify} fastify - Instance of Fastify
+   */
+  fastify;
+  constructor(tracManager) {
+    this.tracManager = tracManager;
+    this.fastify = Fastify({ logger: false });
+    // Initialize routes
+    this.fastify.register(swagger, {
+      routePrefix: "/docs",
+      swagger: {
+        info: {
+          title: "TAP Protocol API",
+          description: "API documentation for TAP Protocol",
+          version: "1.0.1",
+        },
+        // host: "localhost:5099",
+        // schemes: ["http"],
+        consumes: ["application/json"],
+        produces: ["application/json"],
+      },
+      exposeRoute: true,
+    });
+
+    this.fastify.register(fastifySwaggerUi, {
+      routePrefix: "/docs",
+      logo: {
+        type: "image/png",
+        content: Buffer.from(
+          "iVBORw0KGgoAAAANSUhEUgAAAM4AAABWCAYAAACHKqnqAAAABmJLR0QA/wD/AP+gvaeTAAAvBklEQVR42u2dCVhUVRvHLbVc89MsTcEtLQ2zXEsrMzNLK8tKKyvLLCpLLSu1NMU0mRkUFRXFXXAdUVHcEBUFBBFkUxTmDqICAwwwG7MAs7zfe+7cGWa5MyzOCBb3ef6PBbNc7j2/e97zbqdJE5sjaXBQc1Gflbt0BQqtrlgJjXK/oLTsmSaNx/17EGjyPbiHUaAOvZqqKyqDRrlfUNAIzr8CGqLij/ac1xXgjW2U29UIzr8EGiJRzxW3tCIFNMr9qqgBOIqdCY8CQKt/07jDv6ct6k9U638FNCZpLtzM0ebJoVHuVXXg5HvyPs3vzlMouNGxoDPcxoGWjYpEBaM4qNmoSajBqC6oB+4DaIaBwSBAAeoy/n+H+wqcvK5+k/O7cq+wSeF3IVd7RwaNcq8qbrODA018muEDjGP5MCt42l+p3J9+Hgcb2ngOj3IGrlgUH7UGNY+B62VUL1TTegKmKejxXHSGShSYpTdcwd89dt+Ac8eT2wVviIFtxhG/HQzaW9JGuVkVt0ufsX+gcT3wHsSx3ReiwqGBBZXJomgcbDqo21GBEqGSUOGoIAauqagxDFzNXQxNd9DqokGrBwe6jq/pet/Ak+/BS2K9Qd15UJ4qgsocSaPcKFtwCjx9h+L1FzuCxlLFE4KzlIcyBOCeQ8/AlYA6jFqOalYnaCp0k6BSh38wcu5cN3G+7HWfgMNd7OjGlG24BJXZpY1yoyooa3DQRHswrytvEl7/mzWBhzbhnl2jKE/IuwXuP/xqOcu0g4rKECjXogGpq6luIzx9Gjw4oi68QY5uSMkXB6CSKmmUG2ULjunI9fBvme/BmYv3QeLo/uTZmtfjdkj1YqU7wcEFCXxUI2jU2uGgqsxGgVnqGqsQlBUDGraHowk8gBc9l+3GiJ7yh4qMQqjMKm6Um+QIHNNxu5tve8ZJoK5u5hF184PSrw+COjzTuG5wz0EcE17Ozln88uYfQV4uhzJcStVZ5cUI2+CGPet05QU6uhnK3alQcUPcKHcpo7RGAVDGYbAFpXMGj3LbFVdCUu7g5zdIHIZ1LHlwZ5HzkHiHaUCGb2eTvMaSgUL9UoMFp8CDM87RjSj98ShUXC9qlCNdLYDyFFFNX1uuOpKRKptz4kzRS5uiRYPW+kMTftPamdbL+4o8uXyH3tC3dtTdDkMzqTz6FsiXn0ezbyeUfBV6ycnLw2xjRgWevB/yPDhVEAdhiEaidiJNTaSC0vI3GiQ4VO+Ah/EPVbAuPAevg4prhY0yKb0A1CeyQM6LhpIp+0H2VyT9M7bXaqJvQtnWJJDMOQ7FY7eX4vUsr1qf8EJqC42VU6cL7yX8nAq2e1aZUoAeKsbNq6eDjA5Hv+62FJR4jiWf7gNRrxV2n6W7KclxAs9c84zoyVtqZzr2WgmVCCIUqxyrpEYqhxL1xAbqXeMccjTrqI5eNw6O/6g0pwUg50bTg6vgmdXGQdE/QINmrNr0mvKEO6Dcmw7ypeeMg7B/gPV17MoprPpv7j4S4LzrALYHJ5Ttfsn+OA2gJAty9GapGY9Wha4KJmPQEQy4lhD18HPu8p642+AEHBJHGovr5AcxrCFle3/RiI1guCkFKFLaqWxFDKjRtNSjycr2extVgrhscsMDx5M7zdHFk+KNIDGd/5JU4TfoGcUOAGIOTdyTKQ+Ik8l8L0DJ9ENQ9PImyO/Gc+42NoFzF9DgIG2Peh31o3E9wXuL1UrovwYMhTjYpKY1BbPgVpq8WwiTxggUxoJM79M7sjrKY245C7SWoHrk9Vr+lKgrV8v2fslXBwHyFXbSXrwNoidXGoO6L2wA2W8noOLYjUpDnryy4lgm6AX40ZjPV6UyHb7v6wYFTmEnv8eZi2f/1Hh9K9rx+f8Z4TrEFhitMZLP8xV58jZi/pi6pjEWK3BqAQ0NiRZTZCr1s1GYxqHPQBmqIu0wnMR88LNvsX2fencaPqXRzBHjWqIYVcKsGSxhUlSAcmPCVQTQm2SRiLpxXmZdN43fiTOUUy8dCZI+nNeVMznPkdNidRzAbVmV7hhVhiavnYn3tL+q5OO9ZYWDA0ETkoqvk1vKgPqxoQVDL7LedHyaas4JofxKfoOSGu1nxaZEkP52Es3JGy75TOXBDCjwWlOJM3BsnifnHwRlLD5UWjPex1/weihrAYyGXFORJ8df1J33oaM1DagwObNc9y7OAj4YLAxHiYxBQ2fSbWLumQ9rDG7SXoBcfErnofc4HyXCGYjMQjRMKgYmVKmmAKSaSAQqFoFK0qUVySov3QHt1SLQ3SgGXWYJ6ASlOEOxm3tQZchtYBxNAayu8p4roPIkJjnclFhLKIGSCbvsX+/BM89eJe+GAFB4DjlSSy1qOG5pD858R4NA7nseyhPz6lXq0xTI8clV+n0YFL26hQZa1NMPFOsuueTzVYevq0Vjdnwo6uLTyt5lz/0DAZA7jaN4cIX47y6cmWbmenCHkexzuyTH8vJeoCp/F1QVPqhwNJ3EVkHCmktOSg3yu6z0ZHVR47XRxefj4MQnew6+9BbqtsIGJlIP5BAo+xnKgblnBqpS9zUTF2TNsyt6IVBruC7WAAHRQrqLd6Cg32qWa1rlocOHGWjx4U0DxEifXujfMNzS3TheThaJoEnIvXeKv0M//WXLoqDkcz4UDFzHNqVD2Y5kl3yf6tA1lfj38D4OYigIDVdm8/1lZFbCf9eQFBli6tpA0hwHmhfINVMxHrEGFYtS1iKGUQNpPmccOxGsKVOLzgFk4iDLwie7AEXhk1ooZWCSMTAR80dhPzvRQKlqZO5ZAKUhQcvijty2aLKJWNfL0w/lAs5ktlKvv1RZ3Qxe+NxaqAi9hn9TsVnaSGFYgyilwBOkWJ+muIhTX7gJGpzG3SH1+Zs0BNL5EVD8/i6EYpXzKDk+gZR701zy3aoDV1VFv594kj04zP0ZzTU1DoRsVDCaELNF3XwHk/WFGRIxtAGZajCaPFOhVL0GYxSxKI3zGIYLVKo+awSbM5n1CT9sA0AaDrCrqGu40M5AXUeQbhCYShmYJEaYsmsBlPPZCe1n6JjrwXkWrxsrDOU7U1IBTUFbqdYnLCbmMT4IMhze++5+UIYhgMowNM13pIB67SWDfObRJfVfo+PBWe3QXFsXD5q42y4RHQtZG08HWIvGbKvWLWrlNcLZR3nwmkvOo2x3mqJ07gkPtmtR2sHnEUx5GUOeoGZIJJJ2INa8jE/h2ThwgnEQZeAg0tMD6d7LAEXlvTK8fB7C61LMdq0qQtBJcKUQIBkHZwoqFV2/aah0AlMxA1OJESa22SlbVgdzT0UK7ZqKPPymsK93/Az6mDsCIPGmVCsVQ1LxE0wtkk91WRKM8vO6Ln+0ARS3cV93mEXwVShoYm/VSWgK0eukki9DofDFjYBmDtTeM8UtFL++LQpdxYa6noelykKS5aqfTz1Rk+vC5Ixtls4Mz0eXqB6M/QIaghbTMyM6IFhNoy9CAeKxOuASKgEH52VUIiqp0AgUDVMRA5OYmZ2MQOmvYIxqTzqo/ONB+k0YlGCNFpnFyHpE9lM46MnAdzg7lf3NjKcNDmZDFVzOU0AirsOsFWEyvfC9L5KZ3tG6h/YCd/Eb05DKqaXs6esBaK7loDerGkWh2bXzCkj/PI2NP3aDqN+q2kNizP41mUfeZP2lCc94WRUhqKj2+2ugsuAUmXLG8c41fJh8hOdTYH6AfMbHoB4+lXPlbpEezZbKc2gWY0BVuSYeFAvR6eV9GLQxt9hef5MMNJKKw/p07+0Phgh8SXQuQEwe1oWiLuIAjcs3ApUgMsKE/2o2YpbD56H0WkJUTVxKsfBMdeaeHmend+jx1JUbzxqo/TKUgrg7YKV4PM+4vO9M1z67F6cdOlt2W73X0zw+eQ3LLd2Vu9dhjc72K/R6xFIqdDPK0bNVOiscc6W2067HOoCiZYrq6MV2QeflVqW0qtC0d1WnhTrb766LFJsTJWXT+NWW6t7q/s8T6Ck7wOrunbgLDGRhi1WcdystPoxKJoRA0fAgXEuyXzvJ1FBnn/Easz5l9WapfM4DnMF2BWdR51BROEDPoy7kGoGiYcqjYTKcRxN27WVzhoSjEgbyewOBzrm5JwWhvDeToFrCakoGJl4GkpZjLSXEZD9l03vha7wXx3Fm3Um797tx/yAmasPKlvbgTHE0wCU/HQXl4Wsg45Co+UEoJFFzT15dQFHke3IiaVsWp1tSf+LofMr46d7qM0KDOiob7laKoIRSxad7OlZXaoE3+3u8UTJnf4MY12Z6TPCEbMndCWMZRa9scrymw2CsPinf8ftvSnYy4Exn9Yi+tg3gBM46J1GnMPUsAnUaB2jkrSqgbGDSHcpEONY4vYdKn6hqzT0EKh3SClvj9XyNbc0i6rHSoD+elQVnsU0CrZsmxWHHhKY1MaH1RzI3wLmbm1BB+L4VEJXzVb2Ak9Nj1f9w0LC7B+uyNjHGOEQkq5fNK+XsKNubtlh9hgL1WeFdS7H+UpFkEr9dzR4evNmOMpCtbHV8cOiIiZFVcldSrb3k8Ds0m5Oqe78aAWonfsynjaO0GW1QCsARCuAoxkLCUcdwkB7PtgbqdA4D0y0aJh3/xk3RM6s/z+/CGYGfcYHNPWwg5t8lkf3aycoZUbTHWZxQPHiDDE4K5HAKz89SEYKFNbCO9ukPZqRCBP5Np82SAj/joXqadXhRdQGEkY64FHF6D0JX6dSCHr496nIOip3JK1WRFLhCmFtWUPz11ra1cpR48r5i0m2cxxeGrAcdeVpeF9My4KJZe0pg/v8a6VqRofjN7WQh/RM+YN5ngqkgQWdKDT9jOjPrbGZdk3yFbQMOZAGEog7iuR1CHcbBGYY6ImSAYoEpImeHM6eRamm0nbkHJPB6yWL9lEjrJ3omd5CYKv10fwaQArxjWZbSwtGsoU4so2/pDO7glEtwHF9vqZNZ4+vHu+bJmVMLUJRMMJCDT6d3yfR5V1WpuNgt25W8Gx0B4ArJV8eKagtNlWOA8zb+Xapq4RmwFrR44/UYuJVOOwiGKzho0gtrp6tF643fSaf20J+px6h6jd6bVhhr8kSxnh+aXRCSAbAHm8nsxTq0faj9OFD5mfZA0TBZzE7Hs+czT/cYuxl3aKBxlmIx96ydEaJKBOkV4trHz7nOut7xi42Dw3h+1roO/NyW9qXlvr1Ns2vl6vh4wLiOjbbVCzh3PHlPOhkoxMMUjppHEgNduUgjU6xid8o51akscIXkq2LyC78IvqtukSR9xlGcxGot4rUa00o2GE0r4qqtvcql34SPMpVJawIv1+79SaK+zKyTyhp4/BMzCXZg5H0nKjjDCNIuHJy7UXtuMECxwmSAQ8JPHBU8apbFODT3bJwRBRB7pwsJjrI9jETdV+gNISmZwL+K53DNQhmBEBXVzMYa8KezN9CcVs4MV8ABfJ2lQq+VQlBS83qBB71cN9jcwm7rfxCe1Eq5O/mK6kQmuEJy/5jbub/wW7rEdH2C2w+vxe2azDwssYkaS7X8QoEx/sKv/fsv5/uash1YHTtvYpbzJgyIbkZtSQfYitqGg3T7VXugaJisZic18LOGYQHeZbs1ykubqzP3LJ0RF8nDke5QyppWs64UQlLlsAvPkWi3Seki/NcH/23PjE0/c2AewwOwJ81eu1PfrJ91Dg6WuzW7anrIjqW3x4CkUHnsBrhCsuXnheDFd+kCkbinHT3NzU/1jZhhfym3zjKczwHxiCDQkzVT7d+fRzxRJJJuWW1q2cxDz8PzW4+OgkDUBkzZ34gKSmOASmeAumoEym52yhCVjt3K6rkrXxbr3NyzdkasZAb/Otb4zgd7UmF7MrDrigK2Ja8Rvxho7nIqRVc+YLqWUSlV2pmyqcm/+VAez+hcFpIiUmKlqSskXXbO5dBYZRCw2Pq02xfrlgCLs+5W+khh3d8fe2ucydvE6kKeik6CVWhKrkatwcYeAai1OODWJbMDZT87pWBQNdkurjVqq7W5tz/TiTOCAEV9wQRHWa9l5cLIGAhKBDttMumyQYPlJMWYhVL6OrrbNyVZazOtYvCJavavhKb8oKBX2a5UqfIIDnoXSPr3OQps0vldfZAeDXbeIYy064/iYLlwq56Vs58Gpxv3DVbX76D1AFycdXi4fvJDrcBBuBLln8QAdYUBKpkBygRTCgNTKuj9Ll3Bz7df3P8dW525Z7l+UkIo5cUER4vs4zt+OsPKi1mAbnpYx6YEs7RLz1f9/3obBSaO+ffNNHsyB5TtTlUpD2eAKyRdFHm1pvGhu8/p8xtulQD7LT7JMU2mAUgNRzLbMtWhrN1AK2djDuayeIB/UMtxEPqiOAnOgbKZnZTTj9o5S0rHbK+JuWcJlAD42e2Y4Kid27/Ia43ewIupAP+LUKU4e61yotVxG/5V0BR6rRqN3jNdGWY5u0KSBRGp9woa8j0YQ7hUFZnfAjYBuPqQXrf/aoLip/BpFs6dRaxriLG4Q8ginB0W40D0QS3BAfY3amk8A9QlBqiEKqBomC4zMCXSMMne3mUXHNcuiamJuVcF1M6MI3SunYPgqGQUXltOjL24NRQvRvyvMddye/iOKnxti6LswFVwhTCZNOVeQWPMm+LOsDTRKolNfZKqL+m1wanJCG8KCVLaJKd6sKbm4wAXD1gP8jd3gWbqETDMRVNnIQ6yv2KdA2UzOxnw35IR1qlC0jeDa2Tu2Xj35jsLjio/2Y/ngee4tIZaZqOlUaPue2iKjLZ3Uem3YVC2P/2updiSKCMX/Z6df89/Ollmj8umoCs0POveC9dTaswVw/T823TxYRfu0+zRde7xagPYCL8RJOyP/mU4GObhYPsTQVoQYw/UkosMTHE0TPpFMVDUf62F5w5LthdG18jcs3BG6FFvGjOhuQJ7byA+nH7A3Uj+OutYi9h0zqR19zc02PgCp2S6pFa2IhrK9qW5QrrC4LR7th0eiWeZA57YW1tPYg32UWuXyoAl5BVo35f9cBRK3tgG4hcC6V4L9KDqyrtV3H3VE47TUrgf1DqvsMcKKB0WBGUT9kLltyex7SCCNB9h+CPaCJQNTNpfzkAB0+aJNq9e3QoVM0+DgUBmae7x7M09C+9eMaxJ6sYER+0aohT1XQ36X8i5nDZqXg0036SIApjEb3pfQoOlBiNNvcVIM3dc34AC3fUu0d6UEffkb/DkvWKZ+KnEDp2Ag9qV0mOvbjry7ej3wSlQNgMBGrNNVjo+ZBtxBFSzHmtmWUtUFxEoSodtgrLxe6ByOv7NvyNI8y7ggLzAwBQNFd8cp+NEdgHNp1ZByYtBIBu3C1RTDhmB+idOx+qMWJGYgov9lo6CoxJ0PcPPJyx00lq/ONOpV+7HmebJPAvzhvTpUuxKcZnku5Jn3gOHABmAaea/AVNrYC8O8P2ulerXU6D+M7IW78nQ4b8ZsO9aEGoqeqrsEmpJfpgxXYbHxRkooSaJq85B8sdBvAlU7/FB99MZCfx2noZJ9VFozT4DTa8irwCBdGxwtGZa+Fnt/KhYw7I4CtdPeuBc2uQsOKoch2soYraZNMNWx6z1o0nha+47cGwTRktnhoMiONl1Ckne4f70I3qvGvPiuoIsOrGs2NUqHbsdirFU4S4/RwR70/mYojIbU1QGgw88aAtSrgdvPKmgZFJodHUHiXMBQZAUPRMAstd2gmTE5joDiVaJsnhYULJy0vHOjoKj9Hpn0j6A6WGO9Y2tjhDlgc+9cyC5al1wwirmsToWFFha7UJddSs0xt5lZWaT4R186gWnulyGrVfM1bMVyy+48rMVEJwWiSkoPrAzeQzw46zy90p7BzxizAKn878SawlSok0jwcq7mc3wIfuDZYqTiKXNVCE2cy8buQX0k9Ex8zm21/2iBpqK+vzAiPsGGqYDi3mxV/D8WpBvT3K13OogQPAPWnak1JHAmsNcqrpLM/dUlT2PjTHc8R20diRr8d8kkvMF21MmIVRWPeHogjisyqXLRLBcxGFRo1EWLXg5AeT99KbM+H5SDEhqspiSk2pLM0iho32gmT04anw9DyQ4nsrHYvIqgchWH9tp5f0z23T1HW2V8vHBbpBvTXS5FFsThrvHIcB506rnwpf45Np8xS2Svh1s7dZdedFt38WibNh0JRj/9YZNqV6WTf5IRTCps8Ks65UIwRWbGYn8dznpBeAsLEDa/2Ly6VPEy4clAQtJLh3+d7ppqxJSuEfc0eyeQccdZs1eN2xKUoZOCP07uwDe38Nor63u3MvQxV2uDXi+Vuub30+AfPNl12tL4k/uyEnDc84y3xzs8mMg+U8bE12vwEQosGnCKP9kn3u+q2aSwYbESJQPJlWOgQDqYSuQPLkTmJZUyQjUhrru9UPWMiQLX9SF080xdI6Do6yzEDarLH8Fk07HYdb0eFsFv3B/gGN8Qpm9KdKAiyALSnC55BsvbXeDQ2CJVcEWcYFaJBe6UhUYb7DzXvXB1k6r4932nU619lKJYVUcpePEJGoXn4vR/HjstPTNbfXWMZP080bT7xvLVKfqJO6N3WeHblTA69uV8DruVEdrJ+8+MNPouhDz1iEFwzeCbOMldyndpWlBHrw+zG4DxrR54unCHmfukuLjfXmsNf1fH3Ltd62Kr4BVF3P1vtEZWp+zlyt+ORmn+ubwRdnE3UmS0VszxIMCRQW9VpSzNIO8btsfu94gMhYVcmpSlUsaGGIrKZXi2YBow4jNWfDSlpwGb65h+6dPrJ4AZOu/wEvukk4UlNTKZTfHIlWFBPa0C8+yZ+a6SIoP97zLmiE8IAAj7dW/H0HAczwD5bNPgBpdsGWf8kGGBV5SdG+XvBQERaTJYK8VdfV2CciCv6GNL7q8A3vwMW3GDE72JjJ3/int5Z+m9FrfuWGD48HZarW+wZ3dZNh/2l1SrLtYJweBcv3lztK18RPE66PaGGdK6ybm8vdwwcmLdadodzq9+GabddAhocHgnuqrQ6D4aC/IxgdDKbpji4cEQiGmolTXdfMudUv0xIruDd26YSwEDmmTzNKazLIZ4pb7wDFQVaNPOlRKV1/ENU6c2yRZE1ftTl2kgYNszaXB0rVxs/E9wagMlEESELffFBzE8821zEcz/I2N9/CJ7jYtj1lKvptsYOWohuYeSsGsIzYTdzI2iux6P8UMiZOCdoUbd+a2nMGJO1xi2yG24eWm2fQyxjICkK656DZJVl80lMw9aZVWQSLmpf6xXvj7aZLVsRvx3xSUluX98uK1sV2Yp/4Kqy0BSeBs6QX3alnUEEfub3eJxGaYhuakW5EP3XYYG7Hcy/IM989C/l1JJyachXLQ+kmyDK42XHA8uLOs6vG/OgDSVbGul38MlHx3GEQD1mrE47c/L/GPeVe2Kna5dHXsOfy9ooafMZucMxk4lsG+4sFYZrwYZxsftyrPdmMk465uLoVExADCIQ0iSSfVnB4+LZr8Rw5jDIn7el1d5vfaTAu3Wt8swo77K2NcJyxLKMXsZPH7ISDGeEfpkjP5+HN9rT/HPyaNVAgST4tV91LMR6v8/iim0J91rxacWe/AGymuAyQS0y5xpJUX6Xln2r+08bgPDmarEIXl7mkSv2jXihdtcMHn6Ev8YuiAGNPutqq8eDR2Tvkj0t2q1M49+Tq7K58z1SkgHtxotOM3EPMDzbuR96qNV+PhTjMNb6SVS3XcDhzoFxqgogMZW7iD5RMe4xigR7euuWjK9TJofwiPLx64brPTWbsr9wi99UlXznZ0uf5G1j/322K98agNOF05S616bmEHGAnnfIOSlHO+UOYb056ZbTZa1Xzg9uEw55RbVP5ZqKH4+fWZpHy8oQQUG48G4xiwSIvA/luli8+AZHlUw9I/UZ8bZ0fuEMvshiLSnHwmVjmSGceFqsSNoUqwp5k5fR53eWscKY2H+aATAC2yZwvQM1W67FxD0wXiyTK2eaIrIqtauX6836Jq8O6lxeClBKtFLb8jfMj2W4PmCfjPzxPMNl84dJ0/u1iwu/8SAb//39Tnlte0/0qh59MrKP5Tq4TjbK93z8CsV3oECewTF7EVrucu4QLPvRS/6z6K34WPOoA6SPE7h1H8x7GTJnlZp2PC/o+dpPgdI1CnKfZcNGx43iZeGNAmIZvfJjGb3yqFeg+3lHigZapwZov0bH6La6gb2fyHMrP5zQWo7Gz+g0KhsSr3NvXMg7nZ/CYi/Lkok99CdI3fpiCF374gkd+xKI7fuSia71kUxe9RFMF/SnyC308cxvcShXcbVLKPP7RkF394yXb+yNLN/NdKA/lvSAP446Ur+ROkXP6H0mX8yTIf/ieyBUMmgc9DX8t/3e+tmMWfIZ/xqbPx6S9/s8Mqzeg968tH8jeWD/ez/N3ein4fH9Q+yQ/T9uAf03XhR+g68c8aOvCjDY/wL+pbLQNo8oAbZxveh1brG0z7KP37bENSRcnSyH5Gzx9vplVN+zCsaf8+3CXSTzsMcmwLK7LZre5a7zWGkbOuwcC5Anh+vmCB6bo953PjKQQHEBzwWpb1peU1fdqPmozgwFMrs+0cCb02UL49grL6Wv6sy56sjp4hVITnLgo89lCA4ACCA08cQB2koDO2ou10hNI9doyaRAB77AQl6IgbOT16mtK3O0vZbVv/SCy1rm28ENokoBKF59sm3Hi0dYpwP4IDLdKF8PA11HUhPJQphOYCITQTCqFpthAezMme/eCd7O8fyBVCk3z8eX4mIDiA4MD/ChKhY2EcdC6MBo+ic4DgQB/xcehXHHZrQHHouwOL98HQkhBAcOCV0k2A4MAbkgAYL1kJCA58IF0GCA58Lp/fe6p0/kAEBxAcmKGYEe9sfK7QjN2H4MC68pGwUTOc3vAqCkY1C6nw4uyr7Auh2ichTNsdEByI0D0OZ/Ud4IK+LVw0tIQEfdMAt4FDFy5Zxm9+CCOu4gYjyZLIZeQ8xT14nS3bPIm6+4Hus1BTmW2dZcANnMpGO9x+Xv/tlBgY9JuABmfQfOFbpus2YJHgUxM4/f4R9rcChyfgIjgGL/+MDvbgCA41sSmN7raDivUMpgDB0XbdTf3ZZb9gDK2DRNQEBEeO4MDj4VR5p6OZPR8/JfieAQc6nBFaBZHbxVLTH7lIAQPO9Xbpt9u3ukKFtkoRAoJjeDhdyG1xPXsMLUH2GITmLZSIgNM0R6h/8Hb2/AdzhUFN8oRBTfOyghCcoNYFKUoGHFWnwgtBCE4QghPUp+hE0DPisFnPFh/4ywxO8bYTI0uDghCcoDGStUHjJP5BEyTcoA8ky4I+lvkE+oDPg18o5k63AMcwU/2NB9vY5GjemeqnGQsmcILKh/9Ofr69YiBnV2V/oMGpfDI4TNttzDFtlzGntJ3GnNE+Oua8vm0qDY6hGSRBk0nuAqdqe22slixZdBrXOJENQz6Rtwp/i2htPE9eiNWOZaRpOM4SdZUB88hUb+ygPXLsLmTe2YXvRi4YPEdgBqf/nzc7mcH5S+DHgKMeZdN5si9PEIngZLNdbxocywPfi+CoaXBCBDFs70FwzjLgGNpHZrfrfYJ6uOMpocgIDqV85JQR0P9dEIxsF0NVMOAUPxIn7E1+3vqK8A4DDsX2+c0pahcDDjTJs94Et4koqRXOODoanIKLrOf3bHFomBkc8Zbe1Y25L+Xz1lmAAz+XedtlCPioP/DwVb8tsQQHZxx6Bt9R+XwUA055EAy26zserX9kiQmcRGji+p3emF2yqupJRmyEkr9ONxgVL4x4x+gQsG7zVEjqXnCbcrouvbbCenb1WzuhsPdKVmAS+gVCap+1dFvaIT9TKy3AybW8dgP+yjrHgGNtauBaAsEpQXAO2K1v1t3s3muDcLXNbOOFAgJOt10CVtPi8TDhiE5hgjGdw6lRpp89GkHNZ8CB9ucEv7c9l/n0/6IpCYIDCI6m7UWKTqBtm5TVEcEBGpy0bD4rOELh4GbZOPug8PytZsOW+VdHmEy1Rwvj1zgA5zYDjhzzpqpNAZoqn3fREpzZZd+esoIGP2OZ+r1zCA5YzTiKwR3JumVHxfNSBpwrbJ8fDW2eiYcWYxKh2Zg0aOL6gDIJxlmtb7BMumTB6QaiiFByjsYeCJwMqwI1suHSlNBaqxwrDMV9V7MCc6PXKlj65kkYPiPzpun6DPlZcN4Mzu9ZYRZ0PIAzjpSA8+wSap31+iazJ4IDff2oP+xmm/WCD3puMC7yTUf3rcKJJnDQVLvZdY/gO499Qu8n+IwOCr07HaRetP0sMvMgOHIjOFTu/85TWQgOIDgGNNcmm17XNoEabgYnVSh+OC37hxYZQu8WN4TezYkEQm801V5zNEYeLrj2owmcxwriv7L9fd+8Q48iOEDAGVYScull2e72L8sCab1Ny5fWJLFPGxMUCE4ZA04eMdUQnIp5Em9zGfYi5aTfl6rfA1/V23IER86Ac5v8brPyhU4IjoEBRx2q7T3ncGU372P6J7wj9J28z+k7eEfr2r7n5jQbziGr9c2P2Djvz4iGIJV0wfHujKvcqn69BLdCZ2nq4FQVWIJb7GAr85vdV8K6kYdh9PTr8MIPAhj2o4BvggPBkVWBQy0yXTdc6/RGcICecf6mvra8pl5c6iMaHB411vZ6P7lesKz3OsrL1puG4BxgwHHkHFA/Fp79su3nITgcBhxAcIAGJ9Ye2FZJwgAGHEfOAV1ToXAi2xhpIcrYYgLn8aKY52x/368obIwJnGqcA2vJ6z9V/NEXwQECzndls1YjOHEIDvyqnEZ71/4q+9RrseojDQFnueadaQhOBQFnffmrh03fieDMNa9xHDgH4qDlbLcl0jGpIGDq1lky/1SDUOkfJ+fQYNu0eSIeLy2pQ/9wX41EXit5bi0rMLn4WaGDd8GEKanw4rcCePE7AQ3O0BkUvfHsC7Oy+yA4YAIHXdFvmz1qf1KTTeB4/Z1lNZie8aWWE3B6B1CP2YMjPDiKpRN/j+05LRCc0wiOBMGRIDgSBEeC4EjNXrWjVGnH49brj8fP3OyE4KirwBGyl6MjnK2ThfsQHAmCI2lxDXVdKEFwJAiOgfGqqZrfvDnMbsYRXUtmwClvAvZ7dPYrOvK7BTgKBEeC4EgQHAmCI0FwJAiOZKL0n6nk9Z/J/5xiAgdnnC/RHT2bAWf/TJj58ALVJ2kIDixTvb8VZ5zBZlOt4tVFlt8bUtHfD8GRoDtaguBIEBwJuqMlCI6O8arpE6DpRNfPNl04I6zWN69uhuK5J+tdWGqQDt7GG4TnddiqQG3IBrZOKHbSjd8F0oHr6cRPNmhODdgGn32YCCOmCWD4dIEVOC/8KHiDNtNmZX1iCc7gP6+b+z0/t0DAZcDRDLbZ8LUfRxDRl5d1i+2aE3Bqe5+6hFLhjDsaOoXbu7cRnOsMOBU9onJqnUHdnBJuMrmjm97K/szqlxkZD6FXrZwBJ5Ht/RjH2WsCZ5A4pFrHwGeyhTwTON8oZw/4SfVTFwRHj+Ao5qm+WIfgwGL1Rzf8YGzr5Zq3p5vAwRnn3Zr8PWf17eeZ3NGXoNkiN5hp3MVW65vJe6H4txP1LX3RnGMjmPjSW1ZgY2NxPZlt3tntUPq3QkA+KNAuFmPS5T6BMHtcNLw8VQAvfSVgBWewd1ZHGpzZAp4FOPlWjoEFgkgCTv/FggS7gcQRiHHGOWT7c5yBPJ5cZ734772NeqzbNqF3tx20XmK7T08coqIYcAztjt22SgztEi5qheDoGHCSbd/bKS2tddtEoXerK0Lv1ik332AFRyDcYwKnSU6OVXypuej6IFMcp31hYpADcDIZcORNoPreAFNkC84w4Gi8wZt+6CA4UQgOzFN+AQhO+V+qDweSn6NzYL0JnA3q0XTO39bKYdPRq+aNcZwP2cHpsNQcx4Gmb7seHGM6uzklv/inI1D86/H61Zxjm5gkzpZWbnJSoIa9j+n2QSwy4B4vZTgbFXRjjcXAtV5rYMmo0/Dqp1nwyucCJ+BUzRRDZ1NnzeD8Kgi3cgwsEJQQcAYsFljtHubFye6G4ADGcRbagbOOeg/XOFaL6x5bhJ9034beNHQOdNtJ+djNNhgYxTiOjAEnm2W2GW5e40RRdiXGbeKpURgABcY5YD/wMzPbNs8S3mLAUdh61JrnZ043gyNK+t727V7iqDYIjp4BJ6om4w7BKWXAMT90ZpV9+70ZHPXH5rZhvup34hlwisj/r1cP9dxSMRRwjQO4xom0/WyM2TQ/q+tw0QTOZWji2l4FpNzYsgBMhP3Hin85Vq8S/3KsRPRreEe2pNNidD/DGzvtZECphmyEwh4rHCz8V8DGFw7DWx9eh5GfCOCVKYJqwBEcNDsGZglKq2acLPOgHrAwsyeaakCD45P1jdXT1zdrIgHnqRVZ41hmnCW91mY/awPO+wiOgfGqKTHlJtJzjzCy6z5hZBc+6oBQVJU5ILAb+OiSnmECp/0Fyq4MHWeblxAcLQNOZas0YSSucSIfvoq6LozENU6OOXNAKDxi+/6m+TfWmcB5pDDJLk3o6aITLyE4YARnvwhTbiKHl+yIxDVOJK5xIsdKAyLHS1dETpByIt+X+vZAB0F3BAdocBS/mv+eXxXeHX8tmxY0v2yqTxMmTYYPk5rijKM0gvM67a7erBnWE8GRM+DA3sq+59E5EIlrnEhc40RGaB+7XpU50OKaG2YbzntWZtCYrSCeHV6/mnXsS4vYksaqYTo2BofRO6ykHoqdYBwELzF7GvY/vxcmTkiHUZME8OpkQY3AeXGGMaVm8EzqSQQHTOAMnENNMIPzB/VRFTjUIKsn8HLBUgKOFy/H7knXey0VarseouM426l5Fu5oNq+a4YkwzA5geS/mqm02gdPhgpC1z3Lry9mfITgGZ141jOMEN8nNbWn7Xky5iWPA0XUR2Xck6iM+NrMKHKdetYpxEPDwJOmSiSZwpsvmfOdsjC6veO+ZqjjO68tNP9+sGTJqR8VzGqdeNUPbYzHQrr0b1jfWWzIUYkWmeObR+lSMqXeWbcN3Kcl+fnWbWeUIjBi3rXBUNJbUJzBnzqsxW0dPFHBGfyjgjPoINVnAQXA4I6egPhdwEBzOiK9QXws4L05HfYv6TsAZ/tONZ43rm8ynh84WcIb+IuAgOJyBf1R5yJ77U/jacwsFnOcWCThePhlWW8x7/SOY8oxvlg/bNUdT7QtH98NzB/WDx06K4xGC2ktxuuxHHaA4nYkOChza6R0jhN6PnqE47c9SnE4Rjntxt76S/VnLZIrTMpXitEhHXUNdpzgPZaKyhJ84el+zvMy/WhRc47QtSJ3H+jcVH5uA4HCeFR/kDBTv5yA4nBdLtnNGlmzijC4J5CA4nHGSlZwJMi6dKjNJ+verU2QLOVMVczlfyn5/sgbgcPzK3+D4q0YNsfzdzvKB40iu2v6KpzkHtb05mOTJwZQbzmltJw46B35wW3Kn1fZzmPMlxvw08Y9H6kvaoh+ODDDOhLyPrWZCsqU6Wdu8tAUqh2JWQx9/Z2XI18hWGI357o2He7KhseeWVWOIQetAPCOsPuVrWndhQNaqO6YS96rU4qJf8pRTYHJJvf590dih8biPwfHgfGv1VB+7DYq+P1xful34hTGJk2kIbjHb+IG0zyqHsRgmMOpDPHCNd7XxcD84xsZvVfGbKfugyPtQvajw24P0orvQ069/NXu6WEpLSiHIbtKNd7PxuCcHqaC0anyNXqmibw7Wk0LDjOdEtoTgnq8RNNhzmEDWeCcbj3t6FHj6DrUyh3Ab8aLpofUhVeE3/J6Mo2J6TbbfK/Dgvdp4BxuPejnyPLkLrMB5azsUTjtwz1XwNZ92T9q2eWLRHePC/9/T5rXxuB/BsTGJCj7dC4VfHrjXugbeQaYkzk1OGvjN+y+1fW08GujBdNa33oCI1NnfG+lxtkvHiL5A1H9VPwuzUc/SWDyosX9Z49FwZht6e+9624riAt3Qj1nYM7VAyTavCSfpNo13qvFoYGYaZ3U9QSPGWURo6Q2z3BmB9EkjPQUa71Dj0SAP27r9eyUE44QlNCT+wrR5uk0ald8323E3Hv+9g9mwpz5mm0TbuAuTYDqP7AfZeGcajwZ9kGZ+ZAeve61b3f16Wp4HupWbkZa7jXek8biXx/8Bhqg5NAoRQK4AAAAASUVORK5CYII=",
+          "base64"
+        ),
+      },
+      uiConfig: {
+        //   docExpansion: 'full',
+        //   deepLinking: false
+      },
+      transformSpecificationClone: true,
+    });
+    this.initializeRoutes();
+  }
+
+  initializeRoutes() {
+    this.fastify.register((fastify, opts, done) => {
+      // Register Swagger with Fastify
+
+      fastify.get(
+        "/getTransferAmountByInscription/:inscription_id",
+        {
+          schema: {
+            description: "Get transfer amount by inscription ID",
+            //   tags: ['TracManager'],
+            params: {
+              type: "object",
+              properties: {
+                inscription_id: { type: "string" },
+              },
+            },
+            response: {
+              200: {
+                type: "object",
+                properties: {
+                  result: { type: "string" },
                 },
-                // host: "localhost:5099",
-                // schemes: ["http"],
-                consumes: ["application/json"],
-                produces: ["application/json"],
-            },
-            exposeRoute: true,
-        });
-
-        this.fastify.register(fastifySwaggerUi, {
-            routePrefix: "/docs",
-            logo: {
-                type: 'image/png',
-                content: Buffer.from('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', 'base64')
-            },
-            uiConfig: {
-                //   docExpansion: 'full',
-                //   deepLinking: false
-            },
-            transformSpecificationClone: true,
-        });
-        this.initializeRoutes();
-    }
-
-    initializeRoutes() {    
-        this.fastify.register((fastify, opts, done) => {
-        // Register Swagger with Fastify
-
-            fastify.get(
-                "/getTransferAmountByInscription/:inscription_id",
-                {
-                    schema: {
-                        description: "Get transfer amount by inscription ID",
-                        //   tags: ['TracManager'],
-                        params: {
-                            type: "object",
-                            properties: {
-                                inscription_id: { type: "string" },
-                            },
-                        },
-                        response: {
-                            200: {
-                                type: "object",
-                                properties: {
-                                    result: { type: "string" },
-                                },
-                            },
-                            500: {
-                                type: "object",
-                                properties: {
-                                    error: { type: "string" },
-                                },
-                            },
-                        },
-                    },
+              },
+              500: {
+                type: "object",
+                properties: {
+                  error: { type: "string" },
                 },
-                async (request, reply) => {
-                    // /getTransferAmountByInscription/1b8e21761557bbf66c06ae3d8109764d0d8ec5d431b8291160b59ef28ffaab7ai0
-                    try {
-                        const result =
-                            await this.tracManager.tapProtocol.getTransferAmountByInscription(
-                                request.params.inscription_id
-                            );
-                        reply.send({ result });
-                        /*
+              },
+            },
+          },
+        },
+        async (request, reply) => {
+          // /getTransferAmountByInscription/1b8e21761557bbf66c06ae3d8109764d0d8ec5d431b8291160b59ef28ffaab7ai0
+          try {
+            const result =
+              await this.tracManager.tapProtocol.getTransferAmountByInscription(
+                request.params.inscription_id
+              );
+            reply.send({ result });
+            /*
                                         {
                                             "result": "10000000000"
                                         }
                                     */
-                    } catch (e) {
-                        console.log(e);
-                        reply.status(500).send({ error: "Internal Server Error" });
-                    }
-                }
-            );
+          } catch (e) {
+            console.log(e);
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+      );
 
-            fastify.get(
-                "/getDeploymentsLength",
-                {
-                    schema: {
-                        description: "Get the length of deployments",
-                        tags: ["Lengths"],
-                        response: {
-                            200: {
-                                type: "object",
-                                properties: {
-                                    result: { type: "number" },
-                                },
-                            },
-                            500: {
-                                type: "object",
-                                properties: {
-                                    error: { type: "string" },
-                                },
-                            },
-                        },
-                    },
+      fastify.get(
+        "/getDeploymentsLength",
+        {
+          schema: {
+            description: "Get the length of deployments",
+            tags: ["Lengths"],
+            response: {
+              200: {
+                type: "object",
+                properties: {
+                  result: { type: "number" },
                 },
-                async (request, reply) => {
-                    try {
-                        const result =
-                            await this.tracManager.tapProtocol.getDeploymentsLength();
-                        reply.send({ result });
-                        /*
+              },
+              500: {
+                type: "object",
+                properties: {
+                  error: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        async (request, reply) => {
+          try {
+            const result =
+              await this.tracManager.tapProtocol.getDeploymentsLength();
+            reply.send({ result });
+            /*
                                 {
                                     "result": 14881
                                 }
                             */
-                    } catch (e) {
-                        reply.status(500).send({ error: "Internal Server Error" });
-                    }
-                }
-            );
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+      );
 
-            fastify.get(
-                "/getDeployments",
-                {
-                    schema: {
-                        description: "Get a list of deployments",
-                        // tags: ["TracManager"],
-                        querystring: {
-                            type: "object",
-                            properties: {
-                                offset: { type: "integer", default: 0 },
-                                max: { type: "integer", default: 100 },
-                            },
-                        },
-                        response: {
-                            200: {
-                                type: "object",
-                                properties: {
-                                    result: {
-                                        type: "array",
-                                        items: {
-                                            type: "object",
-                                            // Define the properties of each deployment object here
-                                        },
-                                    },
-                                },
-                            },
-                            500: {
-                                type: "object",
-                                properties: {
-                                    error: { type: "string" },
-                                },
-                            },
-                        },
+      fastify.get(
+        "/getDeployments",
+        {
+          schema: {
+            description: "Get a list of deployments",
+            // tags: ["TracManager"],
+            querystring: {
+              type: "object",
+              properties: {
+                offset: { type: "integer", default: 0 },
+                max: { type: "integer", default: 100 },
+              },
+            },
+            response: {
+              200: {
+                type: "object",
+                properties: {
+                  result: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      // Define the properties of each deployment object here
                     },
+                  },
                 },
-                async (request, reply) => {
-                    // /getDeployments/?offset=0&max=2
-                    try {
-                        let { offset, max } = request.query;
-                        offset = offset ? offset : 0;
-                        max = max ? max : 100;
-                        const result = await this.tracManager.tapProtocol.getDeployments(
-                            offset,
-                            max
-                        );
-                        reply.send({ result });
-                        /*
+              },
+              500: {
+                type: "object",
+                properties: {
+                  error: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        async (request, reply) => {
+          // /getDeployments/?offset=0&max=2
+          try {
+            let { offset, max } = request.query;
+            offset = offset ? offset : 0;
+            max = max ? max : 100;
+            const result = await this.tracManager.tapProtocol.getDeployments(
+              offset,
+              max
+            );
+            reply.send({ result });
+            /*
                                 {
                                     "result": [
                                         {
@@ -206,20 +209,20 @@ export default class RestModule {
                                             "dt": null
                                         },
                             */
-                    } catch (e) {
-                        reply.status(500).send({ error: "Internal Server Error" });
-                    }
-                }
-            );
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+      );
 
-            fastify.get("/getDeployment/:ticker", async (request, reply) => {
-                // /getDeployment/gib
-                try {
-                    const result = await this.tracManager.tapProtocol.getDeployment(
-                        request.params.ticker
-                    );
-                    reply.send({ result });
-                    /*
+      fastify.get("/getDeployment/:ticker", async (request, reply) => {
+        // /getDeployment/gib
+        try {
+          const result = await this.tracManager.tapProtocol.getDeployment(
+            request.params.ticker
+          );
+          reply.send({ result });
+          /*
                                 {
                                     "result": {
                                         "tick": "gib",
@@ -241,93 +244,96 @@ export default class RestModule {
                                     }
                                 }
                             */
-                } catch (e) {
-                    reply.status(500).send({ error: "Internal Server Error" });
-                }
-            });
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
 
-            fastify.get("/getMintTokensLeft/:ticker", async (request, reply) => {
-                // /getMintTokensLeft/gib
-                try {
-                    const result = await this.tracManager.tapProtocol.getMintTokensLeft(
-                        request.params.ticker
-                    );
-                    reply.send({ result });
-                    /*
+      fastify.get("/getMintTokensLeft/:ticker", async (request, reply) => {
+        // /getMintTokensLeft/gib
+        try {
+          const result = await this.tracManager.tapProtocol.getMintTokensLeft(
+            request.params.ticker
+          );
+          reply.send({ result });
+          /*
                                 {
                                     "result": "0"
                                 }
                             */
-                } catch (e) {
-                    reply.status(500).send({ error: "Internal Server Error" });
-                }
-            });
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
 
-            fastify.get("/getBalance/:address/:ticker", async (request, reply) => {
-                // /getBalance/bc1pccu8444ay68zltcdjzrdelpnf26us7ywg9pvwl7nkrjgrkz8rlvqe6f880/gib
-                try {
-                    const result = await this.tracManager.tapProtocol.getBalance(
-                        request.params.address,
-                        request.params.ticker
-                    );
-                    reply.send({ result });
-                    /*
+      fastify.get("/getBalance/:address/:ticker", async (request, reply) => {
+        // /getBalance/bc1pccu8444ay68zltcdjzrdelpnf26us7ywg9pvwl7nkrjgrkz8rlvqe6f880/gib
+        try {
+          const result = await this.tracManager.tapProtocol.getBalance(
+            request.params.address,
+            request.params.ticker
+          );
+          reply.send({ result });
+          /*
                                 {
                                     "result": "261000000000000000000"
                                 }
                             */
-                } catch (e) {
-                    reply.status(500).send({ error: "Internal Server Error" });
-                }
-            });
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
 
-            fastify.get("/getTransferable/:address/:ticker", async (request, reply) => {
-                // /getTransferable/bc1pccu8444ay68zltcdjzrdelpnf26us7ywg9pvwl7nkrjgrkz8rlvqe6f880/gib
-                try {
-                    const result = await this.tracManager.tapProtocol.getTransferable(
-                        request.params.address,
-                        request.params.ticker
-                    );
-                    reply.send({ result });
-                    /*
+      fastify.get(
+        "/getTransferable/:address/:ticker",
+        async (request, reply) => {
+          // /getTransferable/bc1pccu8444ay68zltcdjzrdelpnf26us7ywg9pvwl7nkrjgrkz8rlvqe6f880/gib
+          try {
+            const result = await this.tracManager.tapProtocol.getTransferable(
+              request.params.address,
+              request.params.ticker
+            );
+            reply.send({ result });
+            /*
                                 {
                                     "result": "261000000000000000000"
                                 }
                             */
-                } catch (e) {
-                    reply.status(500).send({ error: "Internal Server Error" });
-                }
-            });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+      );
 
-            fastify.get("/getHoldersLength/:ticker", async (request, reply) => {
-                // /getHoldersLength/gib
-                try {
-                    const result = await this.tracManager.tapProtocol.getHoldersLength(
-                        request.params.ticker
-                    );
-                    reply.send({ result });
-                    /*
+      fastify.get("/getHoldersLength/:ticker", async (request, reply) => {
+        // /getHoldersLength/gib
+        try {
+          const result = await this.tracManager.tapProtocol.getHoldersLength(
+            request.params.ticker
+          );
+          reply.send({ result });
+          /*
                                 {
                                     "result": "0"
                                 }
                             */
-                } catch (e) {
-                    reply.status(500).send({ error: "Internal Server Error" });
-                }
-            });
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
 
-            fastify.get("/getHolders/:ticker", async (request, reply) => {
-                try {
-                    let { offset, max } = request.query;
-                    offset = offset ? offset : 0;
-                    max = max ? max : 100;
-                    const result = await this.tracManager.tapProtocol.getHolders(
-                        request.params.ticker,
-                        offset,
-                        max
-                    );
-                    reply.send({ result });
-                    /*
+      fastify.get("/getHolders/:ticker", async (request, reply) => {
+        try {
+          let { offset, max } = request.query;
+          offset = offset ? offset : 0;
+          max = max ? max : 100;
+          const result = await this.tracManager.tapProtocol.getHolders(
+            request.params.ticker,
+            offset,
+            max
+          );
+          reply.send({ result });
+          /*
                                 {
                                     "result": [
                                         {
@@ -348,83 +354,84 @@ export default class RestModule {
                                     }
                                 }
                             */
-                } catch (e) {
-                    console.error(e);
-                    reply.status(500).send({ error: "Internal Server Error" });
-                }
-            });
+        } catch (e) {
+          console.error(e);
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
 
-            fastify.get("/getAccountTokensLength/:address", async (request, reply) => {
-                // /getAccountTokensLength/gib
-                try {
-                    const result =
-                        await this.tracManager.tapProtocol.getAccountTokensLength(
-                            request.params.address
-                        );
-                    reply.send({ result });
-                    /*
+      fastify.get(
+        "/getAccountTokensLength/:address",
+        async (request, reply) => {
+          // /getAccountTokensLength/gib
+          try {
+            const result =
+              await this.tracManager.tapProtocol.getAccountTokensLength(
+                request.params.address
+              );
+            reply.send({ result });
+            /*
                                 {
                                     "result": "0"
                                 }
                             */
-                } catch (e) {
-                    reply.status(500).send({ error: "Internal Server Error" });
-                }
-            });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+      );
 
-            fastify.get("/getAccountTokens/:address", async (request, reply) => {
-                try {
-                    let { offset, max } = request.query;
-                    offset = offset ? offset : 0;
-                    max = max ? max : 500;
-                    const result = await this.tracManager.tapProtocol.getAccountTokens(
-                        request.params.address,
-                        offset,
-                        max
-                    );
-                    reply.send({ result });
-                    /*
+      fastify.get("/getAccountTokens/:address", async (request, reply) => {
+        try {
+          let { offset, max } = request.query;
+          offset = offset ? offset : 0;
+          max = max ? max : 500;
+          const result = await this.tracManager.tapProtocol.getAccountTokens(
+            request.params.address,
+            offset,
+            max
+          );
+          reply.send({ result });
+          /*
                                 {
                                     "result": [
                                         "gib"
                                     ]
                                 }
                             */
-                } catch (e) {
-                    console.error(e);
-                    reply.status(500).send({ error: "Internal Server Error" });
-                }
-            });
+        } catch (e) {
+          console.error(e);
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
 
-
-            fastify.get("/getDmtElementsListLength", async (request, reply) => {
-                // /getDmtElementsListLength/gib
-                try {
-                    const result =
-                        await this.tracManager.tapProtocol.getDmtElementsListLength();
-                    reply.send({ result });
-                    /*
+      fastify.get("/getDmtElementsListLength", async (request, reply) => {
+        // /getDmtElementsListLength/gib
+        try {
+          const result =
+            await this.tracManager.tapProtocol.getDmtElementsListLength();
+          reply.send({ result });
+          /*
                         {
                             "result": 72
                         }
                     */
-                } catch (e) {
-                    reply.status(500).send({ error: "Internal Server Error" });
-                }
-            });
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
 
-
-            fastify.get("/getDmtElementsList", async (request, reply) => {
-                try {
-                    let { offset, max } = request.query;
-                    offset = offset ? offset : 0;
-                    max = max ? max : 500;
-                    const result = await this.tracManager.tapProtocol.getDmtElementsList(
-                        offset,
-                        max
-                    );
-                    reply.send({ result });
-                    /*
+      fastify.get("/getDmtElementsList", async (request, reply) => {
+        try {
+          let { offset, max } = request.query;
+          offset = offset ? offset : 0;
+          max = max ? max : 500;
+          const result = await this.tracManager.tapProtocol.getDmtElementsList(
+            offset,
+            max
+          );
+          reply.send({ result });
+          /*
                                 {
                                     "result": [
                                         {
@@ -452,109 +459,104 @@ export default class RestModule {
                                     }
                                 }
                             */
-                } catch (e) {
-                    reply.status(500).send({ error: "Internal Server Error" });
-                }
-            });
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
 
-
-            fastify.get("/getAccountMintListLength/:address/:ticker", async (request, reply) => {
-                // /getAccountMintListLength/bc1pccu8444ay68zltcdjzrdelpnf26us7ywg9pvwl7nkrjgrkz8rlvqe6f880/gib
-                try {
-                    const result =
-                        await this.tracManager.tapProtocol.getAccountMintListLength(
-                            request.params.address,
-                            request.params.ticker
-                        );
-                    reply.send({ result });
-                    /*
+      fastify.get(
+        "/getAccountMintListLength/:address/:ticker",
+        async (request, reply) => {
+          // /getAccountMintListLength/bc1pccu8444ay68zltcdjzrdelpnf26us7ywg9pvwl7nkrjgrkz8rlvqe6f880/gib
+          try {
+            const result =
+              await this.tracManager.tapProtocol.getAccountMintListLength(
+                request.params.address,
+                request.params.ticker
+              );
+            reply.send({ result });
+            /*
                                 {
                                     "result": 1
                                 }
                             */
-                } catch (e) {
-                    reply.status(500).send({ error: "Internal Server Error" });
-                }
-            });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+      );
 
-            fastify.get(
-                "/getAccountMintList/:address/:ticker",
-                async (request, reply) => {
-                    try {
-                        let { offset, max } = request.query;
-                        offset = offset ? offset : 0;
-                        max = max ? max : 500;
-                        const result = await this.tracManager.tapProtocol.getAccountMintList(
-                            request.params.address,
-                            request.params.ticker,
-                            offset,
-                            max
-                        );
-                        reply.send({ result });
-                    } catch (e) {
-                        reply.status(500).send({ error: "Internal Server Error" });
-                    }
-                }
-            );
+      fastify.get(
+        "/getAccountMintList/:address/:ticker",
+        async (request, reply) => {
+          try {
+            let { offset, max } = request.query;
+            offset = offset ? offset : 0;
+            max = max ? max : 500;
+            const result =
+              await this.tracManager.tapProtocol.getAccountMintList(
+                request.params.address,
+                request.params.ticker,
+                offset,
+                max
+              );
+            reply.send({ result });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+      );
 
-
-
-
-
-
-
-
-            fastify.get("/getTickerMintListLength/:ticker", async (request, reply) => {
-                // /getTickerMintListLength/gib
-                try {
-                    const result =
-                        await this.tracManager.tapProtocol.getTickerMintListLength(
-                            request.params.ticker
-                        );
-                    reply.send({ result });
-                    /*
+      fastify.get(
+        "/getTickerMintListLength/:ticker",
+        async (request, reply) => {
+          // /getTickerMintListLength/gib
+          try {
+            const result =
+              await this.tracManager.tapProtocol.getTickerMintListLength(
+                request.params.ticker
+              );
+            reply.send({ result });
+            /*
                                 {
                                     "result": "0"
                                 }
                             */
-                } catch (e) {
-                    reply.status(500).send({ error: "Internal Server Error" });
-                }
-            });
-
-            fastify.get(
-                "/getTickerMintList/:ticker",
-                async (request, reply) => {
-                    try {
-                        let { offset, max } = request.query;
-                        offset = offset ? offset : 0;
-                        max = max ? max : 500;
-                        const result = await this.tracManager.tapProtocol.getTickerMintList(
-                            request.params.ticker,
-                            offset,
-                            max
-                        );
-                        reply.send({ result });
-                    } catch (e) {
-                        reply.status(500).send({ error: "Internal Server Error" });
-                    }
-                }
-            );
-
-
-            done();
-        });
-    }
-
-    async start() {
-        try {
-            const port = config.get("restPort") || 3000; // Defaulting to 3000 if not configured
-            await this.fastify.listen({ port });
-            // this.fastify.swagger();
-            console.log(`TRAC REST server listening on port ${port}`);
-        } catch (err) {
-            this.fastify.log.error(err);
-            process.exit(1);
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
         }
+      );
+
+      fastify.get("/getTickerMintList/:ticker", async (request, reply) => {
+        try {
+          let { offset, max } = request.query;
+          offset = offset ? offset : 0;
+          max = max ? max : 500;
+          const result = await this.tracManager.tapProtocol.getTickerMintList(
+            request.params.ticker,
+            offset,
+            max
+          );
+          reply.send({ result });
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
+
+      done();
+    });
+  }
+
+  async start() {
+    try {
+      const port = config.get("restPort") || 3000; // Defaulting to 3000 if not configured
+      await this.fastify.listen({ port });
+      // this.fastify.swagger();
+      console.log(`TRAC REST server listening on port ${port}`);
+    } catch (err) {
+      this.fastify.log.error(err);
+      process.exit(1);
     }
+  }
 }
