@@ -396,6 +396,24 @@ export default class RestModule {
                 }
             });
 
+
+            fastify.get("/getDmtElementsListLength", async (request, reply) => {
+                // /getDmtElementsListLength/gib
+                try {
+                    const result =
+                        await this.tracManager.tapProtocol.getDmtElementsListLength();
+                    reply.send({ result });
+                    /*
+                        {
+                            "result": 72
+                        }
+                    */
+                } catch (e) {
+                    reply.status(500).send({ error: "Internal Server Error" });
+                }
+            });
+
+
             fastify.get("/getDmtElementsList", async (request, reply) => {
                 try {
                     let { offset, max } = request.query;
@@ -439,15 +457,34 @@ export default class RestModule {
                 }
             });
 
+
+            fastify.get("/getAccountMintListLength/:address/:ticker", async (request, reply) => {
+                // /getAccountMintListLength/bc1pccu8444ay68zltcdjzrdelpnf26us7ywg9pvwl7nkrjgrkz8rlvqe6f880/gib
+                try {
+                    const result =
+                        await this.tracManager.tapProtocol.getAccountMintListLength(
+                            request.params.address,
+                            request.params.ticker
+                        );
+                    reply.send({ result });
+                    /*
+                                {
+                                    "result": 1
+                                }
+                            */
+                } catch (e) {
+                    reply.status(500).send({ error: "Internal Server Error" });
+                }
+            });
+
             fastify.get(
-                "/getTickerMintList/:address/:ticker",
+                "/getAccountMintList/:address/:ticker",
                 async (request, reply) => {
-                    // Gets the total number of mints performed by a specific address for a given ticker
                     try {
                         let { offset, max } = request.query;
                         offset = offset ? offset : 0;
                         max = max ? max : 500;
-                        const result = await this.tracManager.tapProtocol.getTickerMintList(
+                        const result = await this.tracManager.tapProtocol.getAccountMintList(
                             request.params.address,
                             request.params.ticker,
                             offset,
@@ -459,6 +496,13 @@ export default class RestModule {
                     }
                 }
             );
+
+
+
+
+
+
+
 
             fastify.get("/getTickerMintListLength/:ticker", async (request, reply) => {
                 // /getTickerMintListLength/gib
@@ -477,6 +521,26 @@ export default class RestModule {
                     reply.status(500).send({ error: "Internal Server Error" });
                 }
             });
+
+            fastify.get(
+                "/getTickerMintList/:ticker",
+                async (request, reply) => {
+                    try {
+                        let { offset, max } = request.query;
+                        offset = offset ? offset : 0;
+                        max = max ? max : 500;
+                        const result = await this.tracManager.tapProtocol.getTickerMintList(
+                            request.params.ticker,
+                            offset,
+                            max
+                        );
+                        reply.send({ result });
+                    } catch (e) {
+                        reply.status(500).send({ error: "Internal Server Error" });
+                    }
+                }
+            );
+
 
             done();
         });
