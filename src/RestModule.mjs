@@ -57,32 +57,6 @@ export default class RestModule {
 
       fastify.get(
         "/getTransferAmountByInscription/:inscription_id",
-        {
-          schema: {
-            description: "Get transfer amount by inscription ID",
-            //   tags: ['TracManager'],
-            params: {
-              type: "object",
-              properties: {
-                inscription_id: { type: "string" },
-              },
-            },
-            response: {
-              200: {
-                type: "object",
-                properties: {
-                  result: { type: "string" },
-                },
-              },
-              500: {
-                type: "object",
-                properties: {
-                  error: { type: "string" },
-                },
-              },
-            },
-          },
-        },
         async (request, reply) => {
           // /getTransferAmountByInscription/1b8e21761557bbf66c06ae3d8109764d0d8ec5d431b8291160b59ef28ffaab7ai0
           try {
@@ -105,26 +79,6 @@ export default class RestModule {
 
       fastify.get(
         "/getDeploymentsLength",
-        {
-          schema: {
-            description: "Get the length of deployments",
-            tags: ["Lengths"],
-            response: {
-              200: {
-                type: "object",
-                properties: {
-                  result: { type: "number" },
-                },
-              },
-              500: {
-                type: "object",
-                properties: {
-                  error: { type: "string" },
-                },
-              },
-            },
-          },
-        },
         async (request, reply) => {
           try {
             const result =
@@ -143,41 +97,8 @@ export default class RestModule {
 
       fastify.get(
         "/getDeployments",
-        {
-          schema: {
-            description: "Get a list of deployments",
-            // tags: ["TracManager"],
-            querystring: {
-              type: "object",
-              properties: {
-                offset: { type: "integer", default: 0 },
-                max: { type: "integer", default: 100 },
-              },
-            },
-            response: {
-              200: {
-                type: "object",
-                properties: {
-                  result: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      // Define the properties of each deployment object here
-                    },
-                  },
-                },
-              },
-              500: {
-                type: "object",
-                properties: {
-                  error: { type: "string" },
-                },
-              },
-            },
-          },
-        },
         async (request, reply) => {
-          // /getDeployments/?offset=0&max=2
+          // /getDeployments?offset=0&max=2
           try {
             let { offset, max } = request.query;
             offset = offset ? offset : 0;
@@ -582,7 +503,7 @@ export default class RestModule {
       });
 
       fastify.get("/getTrade/:inscription_id", async (request, reply) => {
-        // /getTrade/c2eec0b30a242605c156408d7bff8081acf5fb0d5afd7937eacfeda41bddd07bi0
+        // /getTrade/91e946faa1b4f50f1ebc0c8ccc5f3196dcd3d80d10be6f5187885efa390cbc10i0
         try {
           const result = await this.tracManager.tapProtocol.getTrade(
             request.params.inscription_id
