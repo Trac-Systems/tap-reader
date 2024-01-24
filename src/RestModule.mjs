@@ -702,6 +702,48 @@ export default class RestModule {
         }
       });
 
+      fastify.get("/getTickerTradesListLength/:ticker", async (request, reply) => {
+        try {
+          const result = await this.tracManager.tapProtocol.getTickerTradesListLength(request.params.ticker);
+          reply.send({ result });
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
+    
+      // getTickerTradesList
+      fastify.get("/getTickerTradesList/:ticker", async (request, reply) => {
+        let { offset, max } = request.query;
+        try {
+          const result = await this.tracManager.tapProtocol.getTickerTradesList(request.params.ticker, offset, max);
+          reply.send({ result });
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
+    
+      // getTradesListLength
+      fastify.get("/getTradesListLength", async (request, reply) => {
+        try {
+          const result = await this.tracManager.tapProtocol.getTradesListLength();
+          reply.send({ result });
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
+    
+      // getTradesList
+      fastify.get("/getTradesList", async (request, reply) => {
+        let { offset, max } = request.query;
+        try {
+          const result = await this.tracManager.tapProtocol.getTradesList(offset, max);
+          reply.send({ result });
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
+    
+
       done();
     });
   }
