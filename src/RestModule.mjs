@@ -77,38 +77,33 @@ export default class RestModule {
         }
       );
 
-      fastify.get(
-        "/getDeploymentsLength",
-        async (request, reply) => {
-          try {
-            const result =
-              await this.tracManager.tapProtocol.getDeploymentsLength();
-            reply.send({ result });
-            /*
+      fastify.get("/getDeploymentsLength", async (request, reply) => {
+        try {
+          const result =
+            await this.tracManager.tapProtocol.getDeploymentsLength();
+          reply.send({ result });
+          /*
                                 {
                                     "result": 14881
                                 }
                             */
-          } catch (e) {
-            reply.status(500).send({ error: "Internal Server Error" });
-          }
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
         }
-      );
+      });
 
-      fastify.get(
-        "/getDeployments",
-        async (request, reply) => {
-          // /getDeployments?offset=0&max=2
-          try {
-            let { offset, max } = request.query;
-            offset = offset ? offset : 0;
-            max = max ? max : 100;
-            const result = await this.tracManager.tapProtocol.getDeployments(
-              offset,
-              max
-            );
-            reply.send({ result });
-            /*
+      fastify.get("/getDeployments", async (request, reply) => {
+        // /getDeployments?offset=0&max=2
+        try {
+          let { offset, max } = request.query;
+          offset = offset ? offset : 0;
+          max = max ? max : 100;
+          const result = await this.tracManager.tapProtocol.getDeployments(
+            offset,
+            max
+          );
+          reply.send({ result });
+          /*
                                 {
                                     "result": [
                                         {
@@ -130,11 +125,10 @@ export default class RestModule {
                                             "dt": null
                                         },
                             */
-          } catch (e) {
-            reply.status(500).send({ error: "Internal Server Error" });
-          }
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
         }
-      );
+      });
 
       fastify.get("/getDeployment/:ticker", async (request, reply) => {
         // /getDeployment/gib
@@ -497,8 +491,8 @@ export default class RestModule {
                                 }
                             */
         } catch (e) {
-            console.log(e)
-            reply.status(500).send({ error: "Internal Server Error" });
+          console.log(e);
+          reply.status(500).send({ error: "Internal Server Error" });
         }
       });
 
@@ -540,6 +534,72 @@ export default class RestModule {
           }
         }
       );
+
+      fastify.get(
+        "/getAccountTradesList/:address/:ticker",
+        async (request, reply) => {
+          // /getAccountTradesList/:address/:ticker
+          try {
+            let { offset, max } = request.query;
+            offset = offset ? offset : 0;
+            max = max ? max : 500;
+            const result =
+              await this.tracManager.tapProtocol.getAccountTradesList(
+                request.params.address,
+                request.params.ticker,
+                offset,
+                max
+              );
+            reply.send({ result });
+            /*
+                                {
+                                    "result": "0"
+                                }
+                            */
+          } catch (e) {
+            console.log(e);
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+      );
+
+      // getAuthCancelled
+      fastify.get(
+        "/getAuthCancelled/:inscription_id",
+        async (request, reply) => {
+          try {
+            const result = await this.tracManager.tapProtocol.getAuthCancelled(
+              request.params.inscription_id
+            );
+            reply.send({ result });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+      );
+
+      // getAuthHashExists
+      fastify.get("/getAuthHashExists/:hash", async (request, reply) => {
+        try {
+          const result = await this.tracManager.tapProtocol.getAuthHashExists(
+            request.params.hash
+          );
+          reply.send({ result });
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
+
+      // getRedeemListLength
+      fastify.get("/getRedeemListLength", async (request, reply) => {
+        try {
+          const result =
+            await this.tracManager.tapProtocol.getRedeemListLength();
+          reply.send({ result });
+        } catch (e) {
+          reply.status(500).send({ error: "Internal Server Error" });
+        }
+      });
 
       done();
     });
