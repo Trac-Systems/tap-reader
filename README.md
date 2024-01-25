@@ -52,11 +52,6 @@ Either download this package using git clone or install it through npmjs (if you
 git clone https://github.com/Trac-Systems/tap-reader.git
 cd tap-reader
 npm i
-```
-
-Then CD into the package folder's root and start it using:
-
-```
 npm start
 ```
 
