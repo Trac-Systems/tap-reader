@@ -162,7 +162,7 @@ export default class TapProtocol {
   /**
    * Retrieves a list of tokens held by a specific address.
    * @param {string} address - The address for which to retrieve tokens.
-   * @param {number} [offset=0] - The starting index for retrieving tokens.
+   * @param {number} [offset=0] - The starting index for rich etrieving tokens.
    * @param {number} [max=500] - The maximum number of tokens to retrieve.
    * @returns {Promise<Array>} An array of token tickers.
    */
@@ -262,12 +262,10 @@ export default class TapProtocol {
     return out;
   }
   /**
-   * Gets the total number of mints performed by a specific address for a given ticker.
-   * @param {string} address - The address for which to retrieve the mint count.
+   * Retrieves the length of the mint list for a specific ticker.
    * @param {string} ticker - The ticker of the token.
-   * @returns {Promise<number>} The number of mints performed by the address for the specified ticker.
+   * @returns {Promise<number>} A promise that resolves with the length of the mint list.
    */
-
   async getTickerMintListLength(ticker) {
     return this.getLength("fml/" + JSON.stringify(ticker.toLowerCase()));
   }

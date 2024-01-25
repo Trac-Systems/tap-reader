@@ -2,10 +2,10 @@ import Corestore from "corestore";
 import Hyperswarm from "hyperswarm";
 import Hyperbee from "hyperbee";
 import goodbye from "graceful-goodbye";
-// import b4a from "b4a";
 import config from "config";
 import figlet from "figlet";
 import WebsocketModule from "./WebsocketModule.mjs";
+import RestModule from "./RestModule.mjs";
 import TapProtocol from "./TapProtocol.mjs";
 
 /**
@@ -22,6 +22,10 @@ export default class TracManager {
    * @property {TapProtocol} tapProtocol - Instance of TapProtocol to manage TAP interactions and data streams.
    */
   tapProtocol;
+  /**
+   * @property {RestModule} restServer - Instance of RestModule for REST API access.
+   */
+  restServer;
   constructor() {
     this.isConnected = false;
     this.store = new Corestore("./tapstore");
@@ -79,6 +83,12 @@ export default class TracManager {
     if (config.get("enableWebsockets")) {
       console.log("Enabling websocket");
       this.websocketServer = new WebsocketModule(this);
+    }
+
+    if(config.get("enableRest")) {
+      console.log('Enabling REST endpoint');
+      this.restServer = new RestModule(this);
+      this.restServer.start();
     }
 
     // await this.sleep(30 * 1000);
