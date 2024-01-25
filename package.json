@@ -10,8 +10,7 @@
   },
   "bin": {
     "myapp": "src/main.mjs"
-  }
-  ,
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Trac-Systems/tap-reader.git"
