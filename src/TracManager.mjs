@@ -63,13 +63,13 @@ export default class TracManager {
       sparse: true,
     });
 
-    console.log("Corestore key:", this.core.key.toString("hex"));
+    console.log("Channel:", this.core.key.toString("hex"));
 
     await this.core.ready();
     await this.initHyperswarm(server, client);
 
     if (rangeStart > -1) {
-      // TODO: is this needed?
+      // TODO: range download is not very fast & efficient and should be replaced with non-sparse downloads instead
       this.startRangeDownload(rangeStart, rangeEnd);
     }
 
