@@ -1,6 +1,6 @@
 {
-  "name": "@trac-systems/tap-reader",
-  "version": "0.13.37",
+  "name": "@trac-network/tap-reader",
+  "version": "0.13.37-beta",
   "description": "decentralized trac core module",
   "main": "src/main.mjs",
   "scripts": {
@@ -8,6 +8,10 @@
     "start": "node src/main.mjs",
     "postinstall": "patch-package"
   },
+  "bin": {
+    "myapp": "src/main.mjs"
+  }
+  ,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Trac-Systems/tap-reader.git"
@@ -63,6 +67,9 @@
     "@jest/globals": "^29.7.0",
     "eslint": "^8.56.0",
     "jest": "^29.7.0"
-
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "author": "Trac Systems"
 }
