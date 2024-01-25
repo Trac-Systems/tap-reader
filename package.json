@@ -9,7 +9,7 @@
     "postinstall": "patch-package"
   },
   "bin": {
-    "myapp": "src/main.mjs"
+    "myapp": "./src/main.mjs"
   },
   "repository": {
     "type": "git",
