@@ -1,6 +1,6 @@
 {
   "name": "@trac-network/tap-reader",
-  "version": "0.13.39-beta",
+  "version": "0.13.40-beta",
   "description": "decentralized trac core module",
   "main": "src/main.mjs",
   "scripts": {
