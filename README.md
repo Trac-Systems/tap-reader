@@ -55,6 +55,12 @@ npm i
 npm start
 ```
 
+## Running in background
+
+There are several different ways to run readers in the background. We recommend to use PM2 to run and organize your readers, especially if you are running multiple instances:
+
+https://pm2.keymetrics.io/
+
 ## API Usage
 
 Either use the reader diretly like so from within your application (please note that your app process will have exclusive access to the reader's db):
