@@ -6,9 +6,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/main.mjs",
-    "docs:tap": "jsdoc2md -c jsdoc.conf -f src/TapProtocol.mjs > docs/tap.md",
-    "docs:trac": "jsdoc2md -c jsdoc.conf -f src/TracManager.mjs > docs/trac.md",
-    "docs:ws": "jsdoc2md -c jsdoc.conf -f src/WebsocketModule.mjs > docs/ws.md",
     "postinstall": "patch-package"
   },
   "repository": {
@@ -65,7 +62,7 @@
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "eslint": "^8.56.0",
-    "jest": "^29.7.0",
-    "jsdoc-to-markdown": "^8.0.0"
+    "jest": "^29.7.0"
+
   }
 }
