@@ -562,7 +562,28 @@ export default class RestModule {
         }
       });
 
-      fastify.get("/getDmtElementsListLength", async (request, reply) => {
+      fastify.get("/getDmtElementsListLength",{
+        schema: {
+          description: "Get the total number of DMT elements",
+          tags: ["DMT"],
+          response: {
+            200: {
+              description: 'Successful response',
+              type: 'object',
+              properties: {
+                result: { type: 'number' }
+              }
+            },
+            500: {
+              description: 'Internal server error',
+              type: 'object',
+              properties: {
+                error: { type: 'string' }
+              }
+            }
+          }
+        }
+      }, async (request, reply) => {
         // /getDmtElementsListLength/gib
         try {
           const result =
@@ -578,7 +599,38 @@ export default class RestModule {
         }
       });
 
-      fastify.get("/getDmtElementsList", async (request, reply) => {
+      fastify.get("/getDmtElementsList", {
+        schema: {
+          description: "Retrieve a list of DMT elements",
+          tags: ["DMT"],
+          querystring: {
+            type: 'object',
+            properties: {
+              offset: { type: 'integer', default: 0 },
+              max: { type: 'integer', default: 500 }
+            }
+          },
+        //   response: {
+        //     200: {
+        //       description: 'Successful response',
+        //       type: 'object',
+        //       properties: {
+        //         result: { 
+        //           type: 'array',
+        //           items: { type: 'object' } // TODO: Specify the structure of each DMT element object
+        //         }
+        //       }
+        //     },
+        //     500: {
+        //       description: 'Internal server error',
+        //       type: 'object',
+        //       properties: {
+        //         error: { type: 'string' }
+        //       }
+        //     }
+        //   }
+        }
+      }, async (request, reply) => {
         try {
           let { offset, max } = request.query;
           offset = offset ? offset : 0;
@@ -623,6 +675,36 @@ export default class RestModule {
 
       fastify.get(
         "/getAccountMintListLength/:address/:ticker",
+        {
+            schema: {
+              description: "Get the number of mints performed by a specific address for a given ticker",
+              tags: ["Minting"],
+              params: {
+                type: 'object',
+                required: ['address', 'ticker'],
+                properties: {
+                  address: { type: 'string' },
+                  ticker: { type: 'string' }
+                }
+              },
+              response: {
+                200: {
+                  description: 'Successful response',
+                  type: 'object',
+                  properties: {
+                    result: { type: 'number' }
+                  }
+                },
+                500: {
+                  description: 'Internal server error',
+                  type: 'object',
+                  properties: {
+                    error: { type: 'string' }
+                  }
+                }
+              }
+            }
+          },
         async (request, reply) => {
           // /getAccountMintListLength/bc1pccu8444ay68zltcdjzrdelpnf26us7ywg9pvwl7nkrjgrkz8rlvqe6f880/gib
           try {
@@ -645,6 +727,47 @@ export default class RestModule {
 
       fastify.get(
         "/getAccountMintList/:address/:ticker",
+        {
+          schema: {
+            description:
+              "Retrieve a list of mints performed by a specific address for a given ticker",
+            tags: ["Minting"],
+            params: {
+              type: "object",
+              required: ["address", "ticker"],
+              properties: {
+                address: { type: "string" },
+                ticker: { type: "string" },
+              },
+            },
+            querystring: {
+              type: "object",
+              properties: {
+                offset: { type: "integer", default: 0 },
+                max: { type: "integer", default: 500 },
+              },
+            },
+            // response: {
+            //   200: {
+            //     description: "Successful response",
+            //     type: "object",
+            //     properties: {
+            //       result: {
+            //         type: "array",
+            //         items: { type: "string" }, // Assuming the result is an array of strings
+            //       },
+            //     },
+            //   },
+            //   500: {
+            //     description: "Internal server error",
+            //     type: "object",
+            //     properties: {
+            //       error: { type: "string" },
+            //     },
+            //   },
+            // },
+          },
+        },
         async (request, reply) => {
           try {
             let { offset, max } = request.query;
@@ -666,7 +789,35 @@ export default class RestModule {
 
       fastify.get(
         "/getTickerMintListLength/:ticker",
-        async (request, reply) => {
+        {
+            schema: {
+              description: "Get the length of the mint list for a specific ticker",
+              tags: ["Minting"],
+              params: {
+                type: 'object',
+                required: ['ticker'],
+                properties: {
+                  ticker: { type: 'string' }
+                }
+              },
+              response: {
+                200: {
+                  description: 'Successful response',
+                  type: 'object',
+                  properties: {
+                    result: { type: 'number' }
+                  }
+                },
+                500: {
+                  description: 'Internal server error',
+                  type: 'object',
+                  properties: {
+                    error: { type: 'string' }
+                  }
+                }
+              }
+            }
+          }, async (request, reply) => {
           // /getTickerMintListLength/gib
           try {
             const result =
@@ -685,7 +836,45 @@ export default class RestModule {
         }
       );
 
-      fastify.get("/getTickerMintList/:ticker", async (request, reply) => {
+      fastify.get("/getTickerMintList/:ticker", {
+        schema: {
+          description: "Retrieve a list of mint records for a specific ticker",
+          tags: ["Minting"],
+          params: {
+            type: 'object',
+            required: ['ticker'],
+            properties: {
+              ticker: { type: 'string' }
+            }
+          },
+          querystring: {
+            type: 'object',
+            properties: {
+              offset: { type: 'integer', default: 0 },
+              max: { type: 'integer', default: 500 }
+            }
+          },
+        //   response: {
+        //     200: {
+        //       description: 'Successful response',
+        //       type: 'object',
+        //       properties: {
+        //         result: { 
+        //           type: 'array',
+        //           items: { type: 'string' } // TODO: Assuming the result is an array of strings
+        //         }
+        //       }
+        //     },
+        //     500: {
+        //       description: 'Internal server error',
+        //       type: 'object',
+        //       properties: {
+        //         error: { type: 'string' }
+        //       }
+        //     }
+        //   }
+        }
+      }, async (request, reply) => {
         try {
           let { offset, max } = request.query;
           offset = offset ? offset : 0;
