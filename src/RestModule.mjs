@@ -1658,44 +1658,148 @@ export default class RestModule {
       );
 
       // getTickerTradesList
-      fastify.get("/getTickerTradesList/:ticker", async (request, reply) => {
-        let { offset, max } = request.query;
-        try {
-          const result = await this.tracManager.tapProtocol.getTickerTradesList(
-            request.params.ticker,
-            offset,
-            max
-          );
-          reply.send({ result });
-        } catch (e) {
-          reply.status(500).send({ error: "Internal Server Error" });
+      fastify.get(
+        "/getTickerTradesList/:ticker",
+        {
+          schema: {
+            description: "Retrieve a list of trades for a specific ticker",
+            tags: ["Trade"],
+            params: {
+              type: "object",
+              required: ["ticker"],
+              properties: {
+                ticker: { type: "string" },
+              },
+            },
+            querystring: {
+              type: "object",
+              properties: {
+                offset: { type: "integer", default: 0 },
+                max: { type: "integer", default: 500 },
+              },
+            },
+            // response: {
+            //   200: {
+            //     description: "Successful response",
+            //     type: "object",
+            //     properties: {
+            //       result: {
+            //         type: "array",
+            //         items: { type: "string" }, // TODO: Specify the structure of each trade record
+            //       },
+            //     },
+            //   },
+            //   500: {
+            //     description: "Internal server error",
+            //     type: "object",
+            //     properties: {
+            //       error: { type: "string" },
+            //     },
+            //   },
+            // },
+          },
+        },
+        async (request, reply) => {
+          let { offset, max } = request.query;
+          try {
+            const result =
+              await this.tracManager.tapProtocol.getTickerTradesList(
+                request.params.ticker,
+                offset,
+                max
+              );
+            reply.send({ result });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
         }
-      });
+      );
 
       // getTradesListLength
-      fastify.get("/getTradesListLength", async (request, reply) => {
-        try {
-          const result =
-            await this.tracManager.tapProtocol.getTradesListLength();
-          reply.send({ result });
-        } catch (e) {
-          reply.status(500).send({ error: "Internal Server Error" });
+      fastify.get(
+        "/getTradesListLength",
+        {
+          schema: {
+            description: "Get the total number of trades across all tickers",
+            tags: ["Trade"],
+            response: {
+              200: {
+                description: "Successful response",
+                type: "object",
+                properties: {
+                  result: { type: "number" },
+                },
+              },
+              500: {
+                description: "Internal server error",
+                type: "object",
+                properties: {
+                  error: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        async (request, reply) => {
+          try {
+            const result =
+              await this.tracManager.tapProtocol.getTradesListLength();
+            reply.send({ result });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
         }
-      });
+      );
 
       // getTradesList
-      fastify.get("/getTradesList", async (request, reply) => {
-        let { offset, max } = request.query;
-        try {
-          const result = await this.tracManager.tapProtocol.getTradesList(
-            offset,
-            max
-          );
-          reply.send({ result });
-        } catch (e) {
-          reply.status(500).send({ error: "Internal Server Error" });
+      fastify.get(
+        "/getTradesList",
+        {
+          schema: {
+            description:
+              "Retrieve a list of all trade records across all tickers",
+            tags: ["Trade"],
+            querystring: {
+              type: "object",
+              properties: {
+                offset: { type: "integer", default: 0 },
+                max: { type: "integer", default: 500 },
+              },
+            },
+            // response: {
+            //   200: {
+            //     description: "Successful response",
+            //     type: "object",
+            //     properties: {
+            //       result: {
+            //         type: "array",
+            //         items: { type: "string" }, // TODO: Specify the structure of each trade record
+            //       },
+            //     },
+            //   },
+            //   500: {
+            //     description: "Internal server error",
+            //     type: "object",
+            //     properties: {
+            //       error: { type: "string" },
+            //     },
+            //   },
+            // },
+          },
+        },
+        async (request, reply) => {
+          let { offset, max } = request.query;
+          try {
+            const result = await this.tracManager.tapProtocol.getTradesList(
+              offset,
+              max
+            );
+            reply.send({ result });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
         }
-      });
+      );
 
       // getAccountTransferListLength
       fastify.get(
