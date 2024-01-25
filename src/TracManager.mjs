@@ -54,7 +54,8 @@ export default class TracManager {
     rangeEnd = -1
   ) {
     // Initialize Corestore and Hyperswarm
-    console.log(figlet.textSync("TAP Protocol Reader"));
+    console.log(figlet.textSync("Trac Core Reader"));
+    console.log("Protocol: Ordinals/TAP");
 
     this.core = this.store.get({
       key: process.argv[2]
@@ -63,13 +64,13 @@ export default class TracManager {
       sparse: true,
     });
 
-    console.log("Corestore key:", this.core.key.toString("hex"));
+    console.log("Channel:", this.core.key.toString("hex"));
 
     await this.core.ready();
     await this.initHyperswarm(server, client);
 
     if (rangeStart > -1) {
-      // TODO: is this needed?
+      // TODO: range download is not very fast & efficient and should be replaced with non-sparse downloads instead
       this.startRangeDownload(rangeStart, rangeEnd);
     }
 

@@ -1,6 +1,66 @@
-# Trac Core Tap-Reader
+# Trac Core Reader for TAP Protocol
+
+Trac Core Reader for TAP Protocol is a NodeJS-based application that provides decentralized access to indexed TAP Protocol data.
+
+The reader basically represents a decentralized API to build upon Bitcoin Ordinal's TAP Protocol.
+
+It sits on top of Holepunch (https://github.com/holepunchto), a set of libraries that enables decentralized data-storage and distribution.
+
+You may run this reader within various restricted networks. Through holepunching, it will try to connect with its peers on the network through any means necessary, helping to maintain steady availability.
+
+As a project/developer, you may use this reader in 3 different ways:
+
+- Utilizing the TracManager's native methods (see below)
+- Enabling REST Endpoints
+- Using websocket-based streaming
+- ... or all of the above combined.
+
+If you do not intend to develop with this package but want to support the project, you may just run it in the background to help strengthen the network.
+
+Trac Core Reader for TAP Protocol is open-source (MIT license) and in beta state, use it on your own risk as stated in the license.
+
+## How it works
+
+The reader connects to the Trac network by subscribing to a channel to request indexing data. Currently the indexers behind this channel are not part of the entire Trac Core release yet but will be released at a later point (the actual writers).
+
+Once a channel has been picked (in the config or upon start), the reader will try to look for peers and starts to share data, similar to how it works with for example with Bittorrent.
+
+This data can then be used through the different APIs that this package provides for further processing within your apps.
+
+## Channel Hopping
+
+Should indexer upgrades require a new channel to hop on, the new channel will be broadcasted through different means by the Trac project.
+
+Ultimately, Trac will carefully roll out an entire system that allows for automated channel hopping as well as decentralized upgrade broadcasts.
+
+The most recent channel is always pre-defined in the reader's config of this repo.
+
+## Requirements
+
+- Linux, Windows, MacOS
+- NodeJS 20+
+- 2-4 CPU Cores, 8GB RAM
+- 500GB SSD drive (make sure it's a good one)
+
+Should work perfectly on Pi 3-5 and low Watts.
+
+## Installation
+
+Either download this package or install it through npmjs:
+
+```
+npm install tap-reader
+```
+
+Then CD into the package folder's root and start it using:
+
+```
+npm start
+```
 
 ## API Usage
+
+Either use the reader diretly like so from within your application (please note that your app process will have exclusive access to the reader's db):
 
 ```js
 import TracManager from "./TracManager.mjs";
@@ -9,22 +69,37 @@ import TracManager from "./TracManager.mjs";
 let tracCore = new TracManager();
 
 // Initialize the reader for the TAP Protocol
-await tracCore.initReader(true, true, -1, -1);
+await tracCore.initReader();
 
 // Example: Retrieve transfer amount by inscription
 let amount = await tracCore.tapProtocol.getTransferAmountByInscription('1b8e21761557bbf66c06ae3d8109764d0d8ec5d431b8291160b59ef28ffaab7ai0');
 
 ```
 
+If rest is enabled, you can instead use the exposed endpoints. You may test these endpoints like this if REST is enabled in the config:
+
+```
+http://localhost:5099/docs
+```
+
+In case websockets are enabled, you can access their endpoints according to this documentation:
+
+https://github.com/BennyTheDev/trac-tap-public-endpoint
+
+Just swap out the given domain in that endpoint example above with your websocket url and port.
+
 ## Configuration File
 > Defaults to ./config/default.json file, enabling websocket server if needed.
 
 ```json
 {
-    "enableWebsockets": true,
-    "websocketPort": 5095,
-    "websocketCORS": "*",
-    "channel": "53d2e64fa7a09e9dc74fc52ee9e9feb9d59b3e2cff4a25dfb543ec3b0bf4b281"
+  "enableRest": true,
+  "restPort": 5099,
+  "enableWebsockets": false,
+  "websocketPort": 5095,
+  "websocketCORS": "*",
+  "channel": "53d2e64fa7a09e9dc74fc52ee9e9feb9d59b3e2cff4a25dfb543ec3b0bf4b281",
+  "channelProduction": "53d2e64fa7a09e9dc74fc52ee9e9feb9d59b3e2cff4a25dfb543ec3b0bf4b281"
 }
 ```
 
@@ -32,7 +107,7 @@ let amount = await tracCore.tapProtocol.getTransferAmountByInscription('1b8e2176
 
 ## Important note
 
-Installing with `npm i` triggers the postinstall script, which patches hypercore library.
+Installing with `npm i` triggers the postinstall script, which patches hypercore library. This is yet necessary before the stable release of the reader.
 
 ```js
 "scripts": {
@@ -45,7 +120,7 @@ Installing with `npm i` triggers the postinstall script, which patches hypercore
 <dl>
 <dt><a href="#initReader">initReader([server], [client], [rangeStart], [rangeEnd])</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
 <dd><p>Initializes the reader for the TAP Protocol, setting up corestore and hyperswarm.
-Also configures the Hyperbee database and, optionally, a websocket server.</p>
+Also configures the Hyperbee database and, optionally, a websocket and REST server.</p>
 </dd>
 <dt><a href="#initHyperswarm">initHyperswarm(server, client)</a> ⇒ <code>Promise.&lt;void&gt;</code></dt>
 <dd><p>Initializes a Hyperswarm network connection for data synchronization.</p>
