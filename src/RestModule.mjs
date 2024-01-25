@@ -944,7 +944,7 @@ export default class RestModule {
         //       properties: {
         //         result: { 
         //           type: 'array',
-        //           items: { type: 'string' } // Assuming the result is an array of strings
+        //           items: { type: 'string' } // TODO: Assuming the result is an array of strings
         //         }
         //       }
         //     },
@@ -998,7 +998,7 @@ export default class RestModule {
             //     description: "Successful response",
             //     type: "object",
             //     properties: {
-            //       result: { type: "object" }, // Specify the structure of the trade object
+            //       result: { type: "object" }, // TODO: Specify the structure of the trade object
             //     },
             //   },
             //   500: {
@@ -1111,7 +1111,7 @@ export default class RestModule {
             //     properties: {
             //       result: {
             //         type: "array",
-            //         items: { type: "string" }, // Assuming the result is an array of strings
+            //         items: { type: "string" }, // TODO: Assuming the result is an array of strings
             //       },
             //     },
             //   },
@@ -1369,24 +1369,97 @@ export default class RestModule {
       );
 
       // getAccountRedeemList
-      fastify.get("/getAccountRedeemList/:address", async (request, reply) => {
-        let { offset, max } = request.query;
-        try {
-          const result =
-            await this.tracManager.tapProtocol.getAccountRedeemList(
-              request.params.address,
-              offset,
-              max
-            );
-          reply.send({ result });
-        } catch (e) {
-          reply.status(500).send({ error: "Internal Server Error" });
+      fastify.get(
+        "/getAccountRedeemList/:address",
+        {
+          schema: {
+            description:
+              "Retrieve a list of redeem records for a specific address",
+            tags: ["Redeem"],
+            params: {
+              type: "object",
+              required: ["address"],
+              properties: {
+                address: { type: "string" },
+              },
+            },
+            querystring: {
+              type: "object",
+              properties: {
+                offset: { type: "integer", default: 0 },
+                max: { type: "integer", default: 500 },
+              },
+            },
+            // response: {
+            //   200: {
+            //     description: "Successful response",
+            //     type: "object",
+            //     properties: {
+            //       result: {
+            //         type: "array",
+            //         items: { type: "string" }, // TODO: Specify the structure of each redeem record
+            //       },
+            //     },
+            //   },
+            //   500: {
+            //     description: "Internal server error",
+            //     type: "object",
+            //     properties: {
+            //       error: { type: "string" },
+            //     },
+            //   },
+            // },
+          },
+        },
+        async (request, reply) => {
+          let { offset, max } = request.query;
+          try {
+            const result =
+              await this.tracManager.tapProtocol.getAccountRedeemList(
+                request.params.address,
+                offset,
+                max
+              );
+            reply.send({ result });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
         }
-      });
+      );
 
       // getAccountAuthListLength
       fastify.get(
         "/getAccountAuthListLength/:address",
+        {
+          schema: {
+            description:
+              "Get the total number of auth records for a specific address",
+            tags: ["Auth"],
+            params: {
+              type: "object",
+              required: ["address"],
+              properties: {
+                address: { type: "string" },
+              },
+            },
+            response: {
+              200: {
+                description: "Successful response",
+                type: "object",
+                properties: {
+                  result: { type: "number" },
+                },
+              },
+              500: {
+                description: "Internal server error",
+                type: "object",
+                properties: {
+                  error: { type: "string" },
+                },
+              },
+            },
+          },
+        },
         async (request, reply) => {
           try {
             const result =
@@ -1401,7 +1474,45 @@ export default class RestModule {
       );
 
       // getAccountAuthList
-      fastify.get("/getAccountAuthList/:address", async (request, reply) => {
+      fastify.get("/getAccountAuthList/:address", {
+        schema: {
+          description: "Retrieve a list of auth records for a specific address",
+          tags: ["Auth"],
+          params: {
+            type: 'object',
+            required: ['address'],
+            properties: {
+              address: { type: 'string' }
+            }
+          },
+          querystring: {
+            type: 'object',
+            properties: {
+              offset: { type: 'integer', default: 0 },
+              max: { type: 'integer', default: 500 }
+            }
+          },
+        //   response: {
+        //     200: {
+        //       description: 'Successful response',
+        //       type: 'object',
+        //       properties: {
+        //         result: { 
+        //           type: 'array',
+        //           items: { type: 'string' } // TODO: Specify the structure of each auth record
+        //         }
+        //       }
+        //     },
+        //     500: {
+        //       description: 'Internal server error',
+        //       type: 'object',
+        //       properties: {
+        //         error: { type: 'string' }
+        //       }
+        //     }
+        //   }
+        }
+      }, async (request, reply) => {
         let { offset, max } = request.query;
         try {
           const result = await this.tracManager.tapProtocol.getAccountAuthList(
@@ -1416,31 +1527,123 @@ export default class RestModule {
       });
 
       // getAuthListLength
-      fastify.get("/getAuthListLength", async (request, reply) => {
-        try {
-          const result = await this.tracManager.tapProtocol.getAuthListLength();
-          reply.send({ result });
-        } catch (e) {
-          reply.status(500).send({ error: "Internal Server Error" });
+      fastify.get(
+        "/getAuthListLength",
+        {
+          schema: {
+            description:
+              "Get the total number of auth records across all addresses",
+            tags: ["Auth"],
+            response: {
+              200: {
+                description: "Successful response",
+                type: "object",
+                properties: {
+                  result: { type: "number" },
+                },
+              },
+              500: {
+                description: "Internal server error",
+                type: "object",
+                properties: {
+                  error: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        async (request, reply) => {
+          try {
+            const result =
+              await this.tracManager.tapProtocol.getAuthListLength();
+            reply.send({ result });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
         }
-      });
+      );
 
       // getAuthList
-      fastify.get("/getAuthList", async (request, reply) => {
-        let { offset, max } = request.query;
-        try {
-          const result = await this.tracManager.tapProtocol.getAuthList(
-            offset,
-            max
-          );
-          reply.send({ result });
-        } catch (e) {
-          reply.status(500).send({ error: "Internal Server Error" });
+      fastify.get(
+        "/getAuthList",
+        {
+          schema: {
+            description:
+              "Retrieve a list of all auth records across all addresses",
+            tags: ["Auth"],
+            querystring: {
+              type: "object",
+              properties: {
+                offset: { type: "integer", default: 0 },
+                max: { type: "integer", default: 500 },
+              },
+            },
+            // response: {
+            //   200: {
+            //     description: "Successful response",
+            //     type: "object",
+            //     properties: {
+            //       result: {
+            //         type: "array",
+            //         items: { type: "string" }, // TODO: Specify the structure of each auth record
+            //       },
+            //     },
+            //   },
+            //   500: {
+            //     description: "Internal server error",
+            //     type: "object",
+            //     properties: {
+            //       error: { type: "string" },
+            //     },
+            //   },
+            // },
+          },
+        },
+        async (request, reply) => {
+          let { offset, max } = request.query;
+          try {
+            const result = await this.tracManager.tapProtocol.getAuthList(
+              offset,
+              max
+            );
+            reply.send({ result });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
         }
-      });
+      );
 
       fastify.get(
         "/getTickerTradesListLength/:ticker",
+        {
+          schema: {
+            description: "Get the total number of trades for a specific ticker",
+            tags: ["Trade"],
+            params: {
+              type: "object",
+              required: ["ticker"],
+              properties: {
+                ticker: { type: "string" },
+              },
+            },
+            response: {
+              200: {
+                description: "Successful response",
+                type: "object",
+                properties: {
+                  result: { type: "number" },
+                },
+              },
+              500: {
+                description: "Internal server error",
+                type: "object",
+                properties: {
+                  error: { type: "string" },
+                },
+              },
+            },
+          },
+        },
         async (request, reply) => {
           try {
             const result =
