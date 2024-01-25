@@ -49,7 +49,7 @@ Should work perfectly on Pi 3-5 and low Watts.
 Either download this package or install it through npmjs:
 
 ```
-npm install tap-reader
+npm install @trac-network/tap-reader
 ```
 
 Then CD into the package folder's root and start it using:
