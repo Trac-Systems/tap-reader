@@ -42,6 +42,19 @@ export default class RestModule {
           "base64"
         ),
       },
+      theme: {
+        favicon: [
+          {
+            filename: "favicon.png",
+            rel: "icon",
+            sizes: "32x32",
+            type: "image/png",
+            content: Buffer.from(
+              "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAACClBMVEUAAADoF4v3udz86/X/7PLmHIrvf7z75PDiHYnlHIn74fDlHIn71ezlHIrxgr70qNLsYq3oOpvMM5nlGofsYq3kHonmI43lHInlHInjHIn/AP/lHInxh7/nHYflHYnmGor/AIDmG4rlHInlHInkHYnvdbbwh7/nHIjkHInkHInmHIrnHojykMX0ttjsfb3fIIDlHInlHYnmGozvhL/zr9Xvhb//AIDwi8P0p9Ltgb//AKroN5bylcjjHovxo8/lHInxncrlHonwl8jlHYrvjMPvgL/uk8TvkcXwkcTukcblG4nuicLtg77ui8LuisL/qqruhcDshr7mGYnternmHInsdbbvgL/lHInrcbXlHIjpaK/mHYjqZq/sZqzmG4jnXKvmHIjjIIr/K6rkHInkG4nbJJL75fHnK5H63Oz63+7lHIn1rdT62evucbX50+j50ef1r9b0qNLwgLzoOJj4zeX4yuP0qNH3yePlH4v0rtX3x+L2v97zn87vd7nrUKTmJo7rT6P2wd/2w+DveLj1stbxj8XtabHpQp3mIIv1vt32wd71vdzmH4r1utv1u9v0tdj0r9XzqdLrU6Xyo8/udLbxncvvjsTwl8jnNpbvkcXqUqXui8LsbbLuhb/lIYzsfrvtf7znOJfsebjoTqLrc7XpYavqbbLlJo3pZ6/mN5foYazlHorlIIv///+BUoroAAAAZnRSTlMAC3uZKLW/Qxr+Q8tCfv7+154FMct50/XCdwHigGBqMgSW6a9zrHdJ3aJmK57+bAiIThSu/mACy/1XA7F0f4DPs/3nWfEgSYC3Wp797f7NA/43KZ1u8RCzWvHMPvwog4jImQaZhAfSxQAzAAAAAWJLR0StIGLCHQAAAAlwSFlzAAAdhwAAHYcBj+XxZQAAAAd0SU1FB+gBGQk6ItmqpvgAAAE4SURBVDjLY2CgB2BkYsYJWEDyrGxpOAE7UAEHZ3pGJi7ABbKCOys7BxfgASngzcrNQwf5BXz8hUUCgkIgBcJZxSUwUFpWBqLKRUTFKsQlJMHyDFLSWZVVQFBdU1tX39AIZDXJMMjKySvA/amY1dzS2tbeoaSsotrZ1dXVrYYWEOpZPVkamlraUgw6vX19fbp66CGlb2BoBGYY9wOBiSmuEDUznwAEFpa45K2sJ4KADc4osZ00GQTscCqwnzIVBBxwyRs5TpsOAk64FDjPmAkGLq5u7h6eWBR4zZoNAt4+vrNn+/ljUSA9Zy4MBARikQ+aN38BDARjc0LIwkUwEBqGTUH44iUwEIFNXiFy6TIoiJLCpiB6+QooiInFGgpxK1dBQTz2YEpYvQYCEpOwylspJkNASioD/QEAEWipK9sYP+kAAAAldEVYdGRhdGU6Y3JlYXRlADIwMjQtMDEtMjVUMDk6NTg6MzQrMDA6MDC2b/3VAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDI0LTAxLTI1VDA5OjU4OjM0KzAwOjAwxzJFaQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABXelRYdFJhdyBwcm9maWxlIHR5cGUgaXB0YwAAeJzj8gwIcVYoKMpPy8xJ5VIAAyMLLmMLEyMTS5MUAxMgRIA0w2QDI7NUIMvY1MjEzMQcxAfLgEigSi4A6hcRdPJCNZUAAAAASUVORK5CYII="
+            ),
+          },
+        ],
+      },
       uiConfig: {
         //   docExpansion: 'full',
         //   deepLinking: false
@@ -53,10 +66,21 @@ export default class RestModule {
 
   initializeRoutes() {
     this.fastify.register((fastify, opts, done) => {
-      // Register Swagger with Fastify
-
       fastify.get(
         "/getTransferAmountByInscription/:inscription_id",
+        {
+          schema: {
+            description: "Get transfer amount by inscription ID",
+            tags: ["Transfer"],
+            params: {
+              type: "object",
+              required: ["inscription_id"],
+              properties: {
+                inscription_id: { type: "string" },
+              },
+            },
+          },
+        },
         async (request, reply) => {
           // /getTransferAmountByInscription/1b8e21761557bbf66c06ae3d8109764d0d8ec5d431b8291160b59ef28ffaab7ai0
           try {
@@ -77,33 +101,57 @@ export default class RestModule {
         }
       );
 
-      fastify.get("/getDeploymentsLength", async (request, reply) => {
-        try {
-          const result =
-            await this.tracManager.tapProtocol.getDeploymentsLength();
-          reply.send({ result });
-          /*
+      fastify.get(
+        "/getDeploymentsLength",
+        {
+          schema: {
+            description: "Get the length of deployments",
+            tags: ["Deployment"],
+          },
+        },
+        async (request, reply) => {
+          try {
+            const result =
+              await this.tracManager.tapProtocol.getDeploymentsLength();
+            reply.send({ result });
+            /*
                                 {
                                     "result": 14881
                                 }
                             */
-        } catch (e) {
-          reply.status(500).send({ error: "Internal Server Error" });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
         }
-      });
+      );
 
-      fastify.get("/getDeployments", async (request, reply) => {
-        // /getDeployments?offset=0&max=2
-        try {
-          let { offset, max } = request.query;
-          offset = offset ? offset : 0;
-          max = max ? max : 100;
-          const result = await this.tracManager.tapProtocol.getDeployments(
-            offset,
-            max
-          );
-          reply.send({ result });
-          /*
+      fastify.get(
+        "/getDeployments",
+        {
+          schema: {
+            description: "Get a list of deployments",
+            tags: ["Deployment"],
+            querystring: {
+              type: "object",
+              properties: {
+                offset: { type: "integer", default: 0 },
+                max: { type: "integer", default: 100 },
+              },
+            },
+          },
+        },
+        async (request, reply) => {
+          // /getDeployments?offset=0&max=2
+          try {
+            let { offset, max } = request.query;
+            offset = offset ? offset : 0;
+            max = max ? max : 100;
+            const result = await this.tracManager.tapProtocol.getDeployments(
+              offset,
+              max
+            );
+            reply.send({ result });
+            /*
                                 {
                                     "result": [
                                         {
@@ -125,19 +173,35 @@ export default class RestModule {
                                             "dt": null
                                         },
                             */
-        } catch (e) {
-          reply.status(500).send({ error: "Internal Server Error" });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
         }
-      });
+      );
 
-      fastify.get("/getDeployment/:ticker", async (request, reply) => {
-        // /getDeployment/gib
-        try {
-          const result = await this.tracManager.tapProtocol.getDeployment(
-            request.params.ticker
-          );
-          reply.send({ result });
-          /*
+      fastify.get(
+        "/getDeployment/:ticker",
+        {
+          schema: {
+            description: "Get a specific deployment by ticker",
+            tags: ["Deployment"],
+            params: {
+              type: "object",
+              required: ["ticker"],
+              properties: {
+                ticker: { type: "string" },
+              },
+            },
+          },
+        },
+        async (request, reply) => {
+          // /getDeployment/gib
+          try {
+            const result = await this.tracManager.tapProtocol.getDeployment(
+              request.params.ticker
+            );
+            reply.send({ result });
+            /*
                                 {
                                     "result": {
                                         "tick": "gib",
@@ -159,48 +223,97 @@ export default class RestModule {
                                     }
                                 }
                             */
-        } catch (e) {
-          reply.status(500).send({ error: "Internal Server Error" });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
         }
-      });
+      );
 
-      fastify.get("/getMintTokensLeft/:ticker", async (request, reply) => {
-        // /getMintTokensLeft/gib
-        try {
-          const result = await this.tracManager.tapProtocol.getMintTokensLeft(
-            request.params.ticker
-          );
-          reply.send({ result });
-          /*
+      fastify.get(
+        "/getMintTokensLeft/:ticker",
+        {
+          schema: {
+            description: "Get remaining mint tokens for a given ticker",
+            tags: ["Token"],
+            params: {
+              type: "object",
+              required: ["ticker"],
+              properties: {
+                ticker: { type: "string" },
+              },
+            },
+          },
+        },
+        async (request, reply) => {
+          // /getMintTokensLeft/gib
+          try {
+            const result = await this.tracManager.tapProtocol.getMintTokensLeft(
+              request.params.ticker
+            );
+            reply.send({ result });
+            /*
                                 {
                                     "result": "0"
                                 }
                             */
-        } catch (e) {
-          reply.status(500).send({ error: "Internal Server Error" });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
         }
-      });
+      );
 
-      fastify.get("/getBalance/:address/:ticker", async (request, reply) => {
-        // /getBalance/bc1pccu8444ay68zltcdjzrdelpnf26us7ywg9pvwl7nkrjgrkz8rlvqe6f880/gib
-        try {
-          const result = await this.tracManager.tapProtocol.getBalance(
-            request.params.address,
-            request.params.ticker
-          );
-          reply.send({ result });
-          /*
+      fastify.get(
+        "/getBalance/:address/:ticker",
+        {
+          schema: {
+            description: "Get the balance of a specific address and ticker",
+            tags: ["Balance"],
+            params: {
+              type: "object",
+              required: ["address", "ticker"],
+              properties: {
+                address: { type: "string" },
+                ticker: { type: "string" },
+              },
+            },
+          },
+        },
+        async (request, reply) => {
+          // /getBalance/bc1pccu8444ay68zltcdjzrdelpnf26us7ywg9pvwl7nkrjgrkz8rlvqe6f880/gib
+          try {
+            const result = await this.tracManager.tapProtocol.getBalance(
+              request.params.address,
+              request.params.ticker
+            );
+            reply.send({ result });
+            /*
                                 {
                                     "result": "261000000000000000000"
                                 }
                             */
-        } catch (e) {
-          reply.status(500).send({ error: "Internal Server Error" });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
         }
-      });
+      );
 
       fastify.get(
         "/getTransferable/:address/:ticker",
+        {
+          schema: {
+            description:
+              "Get the transferable amount for a specific address and ticker",
+            tags: ["Balance"],
+            params: {
+              type: "object",
+              required: ["address", "ticker"],
+              properties: {
+                address: { type: "string" },
+                ticker: { type: "string" },
+              },
+            },
+          },
+        },
         async (request, reply) => {
           // /getTransferable/bc1pccu8444ay68zltcdjzrdelpnf26us7ywg9pvwl7nkrjgrkz8rlvqe6f880/gib
           try {
@@ -220,35 +333,98 @@ export default class RestModule {
         }
       );
 
-      fastify.get("/getHoldersLength/:ticker", async (request, reply) => {
-        // /getHoldersLength/gib
-        try {
-          const result = await this.tracManager.tapProtocol.getHoldersLength(
-            request.params.ticker
-          );
-          reply.send({ result });
-          /*
+      fastify.get(
+        "/getHoldersLength/:ticker",
+        {
+          schema: {
+            description: "Get the total number of holders for a given ticker",
+            tags: ["Holders"],
+            params: {
+              type: "object",
+              required: ["ticker"],
+              properties: {
+                ticker: { type: "string" },
+              },
+            },
+          },
+        },
+        async (request, reply) => {
+          // /getHoldersLength/gib
+          try {
+            const result = await this.tracManager.tapProtocol.getHoldersLength(
+              request.params.ticker
+            );
+            reply.send({ result });
+            /*
                                     {
                                         "result": "0"
                                     }
                                 */
-        } catch (e) {
-          reply.status(500).send({ error: "Internal Server Error" });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
         }
-      });
+      );
 
-      fastify.get("/getHolders/:ticker", async (request, reply) => {
-        try {
-          let { offset, max } = request.query;
-          offset = offset ? offset : 0;
-          max = max ? max : 100;
-          const result = await this.tracManager.tapProtocol.getHolders(
-            request.params.ticker,
-            offset,
-            max
-          );
-          reply.send({ result });
-          /*
+      fastify.get(
+        "/getHolders/:ticker",
+        {
+          schema: {
+            description: "Retrieve a list of holders for a specific ticker",
+            tags: ["Holders"],
+            params: {
+              type: "object",
+              required: ["ticker"],
+              properties: {
+                ticker: { type: "string" },
+              },
+            },
+            querystring: {
+              type: "object",
+              properties: {
+                offset: { type: "integer", default: 0 },
+                max: { type: "integer", default: 500 },
+              },
+            },
+            response: {
+                200: {
+                  description: 'Successful response',
+                  type: 'object',
+                  properties: {
+                    result: { 
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          address: { type: 'string' },
+                          balance: { type: 'string' },
+                          transferable: { type: 'string' }
+                        }
+                      }
+                    }
+                  }
+                },
+                500: {
+                  description: 'Internal server error',
+                  type: 'object',
+                  properties: {
+                    error: { type: 'string' }
+                  }
+                }
+              }
+            }
+        }, async (request, reply) => {
+          try {
+            let { offset, max } = request.query;
+            offset = offset ? offset : 0;
+            max = max ? max : 100;
+            const result = await this.tracManager.tapProtocol.getHolders(
+              request.params.ticker,
+              offset,
+              max
+            );
+            reply.send({ result });
+            /*
                                 {
                                     "result": [
                                         {
@@ -269,15 +445,43 @@ export default class RestModule {
                                     }
                                 }
                             */
-        } catch (e) {
-          console.error(e);
-          reply.status(500).send({ error: "Internal Server Error" });
+          } catch (e) {
+            console.error(e);
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
         }
-      });
+      );
 
       fastify.get(
-        "/getAccountTokensLength/:address",
-        async (request, reply) => {
+        "/getAccountTokensLength/:address",{
+            schema: {
+              description: "Get the total number of tokens held by a specific address",
+              tags: ["Token"],
+              params: {
+                type: 'object',
+                required: ['address'],
+                properties: {
+                  address: { type: 'string' }
+                }
+              },
+              response: {
+                200: {
+                  description: 'Successful response',
+                  type: 'object',
+                  properties: {
+                    result: { type: 'number' }
+                  }
+                },
+                500: {
+                  description: 'Internal server error',
+                  type: 'object',
+                  properties: {
+                    error: { type: 'string' }
+                  }
+                }
+              }
+            }
+          }, async (request, reply) => {
           // /getAccountTokensLength/gib
           try {
             const result =
@@ -296,7 +500,45 @@ export default class RestModule {
         }
       );
 
-      fastify.get("/getAccountTokens/:address", async (request, reply) => {
+      fastify.get("/getAccountTokens/:address",{
+        schema: {
+          description: "Retrieve a list of tokens held by a specific address",
+          tags: ["Token"],
+          params: {
+            type: 'object',
+            required: ['address'],
+            properties: {
+              address: { type: 'string' }
+            }
+          },
+          querystring: {
+            type: 'object',
+            properties: {
+              offset: { type: 'integer', default: 0 },
+              max: { type: 'integer', default: 500 }
+            }
+          },
+          response: {
+            200: {
+              description: 'Successful response',
+              type: 'object',
+              properties: {
+                result: { 
+                  type: 'array',
+                  items: { type: 'string' }
+                }
+              }
+            },
+            500: {
+              description: 'Internal server error',
+              type: 'object',
+              properties: {
+                error: { type: 'string' }
+              }
+            }
+          }
+        }
+      }, async (request, reply) => {
         try {
           let { offset, max } = request.query;
           offset = offset ? offset : 0;
