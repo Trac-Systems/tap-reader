@@ -50,6 +50,7 @@ Either download this package using git clone or install it through npmjs (if you
 
 ```
 git clone https://github.com/Trac-Systems/tap-reader.git
+cd tap-reader
 npm i
 ```
 
