@@ -42,7 +42,7 @@ The most recent channel is always pre-defined in the reader's config of this rep
 - 2-4 CPU Cores, 8GB RAM
 - 500GB SSD drive (make sure it's a good one)
 
-Should work perfectly on Pi 3-5 and low Watts.
+Should work perfectly on Pi 4-5 and low Watts.
 
 ## Installation
 
