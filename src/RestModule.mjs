@@ -890,7 +890,28 @@ export default class RestModule {
         }
       });
 
-      fastify.get("/getMintListLength", async (request, reply) => {
+      fastify.get("/getMintListLength", {
+        schema: {
+          description: "Get the total number of mints across all tickers",
+          tags: ["Minting"],
+          response: {
+            200: {
+              description: 'Successful response',
+              type: 'object',
+              properties: {
+                result: { type: 'number' }
+              }
+            },
+            500: {
+              description: 'Internal server error',
+              type: 'object',
+              properties: {
+                error: { type: 'string' }
+              }
+            }
+          }
+        }
+      }, async (request, reply) => {
         // /getMintListLength
         try {
           const result = await this.tracManager.tapProtocol.getMintListLength();
@@ -905,7 +926,38 @@ export default class RestModule {
         }
       });
 
-      fastify.get("/getMintList", async (request, reply) => {
+      fastify.get("/getMintList", {
+        schema: {
+          description: "Retrieve a list of all mint records across all tickers",
+          tags: ["Minting"],
+          querystring: {
+            type: 'object',
+            properties: {
+              offset: { type: 'integer', default: 0 },
+              max: { type: 'integer', default: 500 }
+            }
+          },
+        //   response: {
+        //     200: {
+        //       description: 'Successful response',
+        //       type: 'object',
+        //       properties: {
+        //         result: { 
+        //           type: 'array',
+        //           items: { type: 'string' } // Assuming the result is an array of strings
+        //         }
+        //       }
+        //     },
+        //     500: {
+        //       description: 'Internal server error',
+        //       type: 'object',
+        //       properties: {
+        //         error: { type: 'string' }
+        //       }
+        //     }
+        //   }
+        }
+      }, async (request, reply) => {
         // /getMintList
         try {
           let { offset, max } = request.query;
@@ -927,24 +979,88 @@ export default class RestModule {
         }
       });
 
-      fastify.get("/getTrade/:inscription_id", async (request, reply) => {
-        // /getTrade/91e946faa1b4f50f1ebc0c8ccc5f3196dcd3d80d10be6f5187885efa390cbc10i0
-        try {
-          const result = await this.tracManager.tapProtocol.getTrade(
-            request.params.inscription_id
-          );
+      fastify.get(
+        "/getTrade/:inscription_id",
+        {
+          schema: {
+            description:
+              "Retrieve details of a specific trade based on its inscription ID",
+            tags: ["Trade"],
+            params: {
+              type: "object",
+              required: ["inscription_id"],
+              properties: {
+                inscription_id: { type: "string" },
+              },
+            },
+            // response: {
+            //   200: {
+            //     description: "Successful response",
+            //     type: "object",
+            //     properties: {
+            //       result: { type: "object" }, // Specify the structure of the trade object
+            //     },
+            //   },
+            //   500: {
+            //     description: "Internal server error",
+            //     type: "object",
+            //     properties: {
+            //       error: { type: "string" },
+            //     },
+            //   },
+            // },
+          },
+        },
+        async (request, reply) => {
+          // /getTrade/91e946faa1b4f50f1ebc0c8ccc5f3196dcd3d80d10be6f5187885efa390cbc10i0
+          try {
+            const result = await this.tracManager.tapProtocol.getTrade(
+              request.params.inscription_id
+            );
 
-          reply.send({ result });
-          /* TODO:
+            reply.send({ result });
+            /* TODO:
                                 {
                             */
-        } catch (e) {
-          reply.status(500).send({ error: "Internal Server Error" });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
         }
-      });
+      );
 
       fastify.get(
         "/getAccountTradesListLength/:address/:ticker",
+        {
+          schema: {
+            description:
+              "Get the total number of trades for a specific address and ticker",
+            tags: ["Trade"],
+            params: {
+              type: "object",
+              required: ["address", "ticker"],
+              properties: {
+                address: { type: "string" },
+                ticker: { type: "string" },
+              },
+            },
+            response: {
+              200: {
+                description: "Successful response",
+                type: "object",
+                properties: {
+                  result: { type: "number" },
+                },
+              },
+              500: {
+                description: "Internal server error",
+                type: "object",
+                properties: {
+                  error: { type: "string" },
+                },
+              },
+            },
+          },
+        },
         async (request, reply) => {
           // /getAccountTradesListLength
           try {
@@ -968,6 +1084,47 @@ export default class RestModule {
 
       fastify.get(
         "/getAccountTradesList/:address/:ticker",
+        {
+          schema: {
+            description:
+              "Retrieve a list of trades for a specific address and ticker",
+            tags: ["Trade"],
+            params: {
+              type: "object",
+              required: ["address", "ticker"],
+              properties: {
+                address: { type: "string" },
+                ticker: { type: "string" },
+              },
+            },
+            querystring: {
+              type: "object",
+              properties: {
+                offset: { type: "integer", default: 0 },
+                max: { type: "integer", default: 500 },
+              },
+            },
+            // response: {
+            //   200: {
+            //     description: "Successful response",
+            //     type: "object",
+            //     properties: {
+            //       result: {
+            //         type: "array",
+            //         items: { type: "string" }, // Assuming the result is an array of strings
+            //       },
+            //     },
+            //   },
+            //   500: {
+            //     description: "Internal server error",
+            //     type: "object",
+            //     properties: {
+            //       error: { type: "string" },
+            //     },
+            //   },
+            // },
+          },
+        },
         async (request, reply) => {
           // /getAccountTradesList/:address/:ticker
           try {
@@ -997,6 +1154,36 @@ export default class RestModule {
       // getAuthCancelled
       fastify.get(
         "/getAuthCancelled/:inscription_id",
+        {
+          schema: {
+            description:
+              "Check if a given token-auth inscription has been cancelled",
+            tags: ["Auth"],
+            params: {
+              type: "object",
+              required: ["inscription_id"],
+              properties: {
+                inscription_id: { type: "string" },
+              },
+            },
+            // response: {
+            //   200: {
+            //     description: "Successful response",
+            //     type: "object",
+            //     properties: {
+            //       result: { type: "boolean" },
+            //     },
+            //   },
+            //   500: {
+            //     description: "Internal server error",
+            //     type: "object",
+            //     properties: {
+            //       error: { type: "string" },
+            //     },
+            //   },
+            // },
+          },
+        },
         async (request, reply) => {
           try {
             const result = await this.tracManager.tapProtocol.getAuthCancelled(
@@ -1010,7 +1197,35 @@ export default class RestModule {
       );
 
       // getAuthHashExists
-      fastify.get("/getAuthHashExists/:hash", async (request, reply) => {
+      fastify.get("/getAuthHashExists/:hash", {
+        schema: {
+          description: "Check if a given hash exists in the token-auth system",
+          tags: ["Auth"],
+          params: {
+            type: 'object',
+            required: ['hash'],
+            properties: {
+              hash: { type: 'string' }
+            }
+          },
+        //   response: {
+        //     200: {
+        //       description: 'Successful response',
+        //       type: 'object',
+        //       properties: {
+        //         result: { type: 'boolean' }
+        //       }
+        //     },
+        //     500: {
+        //       description: 'Internal server error',
+        //       type: 'object',
+        //       properties: {
+        //         error: { type: 'string' }
+        //       }
+        //     }
+        //   }
+        }
+      }, async (request, reply) => {
         try {
           const result = await this.tracManager.tapProtocol.getAuthHashExists(
             request.params.hash
@@ -1022,33 +1237,124 @@ export default class RestModule {
       });
 
       // getRedeemListLength
-      fastify.get("/getRedeemListLength", async (request, reply) => {
-        try {
-          const result =
-            await this.tracManager.tapProtocol.getRedeemListLength();
-          reply.send({ result });
-        } catch (e) {
-          reply.status(500).send({ error: "Internal Server Error" });
+      fastify.get(
+        "/getRedeemListLength",
+        {
+          schema: {
+            description: "Get the total number of redeems across all tokens",
+            tags: ["Redeem"],
+            response: {
+              200: {
+                description: "Successful response",
+                type: "object",
+                properties: {
+                  result: { type: "number" },
+                },
+              },
+              500: {
+                description: "Internal server error",
+                type: "object",
+                properties: {
+                  error: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        async (request, reply) => {
+          try {
+            const result =
+              await this.tracManager.tapProtocol.getRedeemListLength();
+            reply.send({ result });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
         }
-      });
+      );
 
       // getRedeemList
-      fastify.get("/getRedeemList", async (request, reply) => {
-        let { offset, max } = request.query;
-        try {
-          const result = await this.tracManager.tapProtocol.getRedeemList(
-            offset,
-            max
-          );
-          reply.send({ result });
-        } catch (e) {
-          reply.status(500).send({ error: "Internal Server Error" });
+      fastify.get(
+        "/getRedeemList",
+        {
+          schema: {
+            description:
+              "Retrieve a list of all redeem records across all tokens",
+            tags: ["Redeem"],
+            querystring: {
+              type: "object",
+              properties: {
+                offset: { type: "integer", default: 0 },
+                max: { type: "integer", default: 500 },
+              },
+            },
+            // response: {
+            //   200: {
+            //     description: "Successful response",
+            //     type: "object",
+            //     properties: {
+            //       result: {
+            //         type: "array",
+            //         items: { type: "string" }, // Specify the structure of each redeem record
+            //       },
+            //     },
+            //   },
+            //   500: {
+            //     description: "Internal server error",
+            //     type: "object",
+            //     properties: {
+            //       error: { type: "string" },
+            //     },
+            //   },
+            // },
+          },
+        },
+        async (request, reply) => {
+          let { offset, max } = request.query;
+          try {
+            const result = await this.tracManager.tapProtocol.getRedeemList(
+              offset,
+              max
+            );
+            reply.send({ result });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
         }
-      });
+      );
 
       // getAccountRedeemListLength
       fastify.get(
         "/getAccountRedeemListLength/:address",
+        {
+          schema: {
+            description:
+              "Get the total number of redeems performed by a specific address",
+            tags: ["Redeem"],
+            params: {
+              type: "object",
+              required: ["address"],
+              properties: {
+                address: { type: "string" },
+              },
+            },
+            response: {
+              200: {
+                description: "Successful response",
+                type: "object",
+                properties: {
+                  result: { type: "number" },
+                },
+              },
+              500: {
+                description: "Internal server error",
+                type: "object",
+                properties: {
+                  error: { type: "string" },
+                },
+              },
+            },
+          },
+        },
         async (request, reply) => {
           try {
             const result =
