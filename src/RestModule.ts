@@ -84,7 +84,7 @@ export default class RestModule {
           try {
             const result =
               await this.tracManager.tapProtocol.getTransferAmountByInscription(
-                request.params.inscription_id
+                (request.params as any).inscription_id
               );
             reply.send({ result });
             /*
@@ -178,7 +178,7 @@ export default class RestModule {
         async (request: FastifyRequest, reply: FastifyReply) => {
           // /getDeployments?offset=0&max=2
           try {
-            let { offset, max } = request.query;
+            let { offset, max } = request.query as any;
             offset = offset ? offset : 0;
             max = max ? max : 100;
             const result = await this.tracManager.tapProtocol.getDeployments(
@@ -233,7 +233,7 @@ export default class RestModule {
           // /getDeployment/gib
           try {
             const result = await this.tracManager.tapProtocol.getDeployment(
-              request.params.ticker
+              (request.params as any).ticker
             );
             reply.send({ result });
             /*
@@ -283,7 +283,7 @@ export default class RestModule {
           // /getMintTokensLeft/gib
           try {
             const result = await this.tracManager.tapProtocol.getMintTokensLeft(
-              request.params.ticker
+              (request.params as any).ticker
             );
             reply.send({ result });
             /*
@@ -317,8 +317,8 @@ export default class RestModule {
           // /getBalance/bc1pccu8444ay68zltcdjzrdelpnf26us7ywg9pvwl7nkrjgrkz8rlvqe6f880/gib
           try {
             const result = await this.tracManager.tapProtocol.getBalance(
-              request.params.address,
-              request.params.ticker
+              (request.params as any).address,
+              (request.params as any).ticker
             );
             reply.send({ result });
             /*
@@ -353,8 +353,8 @@ export default class RestModule {
           // /getTransferable/bc1pccu8444ay68zltcdjzrdelpnf26us7ywg9pvwl7nkrjgrkz8rlvqe6f880/gib
           try {
             const result = await this.tracManager.tapProtocol.getTransferable(
-              request.params.address,
-              request.params.ticker
+              (request.params as any).address,
+              (request.params as any).ticker
             );
             reply.send({ result });
             /*
@@ -387,7 +387,7 @@ export default class RestModule {
           // /getHoldersLength/gib
           try {
             const result = await this.tracManager.tapProtocol.getHoldersLength(
-              request.params.ticker
+              (request.params as any).ticker
             );
             reply.send({ result });
             /*
@@ -451,11 +451,11 @@ export default class RestModule {
         },
         async (request, reply) => {
           try {
-            let { offset, max } = request.query;
+            let { offset, max } = request.query as any;
             offset = offset ? offset : 0;
             max = max ? max : 100;
             const result = await this.tracManager.tapProtocol.getHolders(
-              request.params.ticker,
+              (request.params as any).ticker,
               offset,
               max
             );
@@ -525,7 +525,7 @@ export default class RestModule {
           try {
             const result =
               await this.tracManager.tapProtocol.getAccountTokensLength(
-                request.params.address
+                (request.params as any).address
               );
             reply.send({ result });
             /*
@@ -582,11 +582,11 @@ export default class RestModule {
         },
         async (request, reply) => {
           try {
-            let { offset, max } = request.query;
+            let { offset, max } = request.query as any;
             offset = offset ? offset : 0;
             max = max ? max : 500;
             const result = await this.tracManager.tapProtocol.getAccountTokens(
-              request.params.address,
+              (request.params as any).address,
               offset,
               max
             );
@@ -682,7 +682,7 @@ export default class RestModule {
         },
         async (request, reply) => {
           try {
-            let { offset, max } = request.query;
+            let { offset, max } = request.query as any;
             offset = offset ? offset : 0;
             max = max ? max : 500;
             const result =
@@ -763,8 +763,8 @@ export default class RestModule {
           try {
             const result =
               await this.tracManager.tapProtocol.getAccountMintListLength(
-                request.params.address,
-                request.params.ticker
+                (request.params as any).address,
+                (request.params as any).ticker
               );
             reply.send({ result });
             /*
@@ -823,13 +823,13 @@ export default class RestModule {
         },
         async (request, reply) => {
           try {
-            let { offset, max } = request.query;
+            let { offset, max } = request.query as any;
             offset = offset ? offset : 0;
             max = max ? max : 500;
             const result =
               await this.tracManager.tapProtocol.getAccountMintList(
-                request.params.address,
-                request.params.ticker,
+                (request.params as any).address,
+                (request.params as any).ticker,
                 offset,
                 max
               );
@@ -877,7 +877,7 @@ export default class RestModule {
           try {
             const result =
               await this.tracManager.tapProtocol.getTickerMintListLength(
-                request.params.ticker
+                (request.params as any).ticker
               );
             reply.send({ result });
             /*
@@ -935,11 +935,11 @@ export default class RestModule {
         },
         async (request, reply) => {
           try {
-            let { offset, max } = request.query;
+            let { offset, max } = request.query as any;
             offset = offset ? offset : 0;
             max = max ? max : 500;
             const result = await this.tracManager.tapProtocol.getTickerMintList(
-              request.params.ticker,
+              (request.params as any).ticker,
               offset,
               max
             );
@@ -1029,7 +1029,7 @@ export default class RestModule {
         async (request, reply) => {
           // /getMintList
           try {
-            let { offset, max } = request.query;
+            let { offset, max } = request.query as any;
             offset = offset ? offset : 0;
             max = max ? max : 500;
             const result = await this.tracManager.tapProtocol.getMintList(
@@ -1085,7 +1085,7 @@ export default class RestModule {
           // /getTrade/91e946faa1b4f50f1ebc0c8ccc5f3196dcd3d80d10be6f5187885efa390cbc10i0
           try {
             const result = await this.tracManager.tapProtocol.getTrade(
-              request.params.inscription_id
+              (request.params as any).inscription_id
             );
 
             reply.send({ result });
@@ -1136,8 +1136,8 @@ export default class RestModule {
           try {
             const result =
               await this.tracManager.tapProtocol.getAccountTradesListLength(
-                request.params.address,
-                request.params.ticker
+                (request.params as any).address,
+                (request.params as any).ticker
               );
 
             reply.send({ result });
@@ -1198,13 +1198,13 @@ export default class RestModule {
         async (request, reply) => {
           // /getAccountTradesList/:address/:ticker
           try {
-            let { offset, max } = request.query;
+            let { offset, max } = request.query as any;
             offset = offset ? offset : 0;
             max = max ? max : 500;
             const result =
               await this.tracManager.tapProtocol.getAccountTradesList(
-                request.params.address,
-                request.params.ticker,
+                (request.params as any).address,
+                (request.params as any).ticker,
                 offset,
                 max
               );
@@ -1257,7 +1257,7 @@ export default class RestModule {
         async (request, reply) => {
           try {
             const result = await this.tracManager.tapProtocol.getAuthCancelled(
-              request.params.inscription_id
+              (request.params as any).inscription_id
             );
             reply.send({ result });
           } catch (e) {
@@ -1302,7 +1302,7 @@ export default class RestModule {
         async (request, reply) => {
           try {
             const result = await this.tracManager.tapProtocol.getAuthHashExists(
-              request.params.hash
+              (request.params as any).hash
             );
             reply.send({ result });
           } catch (e) {
@@ -1384,7 +1384,7 @@ export default class RestModule {
           },
         },
         async (request, reply) => {
-          let { offset, max } = request.query;
+          let { offset, max } = request.query as any;
           try {
             const result = await this.tracManager.tapProtocol.getRedeemList(
               offset,
@@ -1434,7 +1434,7 @@ export default class RestModule {
           try {
             const result =
               await this.tracManager.tapProtocol.getAccountRedeemListLength(
-                request.params.address
+                (request.params as any).address
               );
             reply.send({ result });
           } catch (e) {
@@ -1487,11 +1487,11 @@ export default class RestModule {
           },
         },
         async (request, reply) => {
-          let { offset, max } = request.query;
+          let { offset, max } = request.query as any;
           try {
             const result =
               await this.tracManager.tapProtocol.getAccountRedeemList(
-                request.params.address,
+                (request.params as any).address,
                 offset,
                 max
               );
@@ -1539,7 +1539,7 @@ export default class RestModule {
           try {
             const result =
               await this.tracManager.tapProtocol.getAccountAuthListLength(
-                request.params.address
+                (request.params as any).address
               );
             reply.send({ result });
           } catch (e) {
@@ -1592,11 +1592,11 @@ export default class RestModule {
           },
         },
         async (request, reply) => {
-          let { offset, max } = request.query;
+          let { offset, max } = request.query as any;
           try {
             const result =
               await this.tracManager.tapProtocol.getAccountAuthList(
-                request.params.address,
+                (request.params as any).address,
                 offset,
                 max
               );
@@ -1681,7 +1681,7 @@ export default class RestModule {
           },
         },
         async (request, reply) => {
-          let { offset, max } = request.query;
+          let { offset, max } = request.query as any;
           try {
             const result = await this.tracManager.tapProtocol.getAuthList(
               offset,
@@ -1729,7 +1729,7 @@ export default class RestModule {
           try {
             const result =
               await this.tracManager.tapProtocol.getTickerTradesListLength(
-                request.params.ticker
+                (request.params as any).ticker
               );
             reply.send({ result });
           } catch (e) {
@@ -1781,11 +1781,11 @@ export default class RestModule {
           },
         },
         async (request, reply) => {
-          let { offset, max } = request.query;
+          let { offset, max } = request.query as any;
           try {
             const result =
               await this.tracManager.tapProtocol.getTickerTradesList(
-                request.params.ticker,
+                (request.params as any).ticker,
                 offset,
                 max
               );
@@ -1869,7 +1869,7 @@ export default class RestModule {
           },
         },
         async (request, reply) => {
-          let { offset, max } = request.query;
+          let { offset, max } = request.query as any;
           try {
             const result = await this.tracManager.tapProtocol.getTradesList(
               offset,
@@ -1920,8 +1920,8 @@ export default class RestModule {
           try {
             const result =
               await this.tracManager.tapProtocol.getAccountTransferListLength(
-                request.params.address,
-                request.params.ticker
+                (request.params as any).address,
+                (request.params as any).ticker
               );
             reply.send({ result });
           } catch (e) {
@@ -1975,12 +1975,12 @@ export default class RestModule {
           },
         },
         async (request, reply) => {
-          let { offset, max } = request.query;
+          let { offset, max } = request.query as any;
           try {
             const result =
               await this.tracManager.tapProtocol.getAccountTransferList(
-                request.params.address,
-                request.params.ticker,
+                (request.params as any).address,
+                (request.params as any).ticker,
                 offset,
                 max
               );
@@ -2027,7 +2027,7 @@ export default class RestModule {
           try {
             const result =
               await this.tracManager.tapProtocol.getTickerTransferListLength(
-                request.params.ticker
+                (request.params as any).ticker
               );
             reply.send({ result });
           } catch (e) {
@@ -2080,11 +2080,11 @@ export default class RestModule {
           },
         },
         async (request, reply) => {
-          let { offset, max } = request.query;
+          let { offset, max } = request.query as any;
           try {
             const result =
               await this.tracManager.tapProtocol.getTickerTransferList(
-                request.params.ticker,
+                (request.params as any).ticker,
                 offset,
                 max
               );
@@ -2168,7 +2168,7 @@ export default class RestModule {
           },
         },
         async (request, reply) => {
-          let { offset, max } = request.query;
+          let { offset, max } = request.query as any;
           try {
             const result = await this.tracManager.tapProtocol.getTransferList(
               offset,
@@ -2219,8 +2219,8 @@ export default class RestModule {
           try {
             const result =
               await this.tracManager.tapProtocol.getAccountSentListLength(
-                request.params.address,
-                request.params.ticker
+                (request.params as any).address,
+                (request.params as any).ticker
               );
             reply.send({ result });
           } catch (e) {
@@ -2274,12 +2274,12 @@ export default class RestModule {
           },
         },
         async (request, reply) => {
-          let { offset, max } = request.query;
+          let { offset, max } = request.query as any;
           try {
             const result =
               await this.tracManager.tapProtocol.getAccountSentList(
-                request.params.address,
-                request.params.ticker,
+                (request.params as any).address,
+                (request.params as any).ticker,
                 offset,
                 max
               );
@@ -2328,8 +2328,8 @@ export default class RestModule {
           try {
             const result =
               await this.tracManager.tapProtocol.getAccountReceiveTradesFilledListLength(
-                request.params.address,
-                request.params.ticker
+                (request.params as any).address,
+                (request.params as any).ticker
               );
             reply.send({ result });
           } catch (e) {
@@ -2383,12 +2383,12 @@ export default class RestModule {
           },
         },
         async (request, reply) => {
-          let { offset, max } = request.query;
+          let { offset, max } = request.query as any;
           try {
             const result =
               await this.tracManager.tapProtocol.getAccountReceiveTradesFilledList(
-                request.params.address,
-                request.params.ticker,
+                (request.params as any).address,
+                (request.params as any).ticker,
                 offset,
                 max
               );
@@ -2437,8 +2437,8 @@ export default class RestModule {
           try {
             const result =
               await this.tracManager.tapProtocol.getAccountTradesFilledListLength(
-                request.params.address,
-                request.params.ticker
+                (request.params as any).address,
+                (request.params as any).ticker
               );
             reply.send({ result });
           } catch (e) {
@@ -2492,12 +2492,12 @@ export default class RestModule {
           },
         },
         async (request, reply) => {
-          let { offset, max } = request.query;
+          let { offset, max } = request.query as any;
           try {
             const result =
               await this.tracManager.tapProtocol.getAccountTradesFilledList(
-                request.params.address,
-                request.params.ticker,
+                (request.params as any).address,
+                (request.params as any).ticker,
                 offset,
                 max
               );
@@ -2545,7 +2545,7 @@ export default class RestModule {
           try {
             const result =
               await this.tracManager.tapProtocol.getTickerTradesFilledListLength(
-                request.params.ticker
+                (request.params as any).ticker
               );
             reply.send({ result });
           } catch (e) {
@@ -2598,11 +2598,11 @@ export default class RestModule {
           },
         },
         async (request, reply) => {
-          let { offset, max } = request.query;
+          let { offset, max } = request.query as any;
           try {
             const result =
               await this.tracManager.tapProtocol.getTickerTradesFilledList(
-                request.params.ticker,
+                (request.params as any).ticker,
                 offset,
                 max
               );
@@ -2683,7 +2683,7 @@ export default class RestModule {
         //   }
         }
       }, async (request, reply) => {
-        let { offset, max } = request.query;
+        let { offset, max } = request.query as any;
         try {
           const result = await this.tracManager.tapProtocol.getTradesFilledList(
             offset,
@@ -2762,7 +2762,7 @@ export default class RestModule {
           },
         },
         async (request, reply) => {
-          let { offset, max } = request.query;
+          let { offset, max } = request.query as any;
           try {
             const result = await this.tracManager.tapProtocol.getSentList(
               offset,
@@ -2807,7 +2807,7 @@ export default class RestModule {
       }, async (request, reply) => {
         try {
           const result = await this.tracManager.tapProtocol.getAccumulator(
-            request.params.inscription
+            (request.params as any).inscription
           );
           reply.send({ result });
         } catch (e) {
@@ -2852,7 +2852,7 @@ export default class RestModule {
           try {
             const result =
               await this.tracManager.tapProtocol.getAccountAccumulatorListLength(
-                request.params.address
+                (request.params as any).address
               );
             reply.send({ result });
           } catch (e) {
@@ -2905,11 +2905,11 @@ export default class RestModule {
           },
         },
         async (request, reply) => {
-          let { offset, max } = request.query;
+          let { offset, max } = request.query as any;
           try {
             const result =
               await this.tracManager.tapProtocol.getAccountAccumulatorList(
-                request.params.address,
+                (request.params as any).address,
                 offset,
                 max
               );
@@ -2988,7 +2988,7 @@ export default class RestModule {
           },
         },
         async (request, reply) => {
-          let { offset, max } = request.query;
+          let { offset, max } = request.query as any;
           try {
             const result =
               await this.tracManager.tapProtocol.getAccumulatorList(
@@ -3043,7 +3043,7 @@ export default class RestModule {
         },
         async (request, reply) => {
           let { length_key, iterator_key, offset, max, return_json } =
-            request.query;
+            request.query as any;
           try {
             const result = await this.tracManager.tapProtocol.getListRecords(
               length_key,
@@ -3094,7 +3094,7 @@ export default class RestModule {
         async (request, reply) => {
           try {
             const result = await this.tracManager.tapProtocol.getLength(
-              request.params.length_key
+              (request.params as any).length_key
             );
             reply.send({ result });
           } catch (e) {

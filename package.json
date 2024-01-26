@@ -68,7 +68,8 @@
     "@types/config": "^3.3.3",
     "@types/figlet": "^1.5.8",
     "eslint": "^8.56.0",
-    "jest": "^29.7.0"
+    "jest": "^29.7.0",
+    "typescript": "^5.3.3"
   },
   "directories": {
     "test": "test"
