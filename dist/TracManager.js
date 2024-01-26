@@ -183,7 +183,7 @@ var TracManager = /** @class */ (function () {
     TracManager.prototype.startRangeDownload = function (start, end) {
         var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function () {
-            var chunk_size, i, range, foundPeers;
+            var chunk_size, i, range, discovery, foundPeers;
             return __generator(this, function (_d) {
                 switch (_d.label) {
                     case 0:
@@ -208,20 +208,24 @@ var TracManager = /** @class */ (function () {
                         i++;
                         return [3 /*break*/, 1];
                     case 4:
-                        if (!(end == -1)) return [3 /*break*/, 8];
-                        foundPeers = this.store.findingPeers();
-                        return [4 /*yield*/, this.swarm.flush()];
+                        if (!(end == -1)) return [3 /*break*/, 9];
+                        discovery = this.swarm.refresh({ server: true, client: true });
+                        return [4 /*yield*/, discovery.flushed()];
                     case 5:
                         _d.sent();
-                        return [4 /*yield*/, foundPeers()];
+                        foundPeers = this.store.findingPeers();
+                        return [4 /*yield*/, this.swarm.flush()];
                     case 6:
                         _d.sent();
-                        return [4 /*yield*/, this.sleep(1000)];
+                        return [4 /*yield*/, foundPeers()];
                     case 7:
                         _d.sent();
+                        return [4 /*yield*/, this.sleep(1000)];
+                    case 8:
+                        _d.sent();
                         this.startRangeDownload(start, end);
-                        _d.label = 8;
-                    case 8: return [2 /*return*/];
+                        _d.label = 9;
+                    case 9: return [2 /*return*/];
                 }
             });
         });

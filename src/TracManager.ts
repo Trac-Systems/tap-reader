@@ -168,8 +168,8 @@ export default class TracManager {
     }
 
     if (end == -1) {
-      // const discovery = this.swarm.refresh({ server: true, client: true }); // hardcoded for now, does this need to be configurable?
-      // await discovery.flushed();
+      const discovery = this.swarm.refresh({ server: true, client: true }); // hardcoded for now, does this need to be configurable?
+      await discovery.flushed();
       const foundPeers = this.store.findingPeers();
       await this.swarm.flush();
       await foundPeers();
