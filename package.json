@@ -5,11 +5,11 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/main.mjs",
+    "start": "node dist/main.js",
     "postinstall": "patch-package"
   },
   "bin": {
-    "tap-reader": "./src/main.mjs"
+    "tap-reader": "./dist/main.js"
   },
   "repository": {
     "type": "git",
