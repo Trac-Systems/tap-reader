@@ -1,5 +1,14 @@
+import TracManager from "./TracManager";
+
+interface Holder {
+  address: string; // Assuming address is a string
+  balance: number; // Replace with the correct type for balance
+  transferable: boolean; // Replace with the correct type for transferable
+}
+
 export default class TapProtocol {
-  constructor(tracManager) {
+  tracManager;
+  constructor(tracManager: TracManager) {
     this.tracManager = tracManager;
   }
   /**
@@ -7,7 +16,7 @@ export default class TapProtocol {
    * @param {string} inscription_id - The ID of the inscription to query.
    * @returns {Promise<number|null>} The transfer amount or null if not found.
    */
-  async getTransferAmountByInscription(inscription_id) {
+  async getTransferAmountByInscription(inscription_id: string) {
     let amount = await this.tracManager.bee.get("tamt/" + inscription_id);
     if (amount !== null) {
       return amount.value;
@@ -28,8 +37,8 @@ export default class TapProtocol {
    * @returns {Promise<Array>} An array of deployment records.
    */
   async getDeployments(offset = 0, max = 500) {
-    let out = [];
-    let records = await this.getListRecords("dl", "dli", offset, max, false);
+  let out: unknown [] = [];
+    let records: any = await this.getListRecords("dl", "dli", offset, max, false);
 
     if (!Array.isArray(records)) {
       return records;
@@ -47,7 +56,7 @@ export default class TapProtocol {
    * @returns {Promise<Object|null>} Deployment details or null if not found.
    */
 
-  async getDeployment(ticker) {
+  async getDeployment(ticker:string) {
     let deployment = await this.tracManager.bee.get(
       "d/" + JSON.stringify(ticker.toLowerCase())
     );
@@ -64,7 +73,7 @@ export default class TapProtocol {
    * @returns {Promise<number|null>} The number of tokens left to mint or null if not available.
    */
 
-  async getMintTokensLeft(ticker) {
+  async getMintTokensLeft(ticker: string) {
     let tokens_left = await this.tracManager.bee.get(
       "dc/" + JSON.stringify(ticker.toLowerCase())
     );
@@ -83,7 +92,7 @@ export default class TapProtocol {
    * @returns {Promise<number|null>} The balance of the address or null if not found.
    */
 
-  async getBalance(address, ticker) {
+  async getBalance(address: unknown, ticker: string) {
     let balance = await this.tracManager.bee.get(
       "b/" + address + "/" + JSON.stringify(ticker.toLowerCase())
     );
@@ -100,7 +109,7 @@ export default class TapProtocol {
    * @returns {Promise<number|null>} The transferable amount or null if not found.
    */
 
-  async getTransferable(address, ticker) {
+  async getTransferable(address: unknown, ticker: string) {
     let transferable = await this.tracManager.bee.get(
       "t/" + address + "/" + JSON.stringify(ticker.toLowerCase())
     );
@@ -115,7 +124,7 @@ export default class TapProtocol {
    * @param {string} ticker - The ticker for which to retrieve the number of holders.
    * @returns {Promise<number>} The number of holders for the specified ticker.
    */
-  async getHoldersLength(ticker) {
+  async getHoldersLength(ticker: string) {
     return this.getLength("h/" + JSON.stringify(ticker.toLowerCase()));
   }
   /**
@@ -125,10 +134,10 @@ export default class TapProtocol {
    * @param {number} [max=500] - The maximum number of holders to retrieve.
    * @returns {Promise<Array>} An array of holder records.
    */
-  async getHolders(ticker, offset = 0, max = 500) {
+  async getHolders(ticker: string, offset = 0, max = 500) {
     let _ticker = JSON.stringify(ticker.toLowerCase());
 
-    let out = [];
+    let out: unknown[] = [];
     let records = await this.getListRecords(
       "h/" + _ticker,
       "hi/" + _ticker,
@@ -156,7 +165,7 @@ export default class TapProtocol {
    * @param {string} address - The address for which to retrieve the token count.
    * @returns {Promise<number>} The number of tokens held by the specified address.
    */
-  async getAccountTokensLength(address) {
+  async getAccountTokensLength(address: string) {
     return this.getLength("atl/" + address);
   }
   /**
@@ -166,8 +175,8 @@ export default class TapProtocol {
    * @param {number} [max=500] - The maximum number of tokens to retrieve.
    * @returns {Promise<Array>} An array of token tickers.
    */
-  async getAccountTokens(address, offset = 0, max = 500) {
-    let out = [];
+  async getAccountTokens(address: string, offset = 0, max = 500) {
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "atl/" + address,
       "atli/" + address,
@@ -202,7 +211,7 @@ export default class TapProtocol {
    * @returns {Promise<Array>} An array of DMT element records.
    */
   async getDmtElementsList(offset = 0, max = 500) {
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "dmt-ell",
       "dmt-elli",
@@ -229,7 +238,7 @@ export default class TapProtocol {
    * @param {string} ticker - The ticker of the token.
    * @returns {Promise<number>} The number of mints performed by the address for the specified ticker.
    */
-  async getAccountMintListLength(address, ticker) {
+  async getAccountMintListLength(address: string, ticker: string) {
     return this.getLength(
       "aml/" + address + "/" + JSON.stringify(ticker.toLowerCase())
     );
@@ -240,9 +249,9 @@ export default class TapProtocol {
    * @param {string} ticker - The ticker of the token.
    * @returns {Promise<number>} The number of mints performed by the address for the specified ticker.
    */
-  async getAccountMintList(address, ticker, offset = 0, max = 500) {
+  async getAccountMintList(address: string, ticker: string, offset = 0, max = 500) {
     ticker = JSON.stringify(ticker.toLowerCase());
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "aml/" + address + "/" + ticker,
       "amli/" + address + "/" + ticker,
@@ -266,7 +275,7 @@ export default class TapProtocol {
    * @param {string} ticker - The ticker of the token.
    * @returns {Promise<number>} A promise that resolves with the length of the mint list.
    */
-  async getTickerMintListLength(ticker) {
+  async getTickerMintListLength(ticker: string) {
     return this.getLength("fml/" + JSON.stringify(ticker.toLowerCase()));
   }
   /**
@@ -277,9 +286,9 @@ export default class TapProtocol {
    * @param {number} [max=500] - The maximum number of mint records to retrieve.
    * @returns {Promise<Array>} An array of mint records.
    */
-  async getTickerMintList(ticker, offset = 0, max = 500) {
+  async getTickerMintList(ticker: string, offset = 0, max = 500) {
     ticker = JSON.stringify(ticker.toLowerCase());
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "fml/" + ticker,
       "fmli/" + ticker,
@@ -313,7 +322,7 @@ export default class TapProtocol {
    * @returns {Promise<Array>} An array of mint records.
    */
   async getMintList(offset = 0, max = 500) {
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords("sfml", "sfmli", offset, max, true);
 
     if (!Array.isArray(records)) {
@@ -332,7 +341,7 @@ export default class TapProtocol {
    * @param {string} inscription_id - The ID of the trade inscription to query.
    * @returns {Promise<Object|null>} Trade details or null if not found.
    */
-  async getTrade(inscription_id) {
+  async getTrade(inscription_id: string) {
     let trade = await this.tracManager.bee.get("tol/" + inscription_id);
 
     if (trade !== null) {
@@ -346,7 +355,7 @@ export default class TapProtocol {
    * @param {string} ticker - The ticker of the token.
    * @returns {Promise<number>} The number of trades for the specified address and ticker.
    */
-  async getAccountTradesListLength(address, ticker) {
+  async getAccountTradesListLength(address: string, ticker: string) {
     return this.getLength(
       "atrof/" + address + "/" + JSON.stringify(ticker.toLowerCase())
     );
@@ -360,9 +369,9 @@ export default class TapProtocol {
    * @returns {Promise<Array>} An array of trade records.
    */
 
-  async getAccountTradesList(address, ticker, offset = 0, max = 500) {
+  async getAccountTradesList(address: string, ticker: string, offset = 0, max = 500) {
     ticker = JSON.stringify(ticker.toLowerCase());
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "atrof/" + address + "/" + ticker,
       "atrofi/" + address + "/" + ticker,
@@ -387,7 +396,7 @@ export default class TapProtocol {
    * @returns {Promise<boolean>} True if the inscription is cancelled, false otherwise.
    */
 
-  async getAuthCancelled(inscription_id) {
+  async getAuthCancelled(inscription_id: string) {
     const cancelled = await this.tracManager.bee.get("tac/" + inscription_id);
 
     if (cancelled !== null) {
@@ -401,7 +410,7 @@ export default class TapProtocol {
    * @returns {Promise<boolean>} True if the hash exists, false otherwise.
    */
 
-  async getAuthHashExists(hash) {
+  async getAuthHashExists(hash: string) {
     hash = await this.tracManager.bee.get("tah/" + hash.trim().toLowerCase());
 
     if (hash !== null) {
@@ -425,7 +434,7 @@ export default class TapProtocol {
    */
 
   async getRedeemList(offset = 0, max = 500) {
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords("sftr", "sftri", offset, max, true);
 
     if (!Array.isArray(records)) {
@@ -443,7 +452,7 @@ export default class TapProtocol {
    * @param {string} address - The address for which to retrieve the redeem count.
    * @returns {Promise<number>} The number of redeems performed by the specified address.
    */
-  async getAccountRedeemListLength(address) {
+  async getAccountRedeemListLength(address: string) {
     return this.getLength("tr/" + address);
   }
   /**
@@ -453,8 +462,8 @@ export default class TapProtocol {
    * @param {number} [max=500] - The maximum number of redeem records to retrieve.
    * @returns {Promise<Array>} An array of redeem records for the specified address.
    */
-  async getAccountRedeemList(address, offset = 0, max = 500) {
-    let out = [];
+  async getAccountRedeemList(address: string, offset = 0, max = 500) {
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "tr/" + address,
       "tri/" + address,
@@ -478,7 +487,7 @@ export default class TapProtocol {
    * @param {string} address - The address for which to retrieve the auth count.
    * @returns {Promise<number>} The number of auth records for the specified address.
    */
-  async getAccountAuthListLength(address) {
+  async getAccountAuthListLength(address: string) {
     return this.getLength("ta/" + address);
   }
   /**
@@ -488,8 +497,8 @@ export default class TapProtocol {
    * @param {number} [max=500] - The maximum number of auth records to retrieve.
    * @returns {Promise<Array>} An array of auth records for the specified address.
    */
-  async getAccountAuthList(address, offset = 0, max = 500) {
-    let out = [];
+  async getAccountAuthList(address: string, offset = 0, max = 500) {
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "ta/" + address,
       "tai/" + address,
@@ -522,7 +531,7 @@ export default class TapProtocol {
    * @returns {Promise<Array>} An array of auth records.
    */
   async getAuthList(offset = 0, max = 500) {
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords("sfta", "sftai", offset, max, true);
 
     if (!Array.isArray(records)) {
@@ -540,7 +549,7 @@ export default class TapProtocol {
    * @param {string} ticker - The ticker for which to retrieve the trade count.
    * @returns {Promise<number>} The number of trades for the specified ticker.
    */
-  async getTickerTradesListLength(ticker) {
+  async getTickerTradesListLength(ticker: string) {
     return this.getLength("fatrof/" + JSON.stringify(ticker.toLowerCase()));
   }
   /**
@@ -550,9 +559,9 @@ export default class TapProtocol {
    * @param {number} [max=500] - The maximum number of trades to retrieve.
    * @returns {Promise<Array>} An array of trade records for the specified ticker.
    */
-  async getTickerTradesList(ticker, offset = 0, max = 500) {
+  async getTickerTradesList(ticker: string, offset = 0, max = 500) {
     ticker = JSON.stringify(ticker.toLowerCase());
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "fatrof/" + ticker,
       "fatrofi/" + ticker,
@@ -585,7 +594,7 @@ export default class TapProtocol {
    * @returns {Promise<Array>} An array of all trade records.
    */
   async getTradesList(offset = 0, max = 500) {
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "sfatrof",
       "sfatrofi",
@@ -610,7 +619,7 @@ export default class TapProtocol {
    * @param {string} ticker - The ticker of the token.
    * @returns {Promise<number>} The number of transfers for the specified address and ticker.
    */
-  async getAccountTransferListLength(address, ticker) {
+  async getAccountTransferListLength(address: string, ticker: string) {
     return this.getLength(
       "atrl/" + address + "/" + JSON.stringify(ticker.toLowerCase())
     );
@@ -623,9 +632,9 @@ export default class TapProtocol {
    * @param {number} [max=500] - The maximum number of transfer records to retrieve.
    * @returns {Promise<Array>} An array of transfer records for the specified address and ticker.
    */
-  async getAccountTransferList(address, ticker, offset = 0, max = 500) {
+  async getAccountTransferList(address: string, ticker: string, offset = 0, max = 500) {
     ticker = JSON.stringify(ticker.toLowerCase());
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "atrl/" + address + "/" + ticker,
       "atrli/" + address + "/" + ticker,
@@ -649,7 +658,7 @@ export default class TapProtocol {
    * @param {string} ticker - The ticker for which to retrieve the transfer count.
    * @returns {Promise<number>} The number of transfers for the specified ticker.
    */
-  async getTickerTransferListLength(ticker) {
+  async getTickerTransferListLength(ticker: string) {
     return this.getLength("ftrl/" + JSON.stringify(ticker.toLowerCase()));
   }
   /**
@@ -659,9 +668,9 @@ export default class TapProtocol {
    * @param {number} [max=500] - The maximum number of transfer records to retrieve.
    * @returns {Promise<Array>} An array of transfer records for the specified ticker.
    */
-  async getTickerTransferList(ticker, offset = 0, max = 500) {
+  async getTickerTransferList(ticker: string, offset = 0, max = 500) {
     ticker = JSON.stringify(ticker.toLowerCase());
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "ftrl/" + ticker,
       "ftrli/" + ticker,
@@ -694,7 +703,7 @@ export default class TapProtocol {
    * @returns {Promise<Array>} An array of all transfer records.
    */
   async getTransferList(offset = 0, max = 500) {
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "sftrl",
       "sftrli",
@@ -719,7 +728,7 @@ export default class TapProtocol {
    * @param {string} ticker - The ticker of the token.
    * @returns {Promise<number>} The number of sent transactions for the specified address and ticker.
    */
-  async getAccountSentListLength(address, ticker) {
+  async getAccountSentListLength(address: string, ticker: string) {
     return this.getLength(
       "strl/" + address + "/" + JSON.stringify(ticker.toLowerCase())
     );
@@ -732,9 +741,9 @@ export default class TapProtocol {
    * @param {number} [max=500] - The maximum number of sent transaction records to retrieve.
    * @returns {Promise<Array>} An array of sent transaction records for the specified address and ticker.
    */
-  async getAccountSentList(address, ticker, offset = 0, max = 500) {
+  async getAccountSentList(address: string, ticker: string, offset = 0, max = 500) {
     ticker = JSON.stringify(ticker.toLowerCase());
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "strl/" + address + "/" + ticker,
       "strli/" + address + "/" + ticker,
@@ -759,7 +768,7 @@ export default class TapProtocol {
    * @param {string} ticker - The ticker of the token.
    * @returns {Promise<number>} The number of received trades filled for the specified address and ticker.
    */
-  async getAccountReceiveTradesFilledListLength(address, ticker) {
+  async getAccountReceiveTradesFilledListLength(address: string, ticker: string) {
     return this.getLength(
       "rbtrof/" + address + "/" + JSON.stringify(ticker.toLowerCase())
     );
@@ -773,13 +782,13 @@ export default class TapProtocol {
    * @returns {Promise<Array>} An array of received trades filled records for the specified address and ticker.
    */
   async getAccountReceiveTradesFilledList(
-    address,
-    ticker,
+    address: string,
+    ticker: string,
     offset = 0,
     max = 500
   ) {
     ticker = JSON.stringify(ticker.toLowerCase());
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "rbtrof/" + address + "/" + ticker,
       "rbtrofi/" + address + "/" + ticker,
@@ -804,7 +813,7 @@ export default class TapProtocol {
    * @param {string} ticker - The ticker of the token.
    * @returns {Promise<number>} The number of trades filled for the specified address and ticker.
    */
-  async getAccountTradesFilledListLength(address, ticker) {
+  async getAccountTradesFilledListLength(address: string, ticker: string) {
     return this.getLength(
       "btrof/" + address + "/" + JSON.stringify(ticker.toLowerCase())
     );
@@ -817,9 +826,9 @@ export default class TapProtocol {
    * @param {number} [max=500] - The maximum number of filled trades to retrieve.
    * @returns {Promise<Array>} An array of filled trade records for the specified address and ticker.
    */
-  async getAccountTradesFilledList(address, ticker, offset = 0, max = 500) {
+  async getAccountTradesFilledList(address: string, ticker: string, offset = 0, max = 500) {
     ticker = JSON.stringify(ticker.toLowerCase());
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "btrof/" + address + "/" + ticker,
       "btrofi/" + address + "/" + ticker,
@@ -843,7 +852,7 @@ export default class TapProtocol {
    * @param {string} ticker - The ticker for which to retrieve the filled trade count.
    * @returns {Promise<number>} The number of filled trades for the specified ticker.
    */
-  async getTickerTradesFilledListLength(ticker) {
+  async getTickerTradesFilledListLength(ticker: string) {
     return this.getLength("fbtrof/" + JSON.stringify(ticker.toLowerCase()));
   }
   /**
@@ -853,9 +862,9 @@ export default class TapProtocol {
    * @param {number} [max=500] - The maximum number of filled trade records to retrieve.
    * @returns {Promise<Array>} An array of filled trade records for the specified ticker.
    */
-  async getTickerTradesFilledList(ticker, offset = 0, max = 500) {
+  async getTickerTradesFilledList(ticker: string, offset = 0, max = 500) {
     ticker = JSON.stringify(ticker.toLowerCase());
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "fbtrof/" + ticker,
       "fbtrofi/" + ticker,
@@ -889,7 +898,7 @@ export default class TapProtocol {
    * @returns {Promise<Array|Object>} A promise that resolves to an array of trade records.
    */
   async getTradesFilledList(offset = 0, max = 500) {
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "sfbtrof",
       "sfbtrofi",
@@ -916,7 +925,7 @@ export default class TapProtocol {
    * @param {string} ticker - The ticker symbol for the token.
    * @returns {Promise<number>} A promise that resolves to the length of the receive list.
    */
-  async getAccountReceiveListLength(address, ticker) {
+  async getAccountReceiveListLength(address: string, ticker: string) {
     return this.getLength(
       "rstrl/" + address + "/" + JSON.stringify(ticker.toLowerCase())
     );
@@ -930,9 +939,9 @@ export default class TapProtocol {
    * @param {number} [max=500] - The maximum number of records to retrieve.
    * @returns {Promise<Array|Object>} A promise that resolves to an array of receive transaction records.
    */
-  async getAccountReceiveList(address, ticker, offset = 0, max = 500) {
+  async getAccountReceiveList(address: string, ticker: string, offset = 0, max = 500) {
     ticker = JSON.stringify(ticker.toLowerCase());
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "rstrl/" + address + "/" + ticker,
       "rstrli/" + address + "/" + ticker,
@@ -957,7 +966,7 @@ export default class TapProtocol {
    * @param {string} ticker - The ticker symbol for the token.
    * @returns {Promise<number>} A promise that resolves to the length of the sent list.
    */
-  async getTickerSentListLength(ticker) {
+  async getTickerSentListLength(ticker: string) {
     return this.getLength("fstrl/" + JSON.stringify(ticker.toLowerCase()));
   }
   /**
@@ -968,9 +977,9 @@ export default class TapProtocol {
    * @param {number} [max=500] - The maximum number of records to retrieve.
    * @returns {Promise<Array|Object>} A promise that resolves to an array of sent transaction records.
    */
-  async getTickerSentList(ticker, offset = 0, max = 500) {
+  async getTickerSentList(ticker: string, offset = 0, max = 500) {
     ticker = JSON.stringify(ticker.toLowerCase());
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "fstrl/" + ticker,
       "fstrli/" + ticker,
@@ -1007,7 +1016,7 @@ export default class TapProtocol {
    * @returns {Promise<Array|Object>} A promise that resolves to an array of all sent transaction records.
    */
   async getSentList(offset = 0, max = 500) {
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "sfstrl",
       "sfstrli",
@@ -1032,7 +1041,7 @@ export default class TapProtocol {
    * @param {string} inscription - The inscription identifier.
    * @returns {Promise<Object|null>} A promise that resolves to the accumulator object, or null if not found.
    */
-  async getAccumulator(inscription) {
+  async getAccumulator(inscription: string) {
     const accumulator = await this.tracManager.bee.get("a/" + inscription);
     if (accumulator !== null) {
       return JSON.parse(accumulator.value);
@@ -1045,7 +1054,7 @@ export default class TapProtocol {
    * @param {string} address - The Bitcoin address to query.
    * @returns {Promise<number>} A promise that resolves to the number of accumulator entries.
    */
-  async getAccountAccumulatorListLength(address) {
+  async getAccountAccumulatorListLength(address: string) {
     return this.getLength("al/" + address);
   }
   /**
@@ -1057,8 +1066,8 @@ export default class TapProtocol {
    * @returns {Promise<Array|Object>} A promise that resolves to an array of accumulator records.
    *                                  If an error occurs, returns the error object.
    */
-  async getAccountAccumulatorList(address, offset = 0, max = 500) {
-    let out = [];
+  async getAccountAccumulatorList(address: string, offset = 0, max = 500) {
+  let out: unknown[] = [];
     let records = await this.getListRecords(
       "ali/" + address,
       "ali/" + address,
@@ -1094,7 +1103,7 @@ export default class TapProtocol {
    *                                  If an error occurs, returns the error object.
    */
   async getAccumulatorList(offset = 0, max = 500) {
-    let out = [];
+  let out: unknown[] = [];
     let records = await this.getListRecords("al", "ali", offset, max, true);
 
     if (!Array.isArray(records)) {
@@ -1118,7 +1127,7 @@ export default class TapProtocol {
    * @param {boolean} return_json - Whether to return the records as JSON objects.
    * @returns {Promise<Array|Object|string>} A promise that resolves to an array of records, an error object, or a string message in case of invalid parameters.
    */
-  async getListRecords(length_key, iterator_key, offset, max, return_json) {
+  async getListRecords(length_key: string, iterator_key: string, offset: number, max: number, return_json: boolean) {
     // const queue_result = await enter_queue();
     // if (queue_result !== "") {
     //   return queue_result;
@@ -1131,7 +1140,7 @@ export default class TapProtocol {
       return "invalid offset";
     }
 
-    let out = [];
+    let out: unknown[] = [];
     const batch = this.tracManager.bee.batch();
 
     let length = await batch.get(length_key);
@@ -1169,7 +1178,7 @@ export default class TapProtocol {
    * @param {string} length_key - The key to determine the length of the list.
    * @returns {Promise<number>} A promise that resolves to the length of the list.
    */
-  async getLength(length_key) {
+  async getLength(length_key: string) {
     let length = await this.tracManager.bee.get(length_key);
     if (length === null) {
       length = 0;
@@ -1178,7 +1187,7 @@ export default class TapProtocol {
     }
     return length;
   }
-  sleep(ms) {
+  sleep(ms: number | undefined) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

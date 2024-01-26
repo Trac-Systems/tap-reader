@@ -1,13 +1,18 @@
 import { createServer } from "http";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import config from "config";
+import { DefaultEventsMap } from "socket.io/dist/typed-events";
 
 export default class WebsocketModule {
   /**
    * Creates an instance of WebsocketModule for Trac Core
    * @param {Object} tracManager - An object managing Trac Core.
    */
-  constructor(tracManager) {
+  tracManager;
+  socket_port: number;
+  httpServer;
+  io;
+  constructor(tracManager: any) {
     this.tracManager = tracManager;
 
     this.socket_port = config.get("websocketPort");
@@ -693,7 +698,7 @@ export default class WebsocketModule {
    * @param {Object} cmd - The invalid command object.
    * @param {Socket} socket - The WebSocket socket object.
    */
-  invalidCmd(cmd, socket) {
+  invalidCmd(cmd: any, socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) {
     this.io.to(socket.id).emit("error", { error: "invalid command", cmd: cmd });
   }
   /**
@@ -702,7 +707,7 @@ export default class WebsocketModule {
    * @param {Socket} socket - The WebSocket socket object.
    * @returns {boolean} - True if the command is valid, false otherwise.
    */
-  validCmd(cmd, socket) {
+  validCmd(cmd: { call_id: any; func: any; args: any; }, socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) {
     if (
       typeof cmd.call_id == "undefined" ||
       typeof cmd.func == "undefined" ||

@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+      "target": "es5",            // Specify ECMAScript target version
+      "module": "commonjs",       // Specify module code generation
+      "strict": true,             // Enable all strict type checking options
+      "esModuleInterop": true,    // Enables __importDefault helper for default import interoperability
+      "skipLibCheck": true,       // Skip type checking of all declaration files (*.d.ts)
+      "outDir": "./dist",         // Redirect output structure to the directory
+      "typeRoots": ["./"],        // List of folders to include type definitions from
+      "types": [],                // Type declaration files to be included in compilation
+    }
+  }

@@ -4,9 +4,11 @@ import Hyperbee from "hyperbee";
 import goodbye from "graceful-goodbye";
 import config from "config";
 import figlet from "figlet";
-import WebsocketModule from "./WebsocketModule.mjs";
-import RestModule from "./RestModule.mjs";
-import TapProtocol from "./TapProtocol.mjs";
+import b4a from "b4a"
+import WebsocketModule from "./WebsocketModule";
+import RestModule from "./RestModule";
+import TapProtocol from "./TapProtocol";
+import Hypercore from "hypercore";
 
 /**
  * The TracManager class manages connections and data synchronization
@@ -25,17 +27,26 @@ export default class TracManager {
   /**
    * @property {RestModule} restServer - Instance of RestModule for REST API access.
    */
-  restServer;
+  restServer: RestModule | null;
+  bee: any;
+  swarm: any;
+  store: any;
+  isConnected: boolean;
+  core: any;
+  websocketServer: WebsocketModule | null;
   constructor() {
     this.isConnected = false;
     this.store = new Corestore("./tapstore");
     this.swarm = new Hyperswarm();
     this.bee = null;
+    this.restServer = null;
+    this.core = null;
     this.tapProtocol = new TapProtocol(this);
-
+    this.websocketServer = null;
     goodbye(() => {
       this.swarm.destroy();
     });
+    
   }
   /**
    * Initializes the reader for the TAP Protocol, setting up corestore and hyperswarm.
@@ -58,9 +69,8 @@ export default class TracManager {
     console.log("Protocol: Ordinals/TAP");
 
     this.core = this.store.get({
-      key: process.argv[2]
-        ? Buffer.from(process.argv[2], "hex")
-        : Buffer.from(config.get("channel"), "hex"),
+      key: Buffer.from(config.get("channel") as string,'hex'),
+      // key: Buffer.from(config.get("channel"), "hex"),
       sparse: true,
     });
 
@@ -101,21 +111,21 @@ export default class TracManager {
    * @param {boolean} client - Indicates if this instance should act as a client.
    * @returns {Promise<void>} A promise that resolves when the network is initialized.
    */
-  async initHyperswarm(server, client) {
-    this.swarm.on("connection", (connection) => {
+  async initHyperswarm(server: boolean, client: boolean) {
+    this.swarm.on("connection", (connection: any) => {
       this.isConnected = true;
       console.log(
         "Connected to peer:",
         connection.remotePublicKey.toString("hex")
       );
-      this.core.replicate(connection);
+      this.core?.replicate(connection);
       connection.on("close", () =>
         console.log(
           "Connection closed with peer:",
           connection.remotePublicKey.toString("hex")
         )
       );
-      connection.on("error", (error) =>
+      connection.on("error", (error: any) =>
         console.log(
           "Connection error with peer:",
           connection.remotePublicKey.toString("hex"),
@@ -124,7 +134,7 @@ export default class TracManager {
       );
     });
 
-    const discovery = this.swarm.join(this.core.discoveryKey, {
+    const discovery = this.swarm.join(this.core?.discoveryKey, {
       server: server,
       client: client,
     });
@@ -140,26 +150,26 @@ export default class TracManager {
    * @param {number} end - The ending index for the data download.
    * @returns {Promise<void>} A promise that resolves when the download is complete.
    */
-  async startRangeDownload(start, end) {
-    console.log("Starting chunk download. Core length:", this.core.length);
+  async startRangeDownload(start: number, end: number) {
+    console.log("Starting chunk download. Core length:", this.core?.length);
 
     if (end < 0) {
-      end = this.core.length;
+      end = this.core?.length;
     }
 
     let chunk_size = 20000;
 
     for (let i = start; i < end; i++) {
       console.log("Next chunk", i, i + chunk_size);
-      const range = this.core.download({ start: i, end: i + chunk_size });
+      const range = this.core?.download({ start: i, end: i + chunk_size });
       await range.done();
       i = i + chunk_size - 1;
       start = i;
     }
 
     if (end == -1) {
-      const discovery = this.swarm.refresh({ server: true, client: true }); // hardcoded for now, does this need to be configurable?
-      await discovery.flushed();
+      // const discovery = this.swarm.refresh({ server: true, client: true }); // hardcoded for now, does this need to be configurable?
+      // await discovery.flushed();
       const foundPeers = this.store.findingPeers();
       await this.swarm.flush();
       await foundPeers();
@@ -174,7 +184,7 @@ export default class TracManager {
    * @param {number} ms - The number of milliseconds to delay.
    * @returns {Promise<void>} A promise that resolves after the specified delay.
    */
-  sleep(ms) {
+  sleep(ms: number | undefined) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

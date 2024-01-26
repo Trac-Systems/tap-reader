@@ -1,9 +1,9 @@
 import config from "config";
 import Fastify from "fastify";
-import TracManager from "./TracManager.mjs";
+import TracManager from "./TracManager";
 import swagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
-
+import { FastifyRequest, FastifyReply } from "fastify";
 export default class RestModule {
   /**
    * @property {TracManager} tracManager - Instance of TracManager
@@ -13,12 +13,11 @@ export default class RestModule {
    * @property {Fastify} fastify - Instance of Fastify
    */
   fastify;
-  constructor(tracManager) {
+  constructor(tracManager: any) {
     this.tracManager = tracManager;
     this.fastify = Fastify({ logger: false });
     // Initialize routes
     this.fastify.register(swagger, {
-      routePrefix: "/docs",
       swagger: {
         info: {
           title: "TAP Protocol API",
@@ -30,7 +29,6 @@ export default class RestModule {
         consumes: ["application/json"],
         produces: ["application/json"],
       },
-      exposeRoute: true,
     });
 
     this.fastify.register(fastifySwaggerUi, {
@@ -138,9 +136,46 @@ export default class RestModule {
                 max: { type: "integer", default: 100 },
               },
             },
+            response: {
+              200: {
+                type: "object",
+                properties: {
+                  result: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        tick: { type: "string" },
+                        max: { type: "string" },
+                        lim: { type: "string" },
+                        dec: { type: "integer" },
+                        blck: { type: "integer" },
+                        tx: { type: "string" },
+                        ins: { type: "string" },
+                        num: { type: "integer" },
+                        ts: { type: "integer" },
+                        addr: { type: "string" },
+                        crsd: { type: "boolean" },
+                        dmt: { type: "boolean" },
+                        elem: { type: ["string", "null"] },
+                        prj: { type: ["string", "null"] },
+                        dim: { type: ["string", "null"] },
+                        dt: { type: ["string", "null"] },
+                      },
+                    },
+                  },
+                },
+              },
+              500: {
+                type: "object",
+                properties: {
+                  error: { type: "string" },
+                },
+              },
+            },
           },
         },
-        async (request, reply) => {
+        async (request: FastifyRequest, reply: FastifyReply) => {
           // /getDeployments?offset=0&max=2
           try {
             let { offset, max } = request.query;
@@ -194,7 +229,7 @@ export default class RestModule {
             },
           },
         },
-        async (request, reply) => {
+        async (request: FastifyRequest, reply: FastifyReply) => {
           // /getDeployment/gib
           try {
             const result = await this.tracManager.tapProtocol.getDeployment(
@@ -3075,7 +3110,7 @@ export default class RestModule {
   async start() {
     try {
       const port = config.get("restPort") || 3000; // Defaulting to 3000 if not configured
-      await this.fastify.listen({ port });
+      await this.fastify.listen(port);
       // this.fastify.swagger();
       console.log(`REST server listening on port ${port}`);
     } catch (err) {
