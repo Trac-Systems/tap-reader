@@ -42,21 +42,24 @@ The most recent channel is always pre-defined in the reader's config of this rep
 - 2-4 CPU Cores, 8GB RAM
 - 500GB SSD drive (make sure it's a good one)
 
-Should work perfectly on Pi 3-5 and low Watts.
+Should work perfectly on Pi 4-5 and low Watts.
 
 ## Installation
 
-Either download this package or install it through npmjs:
+Either download this package using git clone or install it through npmjs (if you use npmjs, you'll need to specify your entry point yourself):
 
 ```
-npm install tap-reader
-```
-
-Then CD into the package folder's root and start it using:
-
-```
+git clone https://github.com/Trac-Systems/tap-reader.git
+cd tap-reader
+npm i
 npm start
 ```
+
+## Running in background
+
+There are several different ways to run readers in the background. We recommend to use PM2 to run and organize your readers, especially if you are running multiple instances:
+
+https://pm2.keymetrics.io/
 
 ## API Usage
 
