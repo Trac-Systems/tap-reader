@@ -61,6 +61,20 @@ export default class RestModule {
       },
       transformSpecificationClone: true,
     });
+
+    // Read cache control settings
+    const cacheControlConfig = config.get('cacheControl');
+
+    this.fastify.addHook('onSend', (request, reply, payload, done) => {
+      const maxAge = cacheControlConfig.maxAge;
+      const visibility = cacheControlConfig.public ? 'public' : 'private';
+
+      // Set cache control header
+      reply.header('Cache-Control', `${visibility}, max-age=${maxAge}`);
+      done();
+    });
+
+
     this.initializeRoutes();
   }
 
