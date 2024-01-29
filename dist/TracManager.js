@@ -43,11 +43,13 @@ var corestore_1 = __importDefault(require("corestore"));
 var hyperswarm_1 = __importDefault(require("hyperswarm"));
 var hyperbee_1 = __importDefault(require("hyperbee"));
 var graceful_goodbye_1 = __importDefault(require("graceful-goodbye"));
-var config_1 = __importDefault(require("config"));
 var figlet_1 = __importDefault(require("figlet"));
 var WebsocketModule_1 = __importDefault(require("./WebsocketModule"));
 var RestModule_1 = __importDefault(require("./RestModule"));
 var TapProtocol_1 = __importDefault(require("./TapProtocol"));
+process.env["NODE_CONFIG_DIR"] = "./../config";
+var config_1 = __importDefault(require("config"));
+// import b4a from "b4a"
 /**
  * The TracManager class manages connections and data synchronization
  * using Corestore, Hyperswarm, and Hyperbee technologies. It is designed
@@ -92,7 +94,6 @@ var TracManager = /** @class */ (function () {
                         console.log("Protocol: Ordinals/TAP");
                         this.core = this.store.get({
                             key: Buffer.from(config_1.default.get("channel"), 'hex'),
-                            // key: Buffer.from(config.get("channel"), "hex"),
                             sparse: true,
                         });
                         console.log("Channel:", this.core.key.toString("hex"));
@@ -151,7 +152,7 @@ var TracManager = /** @class */ (function () {
                                 return console.log("Connection closed with peer:", connection.remotePublicKey.toString("hex"));
                             });
                             connection.on("error", function (error) {
-                                return console.log("Connection error with peer:", connection.remotePublicKey.toString("hex"), error);
+                                return console.log("Connection error with peer:", connection.remotePublicKey.toString("hex"));
                             });
                         });
                         discovery = this.swarm.join((_a = this.core) === null || _a === void 0 ? void 0 : _a.discoveryKey, {

@@ -1,14 +1,16 @@
 import Corestore from "corestore";
+import Hypercore from "hypercore";
 import Hyperswarm from "hyperswarm";
 import Hyperbee from "hyperbee";
 import goodbye from "graceful-goodbye";
-import config from "config";
 import figlet from "figlet";
-import b4a from "b4a"
+
 import WebsocketModule from "./WebsocketModule";
 import RestModule from "./RestModule";
 import TapProtocol from "./TapProtocol";
-import Hypercore from "hypercore";
+process.env["NODE_CONFIG_DIR"] = "./../config";
+import config from "config";
+// import b4a from "b4a"
 
 /**
  * The TracManager class manages connections and data synchronization
@@ -70,7 +72,6 @@ export default class TracManager {
 
     this.core = this.store.get({
       key: Buffer.from(config.get("channel") as string,'hex'),
-      // key: Buffer.from(config.get("channel"), "hex"),
       sparse: true,
     });
 
@@ -129,7 +130,7 @@ export default class TracManager {
         console.log(
           "Connection error with peer:",
           connection.remotePublicKey.toString("hex"),
-          error
+          // error
         )
       );
     });
