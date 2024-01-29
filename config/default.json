@@ -1,10 +1,11 @@
 {
     "enableRest": true,
+    "enableRestApiDocs": false,
     "restPort": 5099,
     "cacheControl": {
         "maxAge": 3600,
         "public": true
-    },    
+    },
     "enableWebsockets": false,
     "websocketPort": 5095,
     "websocketCORS": "*",
