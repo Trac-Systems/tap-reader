@@ -1,6 +1,6 @@
 {
     "enableRest": true,
-    "enableRestApiDocs": false,
+    "enableRestApiDocs": true,
     "restPort": 5099,
     "cacheControl": {
         "maxAge": 3600,
