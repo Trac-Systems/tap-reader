@@ -68,7 +68,8 @@ export default class RestModule {
     }
 
     // Read cache control settings
-    const cacheControlConfig = config.get('cacheControl');
+    const cacheControlConfig = config.get('restCacheControl');
+    const restHeaders = config.get('restHeaders');
 
     this.fastify.addHook('onSend', (request, reply, payload, done) => {
       const maxAge = cacheControlConfig.maxAge;
@@ -76,6 +77,11 @@ export default class RestModule {
 
       // Set cache control header
       reply.header('Cache-Control', `${visibility}, max-age=${maxAge}`);
+      // Set each header from the configuration
+      restHeaders.forEach(header => {
+        reply.header(header.name, header.value);
+      });
+
       done();
     });
 
