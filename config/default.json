@@ -2,10 +2,14 @@
     "enableRest": true,
     "enableRestApiDocs": true,
     "restPort": 5099,
-    "cacheControl": {
+    "restCacheControl": {
         "maxAge": 3600,
         "public": true
     },
+    "restHeaders": [
+        { "name": "X-Powered-By", "value": "TracCore" },
+        { "name": "Access-Control-Allow-Origin", "value": "*" }
+    ],
     "enableWebsockets": false,
     "websocketPort": 5095,
     "websocketCORS": "*",
