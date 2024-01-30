@@ -97,11 +97,16 @@ Just swap out the given domain in that endpoint example above with your websocke
 ```json
 {
     "enableRest": true,
+    "enableRestApiDocs": true,
     "restPort": 5099,
-    "cacheControl": {
+    "restCacheControl": {
         "maxAge": 3600,
         "public": true
-    },    
+    },
+    "restHeaders": [
+        { "name": "X-Powered-By", "value": "TracCore" },
+        { "name": "Access-Control-Allow-Origin", "value": "*" }
+    ],
     "enableWebsockets": false,
     "websocketPort": 5095,
     "websocketCORS": "*",
