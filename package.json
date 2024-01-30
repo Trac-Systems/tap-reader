@@ -4,7 +4,7 @@
   "description": "decentralized trac core module",
   "main": "src/main.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node bin/test.js",
     "start": "node src/main.mjs",
     "postinstall": "patch-package"
   },
@@ -63,6 +63,9 @@
     "tap-reader": "^0.1.0"
   },
   "devDependencies": {
+    "@japa/api-client": "^2.0.0-1",
+    "@japa/expect": "^3.0.0-1",
+    "@japa/runner": "^3.0.0-9",
     "@jest/globals": "^29.7.0",
     "eslint": "^8.56.0",
     "jest": "^29.7.0"
@@ -70,5 +73,6 @@
   "directories": {
     "test": "test"
   },
-  "author": "Trac Systems"
+  "author": "Trac Systems",
+  "type": "module"
 }
