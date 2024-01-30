@@ -34,7 +34,8 @@ export default class TracManager {
     this.tapProtocol = new TapProtocol(this);
 
     goodbye(() => {
-      this.swarm.destroy();
+      // this.swarm.destroy();
+      this.close();
     });
   }
   /**
@@ -95,6 +96,45 @@ export default class TracManager {
     // await this.sleep(30 * 1000);
   }
   /**
+   * Closes all initialized services and resources in TracManager.
+   * This includes shutting down the WebSocket server, REST server, Hyperbee database,
+   * and Hyperswarm connections. It ensures a graceful shutdown of all network connections
+   * and database interactions.
+   * 
+   * @async
+   * @returns {Promise<void>} A promise that resolves when all services and resources are closed.
+   */
+  async close() {
+    // Close the WebSocket server if initialized
+    if (this.websocketServer) {
+      console.log('Closing WebSocket server...');
+      await this.websocketServer.httpServer.close();
+      this.websocketServer = null;
+    }
+
+    // Close the REST server if initialized
+    if (this.restServer) {
+      console.log('Closing REST server...');
+      await this.restServer.fastify.close();
+    }
+    // Close Hyperswarm connections
+    if (this.swarm) {
+      console.log('Closing Hyperswarm connections...');
+      await this.swarm.destroy();
+    }
+
+    // Close the Hyperbee database
+    if (this.bee) {
+      console.log('Closing Hyperbee database...');
+      await this.bee.close();
+    }
+    // Additional cleanup if necessary
+
+    console.log('All services closed.');
+    return true;
+
+  }
+  /**
    * Initializes a Hyperswarm network connection for data synchronization.
    *
    * @param {boolean} server - Indicates if this instance should act as a server.
@@ -153,6 +193,7 @@ export default class TracManager {
       console.log("Next chunk", i, i + chunk_size);
       const range = this.core.download({ start: i, end: i + chunk_size });
       await range.done();
+      console.log("Done chunk", i,i + chunk_size)
       i = i + chunk_size - 1;
       start = i;
     }

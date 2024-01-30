@@ -11,7 +11,8 @@ test.group('TracManager', () => {
 
     // Test logic goes here
     expect(1 + 1).toBe(2)
+
+    await tracCore.close();
     
-    process.exit(0) // TODO: implement proper shutdown mechanism to TracManager peer2peer modules
   }).disableTimeout()
 });
