@@ -35,6 +35,7 @@ export default class TracManager {
 
     goodbye(() => {
       // this.swarm.destroy();
+      this.isConnected = false;
       this.close();
     });
   }
@@ -103,34 +104,47 @@ export default class TracManager {
    * 
    * @async
    * @returns {Promise<void>} A promise that resolves when all services and resources are closed.
-   */
-  async close() {
+  */
+ async close() {
+
+    // Close Hypercore connections
+    if(this.store) {
+      console.log('Closing Corestore...');
+      await this.store.close();
+    }
+  
+    // Close Hyperswarm connections
+    if (this.swarm) {
+      console.log('Closing Hyperswarm connections...');
+      await this.swarm.destroy();
+    }
+    
+    // Close the Hyperbee database
+    if (this.bee) {
+      console.log('Closing Hyperbee database...');
+      await this.bee.close();
+    }
+
     // Close the WebSocket server if initialized
     if (this.websocketServer) {
       console.log('Closing WebSocket server...');
       await this.websocketServer.httpServer.close();
       this.websocketServer = null;
     }
-
+    
     // Close the REST server if initialized
     if (this.restServer) {
       console.log('Closing REST server...');
       await this.restServer.fastify.close();
+      this.restServer = null;
     }
-    // Close Hyperswarm connections
-    if (this.swarm) {
-      console.log('Closing Hyperswarm connections...');
-      await this.swarm.destroy();
-    }
+    
 
-    // Close the Hyperbee database
-    if (this.bee) {
-      console.log('Closing Hyperbee database...');
-      await this.bee.close();
-    }
     // Additional cleanup if necessary
 
     console.log('All services closed.');
+    this.isConnected = false;
+
     return true;
 
   }
