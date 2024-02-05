@@ -7,7 +7,8 @@ import figlet from "figlet";
 import WebsocketModule from "./WebsocketModule.mjs";
 import RestModule from "./RestModule.mjs";
 import TapProtocol from "./TapProtocol.mjs";
-
+import TapProtocolMetricsExporter from "./TapProtocolMetricsExporter.mjs";
+import cfg from './config.mjs'
 /**
  * The TracManager class manages connections and data synchronization
  * using Corestore, Hyperswarm, and Hyperbee technologies. It is designed
@@ -32,6 +33,7 @@ export default class TracManager {
     this.swarm = new Hyperswarm();
     this.bee = null;
     this.tapProtocol = new TapProtocol(this);
+    this.config = cfg; // TODO: replace all node-config with this config
 
     goodbye(() => {
       // this.swarm.destroy();
@@ -88,13 +90,16 @@ export default class TracManager {
       this.websocketServer = new WebsocketModule(this);
     }
 
+    if(this.config.enableMetricsExporter) {
+      this.tapProtocolMetricsExporter = new TapProtocolMetricsExporter(this.tapProtocol, this.config.metricsPort);
+      this.tapProtocolMetricsExporter.startServer();
+    }
+
     if(config.get("enableRest")) {
       console.log('Enabling REST endpoint');
       this.restServer = new RestModule(this);
       this.restServer.start();
     }
-
-    // await this.sleep(30 * 1000);
   }
   /**
    * Closes all initialized services and resources in TracManager.
@@ -106,6 +111,11 @@ export default class TracManager {
    * @returns {Promise<void>} A promise that resolves when all services and resources are closed.
   */
  async close() {
+
+    if(this.tapProtocolMetricsExporter){
+      console.log('Closing TapProtocolMetricsExporter server...');
+      this.tapProtocolMetricsExporter.close()
+    }
 
     // Close Hypercore connections
     if(this.store) {
@@ -138,8 +148,8 @@ export default class TracManager {
       await this.restServer.fastify.close();
       this.restServer = null;
     }
-    
 
+    
     // Additional cleanup if necessary
 
     console.log('All services closed.');

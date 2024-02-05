@@ -41,6 +41,7 @@
     "async-key-mutex": "^0.0.4",
     "axios": "^1.6.5",
     "buff-utils": "^0.0.1",
+    "coingecko-api": "^1.0.10",
     "config": "^3.3.10",
     "corestore": "6.8.3",
     "crypto": "^1.0.1",
@@ -57,10 +58,12 @@
     "hyperswarm": "4.5.1",
     "localdrive": "1.7.1",
     "patch-package": "^8.0.0",
+    "prom-client": "^15.1.0",
     "secp256k1": "^5.0.0",
     "sha256": "^0.2.0",
     "socket.io": "^4.7.4",
-    "tap-reader": "^0.1.0"
+    "tap-reader": "^0.1.0",
+    "winston": "^3.11.0"
   },
   "devDependencies": {
     "@japa/api-client": "^2.0.0-1",
