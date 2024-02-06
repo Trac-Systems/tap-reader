@@ -23,6 +23,8 @@ export default class TapProtocolMetricsExporter {
     this.server = null; // Store the server instance
     /** @type {number[]} */
     this.intervals = []; // Store interval IDs
+
+    this.setupBtcPriceMetric();
     this.setupMetrics();
   }
   /**
@@ -91,6 +93,7 @@ export default class TapProtocolMetricsExporter {
     });
   }
   async registerNestedMetrics() {
+
     const mintTokensLeftGauge = new Gauge({
       name: "tap_protocol_mint_tokens_left",
       help: "Number of tokens left to mint for a deployment",
@@ -142,20 +145,22 @@ export default class TapProtocolMetricsExporter {
   }
 
   async monitorBtcPrice(btcPriceGauge) {
+
     const updateBtcPrice = async () => {
       const CoinGeckoClient = new CoinGecko();
-      let data = await CoinGeckoClient.simple.price({
+      let res = await CoinGeckoClient.simple.price({
         ids: 'bitcoin',
         vs_currencies: 'usd',
       });
+      console.log(res.data.bitcoin.usd) 
 
-      const btcPrice = data.bitcoin.usd;
+      const btcPrice = res.data.bitcoin.usd;
       btcPriceGauge.set(btcPrice); // Update the gauge with the latest price
     };
 
     // Update the price immediately and then every 10 seconds
     await updateBtcPrice();
-    const intervalId = setInterval(updateBtcPrice, 10000);
+    const intervalId = setInterval(updateBtcPrice, 60000);
     this.intervals.push(intervalId);
   }
   // async monitorBtcPrice() {

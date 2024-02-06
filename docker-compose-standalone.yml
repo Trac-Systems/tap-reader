@@ -1,0 +1,23 @@
+version: '3.8'
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  tapstore: {}
+
+services:
+  tapreader:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    # expose: 
+    #  - 13337
+    #  - 5099
+    ports:
+     - '13337:13337'
+     - '5099:5099'
+    # networks:
+    #   - monitoring
+    volumes:
+     - './tapstore:/home/node/app/tapstore:rw'
