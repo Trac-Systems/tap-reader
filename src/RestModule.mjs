@@ -3,6 +3,7 @@ import Fastify from "fastify";
 import TracManager from "./TracManager.mjs";
 import swagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
+import cfg from "./config.mjs";
 
 export default class RestModule {
   /**
@@ -16,9 +17,9 @@ export default class RestModule {
   constructor(tracManager) {
     this.tracManager = tracManager;
     this.fastify = Fastify({ logger: false });
+    this.cfg = cfg;
 
-    if(config.get("enableRestApiDocs")) {
-
+    if(this.cfg.enableRestApiDocs) {
       // Initialize routes
       this.fastify.register(swagger, {
         routePrefix: "/docs",
@@ -68,12 +69,11 @@ export default class RestModule {
     }
 
     // Read cache control settings
-    const cacheControlConfig = config.get('restCacheControl');
-    const restHeaders = config.get('restHeaders');
+    const restHeaders = this.cfg.restHeaders;
 
     this.fastify.addHook('onSend', (request, reply, payload, done) => {
-      const maxAge = cacheControlConfig.maxAge;
-      const visibility = cacheControlConfig.public ? 'public' : 'private';
+      const maxAge = this.cfg.restCacheControlMaxAge;
+      const visibility = this.cfg.restCacheControlPublic;
 
       // Set cache control header
       reply.header('Cache-Control', `${visibility}, max-age=${maxAge}`);

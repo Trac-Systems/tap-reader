@@ -1,3 +1,8 @@
+import dotenv from 'dotenv'
+dotenv.config();
+
+console.log(process.env)
+
 import TracManager from "./TracManager.mjs";
 
 let tracCore = new TracManager();

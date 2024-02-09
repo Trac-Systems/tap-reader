@@ -24,6 +24,8 @@ export default class TapProtocolMetricsExporter {
     /** @type {number[]} */
     this.intervals = []; // Store interval IDs
 
+    this.isClosing = false;
+
     this.setupBtcPriceMetric();
     this.setupMetrics();
   }
@@ -67,9 +69,9 @@ export default class TapProtocolMetricsExporter {
     // console.log(lengthMethods)
     lengthMethods.forEach(async (method) => {
       const metricName = `tap_protocol_${method.toLowerCase()}`;
+
       // Zero Value Fix: Initial fetch value, before exposing gauge
       const value = await this.tapProtocol[method]();
-
       const gauge = new Gauge({
         name: metricName,
         help: `Metric for ${method} method of TapProtocol`,
@@ -81,13 +83,15 @@ export default class TapProtocolMetricsExporter {
       // Set up a job to periodically update the metric
       const intervalId = setInterval(async () => {
         try {
-          const value = await this.tapProtocol[method]();
-          // console.log("Logging gauge method", method, value);
-          gauge.set(value);
+          if (!this.isClosing) {
+            const value = await this.tapProtocol[method]();
+            // console.log("Logging gauge method", method, value);
+            gauge.set(value);
+          }
         } catch (error) {
           console.error(`Error updating metric ${metricName}: ${error}`);
         }
-      }, 10000); // Update every 10 seconds
+      }, 14000); // Update every 14 seconds
 
       this.intervals.push(intervalId); // Store the interval ID for later cleanup
     });
@@ -132,12 +136,11 @@ export default class TapProtocolMetricsExporter {
       );
       holdersCountGauge.labels(deployment.tick).set(holdersCount);
     }
-
   }
   async setupBtcPriceMetric() {
     const btcPriceGauge = new Gauge({
-      name: 'bitcoin_price_usd',
-      help: 'Current price of Bitcoin in USD',
+      name: "bitcoin_price_usd",
+      help: "Current price of Bitcoin in USD",
       registers: [this.registry],
     });
 
@@ -145,17 +148,19 @@ export default class TapProtocolMetricsExporter {
   }
 
   async monitorBtcPrice(btcPriceGauge) {
-
     const updateBtcPrice = async () => {
-      const CoinGeckoClient = new CoinGecko();
-      let res = await CoinGeckoClient.simple.price({
-        ids: 'bitcoin',
-        vs_currencies: 'usd',
-      });
-      console.log(res.data.bitcoin.usd) 
-
-      const btcPrice = res.data.bitcoin.usd;
-      btcPriceGauge.set(btcPrice); // Update the gauge with the latest price
+      try{
+        const CoinGeckoClient = new CoinGecko();
+        let res = await CoinGeckoClient.simple.price({
+          ids: "bitcoin",
+          vs_currencies: "usd",
+        });
+  
+        const btcPrice = res.data.bitcoin.usd;
+        btcPriceGauge.set(btcPrice); // Update the gauge with the latest price
+      }catch(ex){
+        console.error('Error fetching BTC price...', ex);
+      }
     };
 
     // Update the price immediately and then every 10 seconds
