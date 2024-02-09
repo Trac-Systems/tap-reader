@@ -96,13 +96,22 @@ Just swap out the given domain in that endpoint example above with your websocke
 
 ```json
 {
-  "enableRest": true,
-  "restPort": 5099,
-  "enableWebsockets": false,
-  "websocketPort": 5095,
-  "websocketCORS": "*",
-  "channel": "53d2e64fa7a09e9dc74fc52ee9e9feb9d59b3e2cff4a25dfb543ec3b0bf4b281",
-  "channelProduction": "53d2e64fa7a09e9dc74fc52ee9e9feb9d59b3e2cff4a25dfb543ec3b0bf4b281"
+    "enableRest": true,
+    "enableRestApiDocs": true,
+    "restPort": 5099,
+    "restCacheControl": {
+        "maxAge": 3600,
+        "public": true
+    },
+    "restHeaders": [
+        { "name": "X-Powered-By", "value": "TracCore" },
+        { "name": "Access-Control-Allow-Origin", "value": "*" }
+    ],
+    "enableWebsockets": false,
+    "websocketPort": 5095,
+    "websocketCORS": "*",
+    "channel": "53d2e64fa7a09e9dc74fc52ee9e9feb9d59b3e2cff4a25dfb543ec3b0bf4b281",
+    "channelTest": "729c91276e20b8e270ea589ac437f24e6c7c66c969b4acfe99bd82faab391e68"
 }
 ```
 
