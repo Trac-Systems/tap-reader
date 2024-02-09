@@ -7,7 +7,8 @@ import figlet from "figlet";
 import WebsocketModule from "./WebsocketModule.mjs";
 import RestModule from "./RestModule.mjs";
 import TapProtocol from "./TapProtocol.mjs";
-
+import TapProtocolMetricsExporter from "./TapProtocolMetricsExporter.mjs";
+import cfg from './config.mjs'
 /**
  * The TracManager class manages connections and data synchronization
  * using Corestore, Hyperswarm, and Hyperbee technologies. It is designed
@@ -32,9 +33,12 @@ export default class TracManager {
     this.swarm = new Hyperswarm();
     this.bee = null;
     this.tapProtocol = new TapProtocol(this);
+    this.config = cfg; // TODO: replace all node-config with this config
 
     goodbye(() => {
-      this.swarm.destroy();
+      // this.swarm.destroy();
+      this.isConnected = false;
+      this.close();
     });
   }
   /**
@@ -86,13 +90,73 @@ export default class TracManager {
       this.websocketServer = new WebsocketModule(this);
     }
 
+    if(this.config.enableMetricsExporter) {
+      this.tapProtocolMetricsExporter = new TapProtocolMetricsExporter(this.tapProtocol, this.config.metricsPort);
+      this.tapProtocolMetricsExporter.startServer();
+    }
+
     if(config.get("enableRest")) {
       console.log('Enabling REST endpoint');
       this.restServer = new RestModule(this);
       this.restServer.start();
     }
+  }
+  /**
+   * Closes all initialized services and resources in TracManager.
+   * This includes shutting down the WebSocket server, REST server, Hyperbee database,
+   * and Hyperswarm connections. It ensures a graceful shutdown of all network connections
+   * and database interactions.
+   * 
+   * @async
+   * @returns {Promise<void>} A promise that resolves when all services and resources are closed.
+  */
+ async close() {
 
-    // await this.sleep(30 * 1000);
+    if(this.tapProtocolMetricsExporter){
+      console.log('Closing TapProtocolMetricsExporter server...');
+      this.tapProtocolMetricsExporter.close()
+    }
+
+    // Close Hypercore connections
+    if(this.store) {
+      console.log('Closing Corestore...');
+      await this.store.close();
+    }
+  
+    // Close Hyperswarm connections
+    if (this.swarm) {
+      console.log('Closing Hyperswarm connections...');
+      await this.swarm.destroy();
+    }
+    
+    // Close the Hyperbee database
+    if (this.bee) {
+      console.log('Closing Hyperbee database...');
+      await this.bee.close();
+    }
+
+    // Close the WebSocket server if initialized
+    if (this.websocketServer) {
+      console.log('Closing WebSocket server...');
+      await this.websocketServer.httpServer.close();
+      this.websocketServer = null;
+    }
+    
+    // Close the REST server if initialized
+    if (this.restServer) {
+      console.log('Closing REST server...');
+      await this.restServer.fastify.close();
+      this.restServer = null;
+    }
+
+    
+    // Additional cleanup if necessary
+
+    console.log('All services closed.');
+    this.isConnected = false;
+
+    return true;
+
   }
   /**
    * Initializes a Hyperswarm network connection for data synchronization.
@@ -153,6 +217,7 @@ export default class TracManager {
       console.log("Next chunk", i, i + chunk_size);
       const range = this.core.download({ start: i, end: i + chunk_size });
       await range.done();
+      console.log("Done chunk", i,i + chunk_size)
       i = i + chunk_size - 1;
       start = i;
     }
