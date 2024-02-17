@@ -1119,10 +1119,7 @@ export default class TapProtocol {
    * @returns {Promise<Array|Object|string>} A promise that resolves to an array of records, an error object, or a string message in case of invalid parameters.
    */
   async getListRecords(length_key, iterator_key, offset, max, return_json) {
-    // const queue_result = await enter_queue();
-    // if (queue_result !== "") {
-    //   return queue_result;
-    // }
+
     if (max > 500) {
       return "request too large";
     }
@@ -1132,7 +1129,7 @@ export default class TapProtocol {
     }
 
     let out = [];
-    const batch = this.tracManager.bee.batch();
+    const batch = this.tracManager.bee;
 
     let length = await batch.get(length_key);
     if (length === null) {
@@ -1142,9 +1139,6 @@ export default class TapProtocol {
     }
     let j = 0;
     for (let i = offset; i < length; i++) {
-      if (i % 50 === 0) {
-        await this.sleep(10);
-      }
       if (j < max) {
         let entry = await batch.get(iterator_key + "/" + i);
         if (return_json) {
@@ -1159,8 +1153,6 @@ export default class TapProtocol {
       j++;
     }
 
-    await batch.flush();
-    // await leave_queue();
     return out;
   }
   /**
