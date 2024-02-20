@@ -7,6 +7,8 @@ import figlet from "figlet";
 import WebsocketModule from "./WebsocketModule.mjs";
 import RestModule from "./RestModule.mjs";
 import TapProtocol from "./TapProtocol.mjs";
+import TapProtocolMetricsExporter from "./TapProtocolMetricsExporter.mjs";
+import cfg from "./config.mjs";
 
 /**
  * The TracManager class manages connections and data synchronization
@@ -32,9 +34,12 @@ export default class TracManager {
     this.swarm = new Hyperswarm();
     this.bee = null;
     this.tapProtocol = new TapProtocol(this);
-
+    this.config = cfg; // TODO: replace all node-config with this config
+    console.log(cfg)
     goodbye(() => {
-      this.swarm.destroy();
+      // this.swarm.destroy();
+      this.isConnected = false;
+      this.close();
     });
   }
   /**
@@ -60,7 +65,7 @@ export default class TracManager {
     this.core = this.store.get({
       key: process.argv[2]
         ? Buffer.from(process.argv[2], "hex")
-        : Buffer.from(config.get("channel"), "hex"),
+        : Buffer.from(this.config.channel, "hex"),
       sparse: true,
     });
 
@@ -81,18 +86,89 @@ export default class TracManager {
 
     await this.bee.ready();
 
-    if (config.get("enableWebsockets")) {
+    if (this.config.enableWebsockets) {
       console.log("Enabling websocket");
       this.websocketServer = new WebsocketModule(this);
     }
 
-    if(config.get("enableRest")) {
-      console.log('Enabling REST endpoint');
+    if (this.config.enableMetricsExporter) {
+      this.tapProtocolMetricsExporter = new TapProtocolMetricsExporter(
+        this.tapProtocol,
+        this.config.metricsPort
+      );
+      this.tapProtocolMetricsExporter.startServer();
+    }
+
+    if (this.config.enableRest) {
+      console.log("Enabling REST endpoint");
       this.restServer = new RestModule(this);
       this.restServer.start();
     }
+  }
+  /**
+   * Closes all initialized services and resources in TracManager.
+   * This includes shutting down the WebSocket server, REST server, Hyperbee database,
+   * and Hyperswarm connections. It ensures a graceful shutdown of all network connections
+   * and database interactions.
+   *
+   * @async
+   * @returns {Promise<void>} A promise that resolves when all services and resources are closed.
+   */
+  async close() {
+    if (this.tapProtocolMetricsExporter) {
+      console.log("Closing TapProtocolMetricsExporter server...");
+      this.tapProtocolMetricsExporter.close();
+    }
 
-    // await this.sleep(30 * 1000);
+    // Close Hypercore connections
+    if (this.store) {
+      try {
+        console.log("Closing Corestore...");
+        this.store.close();
+      } catch (ex) {
+        console.error(ex);
+      }
+    }
+
+    // Close Hyperswarm connections
+    if (this.swarm) {
+      try {
+        console.log("Closing Hyperswarm connections...");
+        this.swarm.destroy();
+      } catch (ex) {
+        console.error(ex);
+      }
+    }
+
+    // Close the Hyperbee database
+    if (this.bee) {
+      try {
+        console.log("Closing Hyperbee database...");
+        this.bee.close();
+      } catch (ex) {
+        console.error(ex);
+      }
+    }
+
+    // Close the WebSocket server if initialized
+    if (this.websocketServer) {
+      console.log("Closing WebSocket server...");
+      await this.websocketServer.httpServer.close();
+      this.websocketServer = null;
+    }
+
+    // Close the REST server if initialized
+    if (this.restServer) {
+      console.log("Closing REST server...");
+      await this.restServer.fastify.close();
+      this.restServer = null;
+    }
+
+    // Additional cleanup if necessary
+    console.log("All services closed.");
+    this.isConnected = false;
+
+    return true;
   }
   /**
    * Initializes a Hyperswarm network connection for data synchronization.
@@ -128,10 +204,13 @@ export default class TracManager {
       server: server,
       client: client,
     });
+
     await discovery.flushed();
+    // TODO: implement a knowPeers file, to cache known peers for faster bootstrapping application!
     const foundPeers = this.store.findingPeers();
     await this.swarm.flush();
     await foundPeers();
+
   }
   /**
    * Starts downloading data within a specified range.
@@ -153,6 +232,7 @@ export default class TracManager {
       console.log("Next chunk", i, i + chunk_size);
       const range = this.core.download({ start: i, end: i + chunk_size });
       await range.done();
+      console.log("Done chunk", i, i + chunk_size);
       i = i + chunk_size - 1;
       start = i;
     }
