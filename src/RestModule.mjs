@@ -72,11 +72,15 @@ export default class RestModule {
     const restHeaders = config.get('restHeaders');
 
     this.fastify.addHook('onSend', (request, reply, payload, done) => {
+
       const maxAge = cacheControlConfig.maxAge;
       const visibility = cacheControlConfig.public ? 'public' : 'private';
 
       // Set cache control header
-      reply.header('Cache-Control', `${visibility}, max-age=${maxAge}`);
+      console.log(request.routerPath)
+      if (request.routerPath !== '/getSyncStatus') {
+        reply.header('Cache-Control', `${visibility}, max-age=${maxAge}`);
+      }
       // Set each header from the configuration
       restHeaders.forEach(header => {
         reply.header(header.name, header.value);
@@ -91,6 +95,22 @@ export default class RestModule {
 
   initializeRoutes() {
     this.fastify.register((fastify, opts, done) => {
+      fastify.get(
+        "/getSyncStatus",
+        {
+          schema: {
+            description: "Get the percentage of synced blocks",
+            tags: ["Node"],
+          },
+        },
+        async (request, reply) => {
+          reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+          if(this.tracManager.blockDownloader){
+            reply.send({ result: this.tracManager.blockDownloader.progress });
+          }else{
+            reply.send({ result: 0 });
+          }
+      });
       fastify.get(
         "/getTransferAmountByInscription/:inscription_id",
         {
