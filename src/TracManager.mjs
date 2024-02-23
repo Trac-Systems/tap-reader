@@ -7,6 +7,8 @@ import figlet from "figlet";
 import WebsocketModule from "./WebsocketModule.mjs";
 import RestModule from "./RestModule.mjs";
 import TapProtocol from "./TapProtocol.mjs";
+import BlockDownloader from "./BlockDownloader.mjs";
+// import { Node } from "hyperbee/lib/messages.js";
 
 /**
  * The TracManager class manages connections and data synchronization
@@ -69,11 +71,6 @@ export default class TracManager {
     await this.core.ready();
     await this.initHyperswarm(server, client);
 
-    if (rangeStart > -1) {
-      // TODO: range download is not very fast & efficient and should be replaced with non-sparse downloads instead
-      this.startRangeDownload(rangeStart, rangeEnd);
-    }
-
     this.bee = new Hyperbee(this.core, {
       keyEncoding: "utf-8",
       valueEncoding: "utf-8",
@@ -86,11 +83,21 @@ export default class TracManager {
       this.websocketServer = new WebsocketModule(this);
     }
 
-    if(config.get("enableRest")) {
-      console.log('Enabling REST endpoint');
+    if (config.get("enableRest")) {
+      console.log("Enabling REST endpoint");
       this.restServer = new RestModule(this);
       this.restServer.start();
     }
+
+    if(config.get("enableBlockDownloader")) {
+      this.blockDownloader = new BlockDownloader(this.core);
+      this.blockDownloader.startRangeDownload()
+    }
+
+    // if (rangeStart > -1) {
+    //   // TODO: range download is not very fast & efficient and should be replaced with non-sparse downloads instead
+    //   this.startRangeDownload(rangeStart, rangeEnd);
+    // }
 
     // await this.sleep(30 * 1000);
   }
@@ -158,13 +165,12 @@ export default class TracManager {
     }
 
     if (end == -1) {
-      const discovery = this.swarm.refresh({ server: true, client: true }); // hardcoded for now, does this need to be configurable?
-      await discovery.flushed();
-      const foundPeers = this.store.findingPeers();
-      await this.swarm.flush();
-      await foundPeers();
-      await this.sleep(1000);
-
+      // const discovery = this.swarm.refresh({ server: true, client: true }); // hardcoded for now, does this need to be configurable?
+      // await discovery.flushed();
+      // const foundPeers = this.store.findingPeers();
+      // await this.swarm.flush();
+      // await foundPeers();
+      // await this.sleep(1000);
       this.startRangeDownload(start, end);
     }
   }
