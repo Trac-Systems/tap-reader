@@ -2,6 +2,150 @@ export default class TapProtocol {
   constructor(tracManager) {
     this.tracManager = tracManager;
   }
+
+  /**
+   * Returns the amount of HISTORIC DMT Mints of an address.
+   *
+   * @param {string} address
+   * @returns {Promise<number>}
+   */
+  async getDmtMintWalletHistoricListLength(address) {
+    return this.getLength(
+        "dmtmwl/" + address
+    );
+  }
+
+  /**
+   * Returns the HISTORICAL ownership of an address of DMT Mints.
+   * The result should be compared with the actual ownership for each item
+   * using getDmtMintHolder() for real-time ownership.
+   *
+   * @param {string} address
+   * @param {int} offset
+   * @param {max} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getDmtMintWalletHistoricList(address, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "dmtmwl/" + address,
+        "dmtmwli/" + address,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      out.push(records[i]);
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the amount of holder changes for a given DMT Mint.
+   *
+   * @param {string} inscription_id
+   * @returns {Promise<number>}
+   */
+  async getDmtMintHoldersHistoryListLength(inscription_id) {
+    return this.getLength(
+        "dmtmhl/" + inscription_id
+    );
+  }
+
+  /**
+   * Returns the ownership history of a DMT Mint inscriptions.
+   *
+   * @param {string} inscription_id
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getDmtMintHoldersHistoryList(inscription_id, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "dmtmhl/" + inscription_id,
+        "dmtmhli/" + inscription_id,
+        offset,
+        max,
+        true
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      records[i].elem = JSON.parse(records[i].elem);
+      out.push(records[i]);
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns a history object with element, owner and block data but based on a given block instead of an inscription id.
+   *
+   * @param {int} block
+   * @returns {Promise<Object|null>}
+   */
+  async getDmtMintHolderByBlock(block)
+  {
+    let holder = await this.tracManager.bee.get('dmtmhb/'+parseInt(block));
+    if (holder !== null) {
+      holder = await this.tracManager.bee.get(holder.value);
+      if(holder !== null)
+      {
+        holder = JSON.parse(holder.value);
+        holder.elem = JSON.parse(holder.elem);
+        return holder;
+      }
+      return null;
+    }
+    return null;
+  }
+
+  /**
+   * Returns a history object with element, owner and block data.
+   *
+   * @param {string} inscription_id
+   * @returns {Promise<Object|null>}
+   */
+  async getDmtMintHolder(inscription_id)
+  {
+    let holder = await this.tracManager.bee.get('dmtmh/'+inscription_id);
+    if (holder !== null) {
+      holder = JSON.parse(holder.value);
+      holder.elem = JSON.parse(holder.elem);
+      return holder;
+    }
+    return null;
+  }
+
+  /**
+   * Returns a list of reorgs that occured over the lifetime of the connected writer.
+   *
+   * Clients are advised to check for NEW reorgs upon every new block and wipe their local databases (if any in use)
+   * for current block height - 8 and re-populate.
+   *
+   * @returns {Promise<Array|null>}
+   */
+  async getReorgs()
+  {
+    let reorgs = await this.tracManager.bee.get('reorgs');
+    if (reorgs !== null) {
+      return JSON.parse(reorgs.value);
+    }
+    return null;
+  }
+
   /**
    * Retrieves the transfer amount for a given inscription ID.
    * @param {string} inscription_id - The ID of the inscription to query.
