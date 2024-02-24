@@ -394,7 +394,7 @@ Initializes a Hyperswarm network connection for data synchronization.
 
 <a name="getSyncStatus"></a>
 
-## getSyncStatus() ⇒ `Promise<Object>`
+## getSyncStatus() ⇒ `Promise<Number|null>`
 
 Retrieves the current synchronization status, indicating the percentage of blocks that have been successfully synced.
 
