@@ -1281,6 +1281,28 @@ export default class TapProtocol {
    * @returns {Promise<Array|Object|string>} A promise that resolves to an array of records, an error object, or a string message in case of invalid parameters.
    */
   async getListRecords(length_key, iterator_key, offset, max, return_json) {
+
+    if(typeof offset === "string" && this.isNumeric(offset))
+    {
+      offset = parseInt(''+offset);
+    }
+
+    if(typeof max === "string" && this.isNumeric(max))
+    {
+      max = parseInt(''+max);
+    }
+
+    if(typeof offset !== "string" && !this.isNumeric(offset))
+    {
+      return null;
+    }
+
+    if(typeof max !== "string" && !this.isNumeric(max))
+    {
+      return null;
+    }
+
+
     if (max > 500) {
       return "request too large";
     }
@@ -1329,6 +1351,12 @@ export default class TapProtocol {
     }
     return length;
   }
+
+  isNumeric(str) {
+    return !isNaN(str) &&
+        !isNaN(parseFloat(str))
+  }
+
   sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
