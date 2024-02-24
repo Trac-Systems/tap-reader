@@ -109,25 +109,33 @@ export default class TracManager {
    * @returns {Promise<void>} A promise that resolves when the network is initialized.
    */
   async initHyperswarm(server, client) {
-    this.swarm.on("connection", (connection) => {
+    this.swarm.on("connection", (connection, peerInfo) => {
       this.isConnected = true;
+
+      if(connection.remotePublicKey.toString("hex") ===
+          '40849bd2e5b85726c957b58cfdf3453f7020ec31ff3ad4e422b5746829a7914e')
+      {
+        peerInfo.ban(true);
+        console.log('Banned', connection.remotePublicKey.toString("hex"));
+      }
+
       console.log(
-        "Connected to peer:",
-        connection.remotePublicKey.toString("hex")
+          "Connected to peer:",
+          connection.remotePublicKey.toString("hex")
       );
       this.core.replicate(connection);
       connection.on("close", () =>
-        console.log(
-          "Connection closed with peer:",
-          connection.remotePublicKey.toString("hex")
-        )
+          console.log(
+              "Connection closed with peer:",
+              connection.remotePublicKey.toString("hex")
+          )
       );
       connection.on("error", (error) =>
-        console.log(
-          "Connection error with peer:",
-          connection.remotePublicKey.toString("hex"),
-          error
-        )
+          console.log(
+              "Connection error with peer:",
+              connection.remotePublicKey.toString("hex"),
+              error
+          )
       );
     });
 

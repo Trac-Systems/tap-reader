@@ -111,6 +111,210 @@ export default class RestModule {
             reply.send({ result: 0 });
           }
       });
+
+      fastify.get(
+          "/getDmtMintHoldersHistoryListLength/:inscription_id",
+          {
+            schema: {
+              description: "Returns the amount of holder changes for a given DMT Mint.",
+              tags: ["DMT"],
+              params: {
+                type: "object",
+                required: ["inscription_id"],
+                properties: {
+                  inscription_id: { type: "string" },
+                },
+              },
+            },
+          },
+          async (request, reply) => {
+            try {
+              const result = await this.tracManager.tapProtocol.getDmtMintHoldersHistoryListLength(request.params.inscription_id);
+              reply.send({ result });
+            } catch (e) {
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
+      );
+
+      fastify.get(
+          "/getDmtMintHoldersHistoryList/:inscription_id",
+          {
+            schema: {
+              description: "Returns the amount of holder changes for a given DMT Mint.",
+              tags: ["DMT"],
+              params: {
+                type: "object",
+                required: ["inscription_id"],
+                properties: {
+                  inscription_id: { type: "string" },
+                },
+              },
+              querystring: {
+                type: "object",
+                properties: {
+                  offset: { type: "integer", default: 0 },
+                  max: { type: "integer", default: 500 },
+                },
+              },
+            },
+          },
+          async (request, reply) => {
+            try {
+              let { offset, max } = request.query;
+              offset = offset ? offset : 0;
+              max = max ? max : 500;
+              const result = await this.tracManager.tapProtocol.getDmtMintHoldersHistoryList(
+                  request.params.inscription_id,
+                  offset,
+                  max
+              );
+              reply.send({ result });
+            } catch (e) {
+              console.error(e);
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
+      );
+
+      fastify.get(
+          "/getDmtMintHolder/:inscription_id",
+          {
+            schema: {
+              description: "Returns a history object with element, owner and block data.",
+              tags: ["DMT"],
+              params: {
+                type: "object",
+                required: ["inscription_id"],
+                properties: {
+                  inscription_id: { type: "string" },
+                },
+              },
+            },
+          },
+          async (request, reply) => {
+            try {
+              const result = await this.tracManager.tapProtocol.getDmtMintHolder(request.params.inscription_id);
+              reply.send({ result });
+            } catch (e) {
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
+      );
+
+      fastify.get(
+          "/getDmtMintHolderByBlock/:block",
+          {
+            schema: {
+              description: "Returns a history object with element, owner and block data but based on a given block instead of an inscription id.",
+              tags: ["DMT"],
+              params: {
+                type: "object",
+                required: ["block"],
+                properties: {
+                  block: { type: "integer" },
+                },
+              },
+            },
+          },
+          async (request, reply) => {
+            try {
+              const result = await this.tracManager.tapProtocol.getDmtMintHolderByBlock(request.params.block);
+              reply.send({ result });
+            } catch (e) {
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
+      );
+
+      fastify.get(
+          "/getDmtMintWalletHistoricListLength/:address",
+          {
+            schema: {
+              description: "Returns the amount of HISTORIC DMT Mints of an address.",
+              tags: ["DMT"],
+              params: {
+                type: "object",
+                required: ["address"],
+                properties: {
+                  address: { type: "string" },
+                },
+              },
+            },
+          },
+          async (request, reply) => {
+            try {
+              const result = await this.tracManager.tapProtocol.getDmtMintWalletHistoricListLength(request.params.address);
+              reply.send({ result });
+            } catch (e) {
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
+      );
+
+      fastify.get(
+          "/getDmtMintWalletHistoricList/:address",
+          {
+            schema: {
+              description: "Returns the HISTORICAL ownership of an address of DMT Mints.",
+              tags: ["DMT"],
+              params: {
+                type: "object",
+                required: ["address"],
+                properties: {
+                  address: { type: "string" },
+                },
+              },
+              querystring: {
+                type: "object",
+                properties: {
+                  offset: { type: "integer", default: 0 },
+                  max: { type: "integer", default: 500 },
+                },
+              },
+            },
+          },
+          async (request, reply) => {
+            try {
+              let { offset, max } = request.query;
+              offset = offset ? offset : 0;
+              max = max ? max : 500;
+              const result = await this.tracManager.tapProtocol.getDmtMintWalletHistoricList(
+                  request.params.address,
+                  offset,
+                  max
+              );
+              reply.send({ result });
+            } catch (e) {
+              console.error(e);
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
+      );
+
+
+      fastify.get(
+          "/getReorgs",
+          {
+            schema: {
+              description: "Get a list of reorgs that occurred on the connected writer since its existence.",
+              tags: ["Node"],
+            },
+          },
+          async (request, reply) => {
+            try {
+              const result =
+                  await this.tracManager.tapProtocol.getReorgs();
+              reply.send({ result });
+
+            } catch (e) {
+              console.log(e);
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
+      );
+
+
       fastify.get(
         "/getTransferAmountByInscription/:inscription_id",
         {
