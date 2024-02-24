@@ -112,6 +112,7 @@ export default class TracManager {
     this.swarm.on("connection", (connection, peerInfo) => {
       this.isConnected = true;
 
+      // temporary naughty list
       if(connection.remotePublicKey.toString("hex") ===
           '40849bd2e5b85726c957b58cfdf3453f7020ec31ff3ad4e422b5746829a7914e')
       {
