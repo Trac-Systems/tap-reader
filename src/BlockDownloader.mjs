@@ -5,7 +5,7 @@ export default class BlockDownloader {
       this.downloadedBlocks = [];
       this.totalBlocks;
       this.progress = 0;
-      this.chunkSize = 20000;
+      this.chunkSize = 1_000;
     }
     setIsRunning(flag) {
       this.isRunning = flag;
