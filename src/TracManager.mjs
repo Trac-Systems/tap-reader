@@ -114,7 +114,9 @@ export default class TracManager {
 
       // temporary naughty list
       if(connection.remotePublicKey.toString("hex") ===
-          '40849bd2e5b85726c957b58cfdf3453f7020ec31ff3ad4e422b5746829a7914e')
+          '40849bd2e5b85726c957b58cfdf3453f7020ec31ff3ad4e422b5746829a7914e' ||
+            connection.remotePublicKey.toString("hex") ===
+              'e6e23434b7d9c9d9f67619986fcb7112b87ef5c2cb459f29574c5093c94c816a')
       {
         peerInfo.ban(true);
         console.log('Banned', connection.remotePublicKey.toString("hex"));
