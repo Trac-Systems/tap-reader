@@ -1292,6 +1292,7 @@ export default class TapProtocol {
     const fetchPromises = Array.from({ length: numItemsToFetch }, (_, index) => {
       const fetchIndex = offset + index;
       return batch.get(iterator_key + "/" + fetchIndex).then(entry => {
+        if(entry === null || typeof entry.value === 'undefined') return null;
         return return_json ? JSON.parse(entry.value) : entry.value;
       });
     });
