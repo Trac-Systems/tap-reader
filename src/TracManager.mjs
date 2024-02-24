@@ -50,7 +50,7 @@ export default class TracManager {
    * @returns {Promise<void>} A promise that resolves when initialization is complete.
    */
   async initReader(
-    server = false,
+    server = true,
     client = true,
     rangeStart = -1,
     rangeEnd = -1
