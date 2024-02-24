@@ -130,6 +130,19 @@ export default class TapProtocol {
   }
 
   /**
+   * Retrieves the current synchronization status, indicating the percentage of blocks that have been successfully synced
+   *
+   * @returns {Promise<number|null>}
+   */
+  async getSyncStatus()
+  {
+    if(this.tracManager.blockDownloader){
+      return this.tracManager.blockDownloader.progress;
+    } else {
+      return null;
+    }
+  }
+  /**
    * Returns a list of reorgs that occured over the lifetime of the connected writer.
    *
    * Clients are advised to check for NEW reorgs upon every new block and wipe their local databases (if any in use)

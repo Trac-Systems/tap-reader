@@ -101,7 +101,7 @@ Just swap out the given domain in that endpoint example above with your websocke
     "restPort": 5099,
     "restCacheControl": {
         "maxAge": 3600,
-        "public": true
+        "public": false
     },
     "restHeaders": [
         { "name": "X-Powered-By", "value": "TracCore" },
@@ -110,22 +110,12 @@ Just swap out the given domain in that endpoint example above with your websocke
     "enableWebsockets": false,
     "websocketPort": 5095,
     "websocketCORS": "*",
-    "channel": "53d2e64fa7a09e9dc74fc52ee9e9feb9d59b3e2cff4a25dfb543ec3b0bf4b281",
-    "channelTest": "729c91276e20b8e270ea589ac437f24e6c7c66c969b4acfe99bd82faab391e68"
+    "channel": "4600e05f4b315ea2ac832aa893aed4872ca0d5e40cf35e22592de55efa460edd",
+    "enableBlockDownloader": false
 }
 ```
 
-> Distributed Data Channel "53d2e64fa7a09e9dc74fc52ee9e9feb9d59b3e2cff4a25dfb543ec3b0bf4b281" is the currently active one for TAP Protocol.  
-
-## Important note
-
-Installing with `npm i` triggers the postinstall script, which patches hypercore library. This is yet necessary before the stable release of the reader.
-
-```js
-"scripts": {
-    "postinstall": "patch-package"
-},
-```
+> Distributed Data Channel "4600e05f4b315ea2ac832aa893aed4872ca0d5e40cf35e22592de55efa460edd" is the currently active one for TAP Protocol.  
 
 ## Trac Core Manager API
 
@@ -169,10 +159,42 @@ Initializes a Hyperswarm network connection for data synchronization.
 | server | <code>boolean</code> | Indicates if this instance should act as a server. |
 | client | <code>boolean</code> | Indicates if this instance should act as a client. |
 
-
 # Tap Protocol API
 
 <dl>
+<dt><a href="#getSyncStatus">getSyncStatus()</a> ⇒ <code>Promise.&lt;(Number|null)&gt;</code></dt>
+<dd><p>Retrieves the current synchronization status, indicating the percentage of blocks that have been successfully synced.</p>
+</dd>
+
+<dl>
+<dt><a href="#getReorgs">getReorgs()</a> ⇒ <code>Promise.&lt;(Array|null)&gt;</code></dt>
+<dd><p>Retrieves a list of blockchain reorganizations detected by the connected writer.</p>
+</dd>
+
+<dt><a href="#getDmtMintWalletHistoricListLength">getDmtMintWalletHistoricListLength(address)</a> ⇒ <code>Promise.&lt;number&gt;</code></dt>
+<dd><p>Retrieves the total number of historic DMT Mints for a specific address.</p>
+</dd>
+
+<dt><a href="#getDmtMintWalletHistoricList">getDmtMintWalletHistoricList(address, offset, max)</a> ⇒ <code>Promise.&lt;(Object[]|string)&gt;</code></dt>
+<dd><p>Fetches a historical list of DMT Mints ownership for a specific address.</p>
+</dd>
+
+<dt><a href="#getDmtMintHoldersHistoryListLength">getDmtMintHoldersHistoryListLength(inscription_id)</a> ⇒ <code>Promise.&lt;number&gt;</code></dt>
+<dd><p>Determines the number of holder changes for a specific DMT Mint.</p>
+</dd>
+
+<dt><a href="#getDmtMintHoldersHistoryList">getDmtMintHoldersHistoryList(inscription_id, offset, max)</a> ⇒ <code>Promise.&lt;(Object[]|string)&gt;</code></dt>
+<dd><p>Retrieves the ownership history of a DMT Mint.</p>
+</dd>
+
+<dt><a href="#getDmtMintHolderByBlock">getDmtMintHolderByBlock(block)</a> ⇒ <code>Promise.&lt;(Object|null)&gt;</code></dt>
+<dd><p>Provides a history object based on a given block number.</p>
+</dd>
+
+<dt><a href="#getDmtMintHolder">getDmtMintHolder(inscription_id)</a> ⇒ <code>Promise.&lt;(Object|null)&gt;</code></dt>
+<dd><p>Fetches a history object for a specific DMT Mint.</p>
+</dd>
+
 <dt><a href="#getTransferAmountByInscription">getTransferAmountByInscription(inscription_id)</a> ⇒ <code>Promise.&lt;(number|null)&gt;</code></dt>
 <dd><p>Retrieves the transfer amount for a given inscription ID.</p>
 </dd>
@@ -369,6 +391,97 @@ Initializes a Hyperswarm network connection for data synchronization.
 <dd><p>Gets the length of a list based on a specified key.</p>
 </dd>
 </dl>
+
+<a name="getSyncStatus"></a>
+
+## getSyncStatus() ⇒ `Promise<Object>`
+
+Retrieves the current synchronization status, indicating the percentage of blocks that have been successfully synced.
+
+**Returns**: `Promise<Number|null>` - A number representing the percentage of blocks synced. If the block downloader is not active, returns null.
+
+<a name="getReorgs"></a>
+
+## getReorgs() ⇒ `Promise<Array|null>`
+
+Retrieves a list of blockchain reorganizations detected by the connected writer, crucial for maintaining data integrity after blockchain reorgs.
+
+**Returns**: `Promise<Array|null>` - An array of detected reorgs, or `null` if none were found.
+
+<a name="getDmtMintWalletHistoricListLength"></a>
+
+## getDmtMintWalletHistoricListLength(address) ⇒ `Promise<number>`
+
+Retrieves the total number of historic DMT Mints for a specific address. This function is essential for understanding the historical interactions of an address with DMT Mints.
+
+**Returns**: `Promise<number>` - The number of historic DMT Mints associated with the given address.
+| Param | Type | Description |
+| --- | --- | --- |
+| address | `string` | The address to query. |
+
+<a name="getDmtMintWalletHistoricList"></a>
+
+## getDmtMintWalletHistoricList(address, offset, max) ⇒ `Promise<Object[]|string>`
+
+Fetches a historical list of DMT Mints ownership for a specific address. This list should be compared with current ownership data for accuracy.
+
+**Returns**: `Promise<Object[]|string>` - An array of historic DMT Mint ownership records or an error message.
+
+  | Param | Type | Description |
+  | --- | --- | --- |
+  | address | `string` | The address to query. |
+  | offset | `int` | The starting index for pagination. Optional, default `0`. |
+  | max | `int` | The maximum number of records to retrieve. Optional, default `500`. |
+
+<a name="getDmtMintHoldersHistoryListLength"></a>
+
+## getDmtMintHoldersHistoryListLength(inscription_id) ⇒ `Promise<number>`
+
+Determines the number of holder changes for a specific DMT Mint, providing insight into its trading history.
+
+**Returns**: `Promise<number>` - The number of holder changes for the specified DMT Mint.
+
+  | Param | Type | Description |
+  | --- | --- | --- |
+  | inscription_id | `string` | The ID of the DMT Mint to query. |
+
+<a name="getDmtMintHoldersHistoryList"></a>
+
+## getDmtMintHoldersHistoryList(inscription_id, offset, max) ⇒ `Promise<Object[]|string>`
+
+Retrieves the ownership history of a DMT Mint, including details of each transaction and ownership change.
+
+**Returns**: `Promise<Object[]|string>` - An array of DMT Mint ownership history records or an error message.
+
+  | Param | Type | Description |
+  | --- | --- | --- |
+  | inscription_id | `string` | The ID of the DMT Mint to query. |
+  | offset | `int` | The starting index for pagination. Optional, default `0`. |
+  | max | `int` | The maximum number of records to retrieve. Optional, default `500`. |
+
+<a name="getDmtMintHolderByBlock"></a>
+
+## getDmtMintHolderByBlock(block) ⇒ `Promise<Object|null>`
+
+Provides a history object containing element, owner, and block data based on a given block number instead of an inscription ID.
+
+**Returns**: `Promise<Object|null>` - A history object with element, owner, and block data, or `null` if not found.
+
+  | Param | Type | Description |
+  | --- | --- | --- |
+  | block | `int` | The block number to query. |
+
+<a name="getDmtMintHolder"></a>
+
+## getDmtMintHolder(inscription_id) ⇒ `Promise<Object|null>`
+
+Fetches a history object containing details about the holder, element, and associated block data for a specific DMT Mint.
+
+**Returns**: `Promise<Object|null>` - A history object with holder, element, and block data, or `null` if not found.
+
+  | Param | Type | Description |
+  | --- | --- | --- |
+  | inscription_id | `string` | The ID of the DMT Mint to query. |
 
 <a name="getTransferAmountByInscription"></a>
 

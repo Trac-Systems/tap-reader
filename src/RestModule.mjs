@@ -77,8 +77,8 @@ export default class RestModule {
       const visibility = cacheControlConfig.public ? 'public' : 'private';
 
       // Set cache control header
-      console.log(request.routerPath)
-      if (request.routerPath !== '/getSyncStatus') {
+
+      if (request.routeOptions.url !== '/getSyncStatus' || request.routeOptions.url !== '/getReorgs') {
         reply.header('Cache-Control', `${visibility}, max-age=${maxAge}`);
       }
       // Set each header from the configuration
@@ -302,6 +302,7 @@ export default class RestModule {
             },
           },
           async (request, reply) => {
+            reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
             try {
               const result =
                   await this.tracManager.tapProtocol.getReorgs();
@@ -647,7 +648,12 @@ export default class RestModule {
                       properties: {
                         address: { type: "string" },
                         balance: { type: "string" },
-                        transferable: { type: "string" },
+                        transferable: { 
+                          oneOf: [
+                            { type: "string" },
+                            { type: "null" }
+                          ]
+                        },
                       },
                     },
                   },
@@ -1365,6 +1371,70 @@ export default class RestModule {
           }
         }
       );
+
+      fastify.get(
+        "/getAccountReceiveList/:address/:ticker",
+        {
+          schema: {
+            description: "Retrieve a list of received transactions for a specific address and ticker",
+            tags: ["Transactions"],
+            params: {
+              type: "object",
+              required: ["address", "ticker"],
+              properties: {
+                address: { type: "string" },
+                ticker: { type: "string" },
+              },
+            },
+            querystring: {
+              type: "object",
+              properties: {
+                offset: { type: "integer", default: 0 },
+                max: { type: "integer", default: 500 },
+              },
+            },
+            // response: {
+            //   200: {
+            //     description: "Successful response",
+            //     type: "array", // Assuming the response is an array of transaction records
+            //     items: {
+            //       type: "object",
+            //       properties: {
+            //         // Define the structure of each transaction record according to your application's data model
+            //         // Example:
+            //         transactionId: { type: "string" },
+            //         amount: { type: "number" },
+            //         timestamp: { type: "string" },
+            //         // Add other necessary fields
+            //       },
+            //     },
+            //   },
+            //   500: {
+            //     description: "Internal server error",
+            //     type: "object",
+            //     properties: {
+            //       error: { type: "string" },
+            //     },
+            //   },
+            // },
+          },
+        },
+        async (request, reply) => {
+          let { offset, max } = request.query;
+          try {
+            const result = await this.tracManager.tapProtocol.getAccountReceiveList(
+              request.params.address,
+              request.params.ticker,
+              offset,
+              max
+            );
+            reply.send({result});
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+      );
+
 
       fastify.get(
         "/getAccountTradesList/:address/:ticker",
