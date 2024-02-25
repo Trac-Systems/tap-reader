@@ -2979,6 +2979,110 @@ export default class RestModule {
         }
       });
 
+        // getTickerSentListLength
+      fastify.get(
+        "/getTickerSentListLength/:ticker",
+        {
+          schema: {
+            description: "Get the total number of sent transactions for a given ticker",
+            tags: ["Transactions"],
+            params: {
+              type: "object",
+              required: ["ticker"],
+              properties: {
+                ticker: { type: "string" },
+              },
+            },
+            response: {
+              200: {
+                description: "Successful response",
+                type: "object",
+                properties: {
+                  result: { type: "number" },
+                },
+              },
+              500: {
+                description: "Internal server error",
+                type: "object",
+                properties: {
+                  error: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        async (request, reply) => {
+          try {
+            const result =
+              await this.tracManager.tapProtocol.getTickerSentListLength(
+                request.params.ticker
+              );
+            reply.send({ result });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+      );
+
+      // getTickerSentList
+      fastify.get(
+        "/getTickerSentList/:ticker",
+        {
+          schema: {
+            description:
+              "Retrieve a list of sent transactions for a specific ticker",
+            tags: ["Transactions"],
+            params: {
+              type: "object",
+              required: ["ticker"],
+              properties: {
+                ticker: { type: "string" },
+              },
+            },
+            querystring: {
+              type: "object",
+              properties: {
+                offset: { type: "integer", default: 0 },
+                max: { type: "integer", default: 500 },
+              },
+            },
+            // response: {
+            //   200: {
+            //     description: "Successful response",
+            //     type: "object",
+            //     properties: {
+            //       result: {
+            //         type: "array",
+            //         items: { type: "string" }, // TODO: Specify the structure of each transaction record
+            //       },
+            //     },
+            //   },
+            //   500: {
+            //     description: "Internal server error",
+            //     type: "object",
+            //     properties: {
+            //       error: { type: "string" },
+            //     },
+            //   },
+            // },
+          },
+        },
+        async (request, reply) => {
+          let { offset, max } = request.query;
+          try {
+            const result =
+              await this.tracManager.tapProtocol.getTickerSentList(
+                request.params.ticker,
+                offset,
+                max
+              );
+            reply.send({ result });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+      );
+
       // getSentListLength
       fastify.get("/getSentListLength", {
         schema: {
