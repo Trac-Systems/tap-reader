@@ -58,6 +58,15 @@ export default class WebsocketModule {
                   await this.tracManager.tapProtocol.getReorgs();
               break;
 
+            case "currentBlock":
+              if (cmd.args.length != 0) {
+                this.invalidCmd(cmd, socket);
+                return;
+              }
+              result =
+                  await this.tracManager.tapProtocol.getCurrentBlock();
+              break;
+  
             case "dmtMintHoldersHistoryListLength":
               if (cmd.args.length != 1) {
                 this.invalidCmd(cmd, socket);
