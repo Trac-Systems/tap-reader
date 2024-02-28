@@ -15,7 +15,7 @@ export default class WebsocketModule {
     this.httpServer = createServer();
     this.httpServer.maxConnections = 1000;
 
-    printConsole( { topic: "Websocket", value: `Starting socket.io: http://localhost:${this.socket_port}` } )
+    printConsole( { topic: "Websocket", value: `Starting socket.io on port: ${this.socket_port}` } )
     // console.log("Starting socket.io");
     this.io = new Server(this.httpServer, {
       cors: {
