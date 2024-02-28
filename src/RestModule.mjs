@@ -77,8 +77,12 @@ export default class RestModule {
       const visibility = cacheControlConfig.public ? 'public' : 'private';
 
       // Set cache control header
-
-      if (request.routeOptions.url !== '/getSyncStatus' || request.routeOptions.url !== '/getReorgs') {
+      if (
+        request.routeOptions.url == '/getSyncStatus' || 
+        request.routeOptions.url == '/getReorgs' || 
+        request.routeOptions.url == '/getCurrentBlock' ) {
+        reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      } else {
         reply.header('Cache-Control', `${visibility}, max-age=${maxAge}`);
       }
       // Set each header from the configuration
@@ -95,6 +99,7 @@ export default class RestModule {
 
   initializeRoutes() {
     this.fastify.register((fastify, opts, done) => {
+
       fastify.get(
         "/getSyncStatus",
         {
@@ -111,6 +116,51 @@ export default class RestModule {
             reply.send({ result: 0 });
           }
       });
+
+
+      fastify.get(
+        "/getReorgs",
+        {
+          schema: {
+            description: "Get a list of reorgs that occurred on the connected writer since its existence.",
+            tags: ["Node"],
+          },
+        },
+        async (request, reply) => {
+          reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+          try {
+            const result =
+                await this.tracManager.tapProtocol.getReorgs();
+            reply.send({ result });
+
+          } catch (e) {
+            console.log(e);
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+    );
+
+      fastify.get(
+        "/getCurrentBlock",
+        {
+          schema: {
+            description: "Get the current block of the indexer.",
+            tags: ["Node"],
+          },
+        },
+        async (request, reply) => {
+          reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+          try {
+            const result =
+                await this.tracManager.tapProtocol.getCurrentBlock();
+            reply.send({ result });
+
+          } catch (e) {
+            console.log(e);
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+    );
 
       fastify.get(
           "/getDmtMintHoldersHistoryListLength/:inscription_id",
@@ -291,30 +341,6 @@ export default class RestModule {
             }
           }
       );
-
-
-      fastify.get(
-          "/getReorgs",
-          {
-            schema: {
-              description: "Get a list of reorgs that occurred on the connected writer since its existence.",
-              tags: ["Node"],
-            },
-          },
-          async (request, reply) => {
-            reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-            try {
-              const result =
-                  await this.tracManager.tapProtocol.getReorgs();
-              reply.send({ result });
-
-            } catch (e) {
-              console.log(e);
-              reply.status(500).send({ error: "Internal Server Error" });
-            }
-          }
-      );
-
 
       fastify.get(
         "/getTransferAmountByInscription/:inscription_id",

@@ -134,8 +134,7 @@ export default class TapProtocol {
    *
    * @returns {Promise<number|null>}
    */
-  async getSyncStatus()
-  {
+  async getSyncStatus() {
     if(this.tracManager.blockDownloader){
       return this.tracManager.blockDownloader.progress;
     } else {
@@ -150,14 +149,26 @@ export default class TapProtocol {
    *
    * @returns {Promise<Array|null>}
    */
-  async getReorgs()
-  {
+  async getReorgs() {
     let reorgs = await this.tracManager.bee.get('reorgs');
     if (reorgs !== null) {
       return JSON.parse(reorgs.value);
     }
     return null;
   }
+
+  /**
+   * Returns the current block of the indexer state.
+   *
+   * @returns {Promise<number|null>}
+   */
+    async getCurrentBlock() {
+      let reorgs = await this.tracManager.bee.get('block');
+      if (reorgs !== null) {
+        return JSON.parse(reorgs.value);
+      }
+      return null;
+    }
 
   /**
    * Retrieves the transfer amount for a given inscription ID.
