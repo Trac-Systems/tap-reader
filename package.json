@@ -8,6 +8,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/main.mjs"
   },
+  "bin": {
+    "tap": "bin/tap.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Trac-Systems/tap-reader.git"

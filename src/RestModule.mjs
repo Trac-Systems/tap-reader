@@ -3,6 +3,7 @@ import Fastify from "fastify";
 import TracManager from "./TracManager.mjs";
 import swagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
+import { printConsole } from "./helpers/mixed.mjs";
 
 export default class RestModule {
   /**
@@ -3526,7 +3527,13 @@ export default class RestModule {
       const port = config.get("restPort") || 3000; // Defaulting to 3000 if not configured
       await this.fastify.listen({ port });
       // this.fastify.swagger();
-      console.log(`REST server listening on port ${port}`);
+
+      printConsole({ topic: "REST", value: `Listening on port: ${port}` })
+      if( config.get( "enableRestApiDocs" ) ) {
+        printConsole({ topic: "REST", value: `Docs: http://localhost:${port}/docs`})
+      }
+
+      // console.log(`REST server listening on port ${port}`);
     } catch (err) {
       this.fastify.log.error(err);
       process.exit(1);

@@ -8,6 +8,7 @@ import WebsocketModule from "./WebsocketModule.mjs";
 import RestModule from "./RestModule.mjs";
 import TapProtocol from "./TapProtocol.mjs";
 import BlockDownloader from "./BlockDownloader.mjs";
+import { printConsole } from "./helpers/mixed.mjs";
 // import { Node } from "hyperbee/lib/messages.js";
 
 /**
@@ -57,7 +58,8 @@ export default class TracManager {
   ) {
     // Initialize Corestore and Hyperswarm
     console.log(figlet.textSync("Trac Core Reader"));
-    console.log("Protocol: Ordinals/TAP");
+    printConsole({ topic: "Protocol", value: "Ordinals/TAP" });
+    // console.log("Protocol: Ordinals/TAP");
 
     this.core = this.store.get({
       key: process.argv[2]
@@ -66,7 +68,8 @@ export default class TracManager {
       sparse: true,
     });
 
-    console.log("Channel:", this.core.key.toString("hex"));
+    printConsole({ topic: "Channel", value: this.core.key.toString("hex") });
+    // console.log("Channel:", this.core.key.toString("hex"));
 
     await this.core.ready();
     await this.initHyperswarm(server, client);
@@ -79,12 +82,14 @@ export default class TracManager {
     await this.bee.ready();
 
     if (config.get("enableWebsockets")) {
-      console.log("Enabling websocket");
+      printConsole({ topic: "Websocket", value: "Enabled" });
+      // console.log("Enabling websocket");
       this.websocketServer = new WebsocketModule(this);
     }
 
     if (config.get("enableRest")) {
-      console.log("Enabling REST endpoint");
+      printConsole({ topic: "REST", value: "Enabled" });
+      // console.log("Enabling REST endpoint");
       this.restServer = new RestModule(this);
       this.restServer.start();
     }
@@ -119,27 +124,37 @@ export default class TracManager {
               'e6e23434b7d9c9d9f67619986fcb7112b87ef5c2cb459f29574c5093c94c816a')
       {
         peerInfo.ban(true);
-        console.log('Banned', connection.remotePublicKey.toString("hex"));
+        printConsole({ topic: "Peer (Banned)", value: connection.remotePublicKey.toString("hex") });
+        // console.log('Banned', connection.remotePublicKey.toString("hex"));
       }
 
+      printConsole({ topic: "Peer (new Connection)", value: connection.remotePublicKey.toString("hex") });
+/*
       console.log(
           "Connected to peer:",
           connection.remotePublicKey.toString("hex")
       );
+*/
       this.core.replicate(connection);
-      connection.on("close", () =>
+      connection.on("close", () => {
+          printConsole({ topic: "Peer (Connection Closed)", value: connection.remotePublicKey.toString("hex") });
+/*
           console.log(
               "Connection closed with peer:",
               connection.remotePublicKey.toString("hex")
           )
-      );
-      connection.on("error", (error) =>
+*/
+      });
+      connection.on("error", (error) => {
+          printConsole({ topic: "Peer (Connection Error)", value: connection.remotePublicKey.toString("hex"), secondLineValue: error });
+/*
           console.log(
               "Connection error with peer:",
               connection.remotePublicKey.toString("hex"),
               error
           )
-      );
+*/
+      });
     });
 
     const discovery = this.swarm.join(this.core.discoveryKey, {
@@ -159,7 +174,8 @@ export default class TracManager {
    * @returns {Promise<void>} A promise that resolves when the download is complete.
    */
   async startRangeDownload(start, end) {
-    console.log("Starting chunk download. Core length:", this.core.length);
+    printConsole({ topic: "Range Download", value: "Starting chunk download" });
+    // console.log("Starting chunk download. Core length:", this.core.length);
 
     if (end < 0) {
       end = this.core.length;
@@ -168,7 +184,8 @@ export default class TracManager {
     let chunk_size = 20000;
 
     for (let i = start; i < end; i++) {
-      console.log("Next chunk", i, i + chunk_size);
+      printConsole({ topic: "Range Download", value: `Next chunk: ${i}, ${i + chunk_size}.` });
+      // console.log("Next chunk", i, i + chunk_size);
       const range = this.core.download({ start: i, end: i + chunk_size });
       await range.done();
       i = i + chunk_size - 1;

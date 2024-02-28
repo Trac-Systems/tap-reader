@@ -1,6 +1,7 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
 import config from "config";
+import { printConsole } from "./helpers/mixed.mjs";
 
 export default class WebsocketModule {
   /**
@@ -14,7 +15,8 @@ export default class WebsocketModule {
     this.httpServer = createServer();
     this.httpServer.maxConnections = 1000;
 
-    console.log("Starting socket.io");
+    printConsole( { topic: "Websocket", value: `Starting socket.io: http://localhost:${this.socket_port}` } )
+    // console.log("Starting socket.io");
     this.io = new Server(this.httpServer, {
       cors: {
         origin: config.get("websocketCORS"),
@@ -768,7 +770,8 @@ export default class WebsocketModule {
           result: result,
         });
 
-        console.log("Served response", response);
+        printConsole( { topic: "Websocket", value: "Served response", secondLineValue: response } )
+        // console.log("Served response", response);
       });
     });
   }
