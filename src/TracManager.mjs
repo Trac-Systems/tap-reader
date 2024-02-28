@@ -29,12 +29,13 @@ export default class TracManager {
    * @property {RestModule} restServer - Instance of RestModule for REST API access.
    */
   restServer;
-  constructor() {
+  constructor( isCli=false ) {
     this.isConnected = false;
     this.store = new Corestore("./tapstore");
     this.swarm = new Hyperswarm();
     this.bee = null;
     this.tapProtocol = new TapProtocol(this);
+    isCli ? process.env.NODE_CONFIG_DIR = './' : '';
 
     goodbye(() => {
       this.swarm.destroy();

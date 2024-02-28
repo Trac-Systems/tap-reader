@@ -6,7 +6,7 @@ export class CLI {
 
 
     async start() {
-        let tracCore = new TracManager();
+        let tracCore = new TracManager( true );
         await tracCore.initReader();
 
         return true;
