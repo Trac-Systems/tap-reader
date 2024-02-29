@@ -196,16 +196,17 @@ export default class TapProtocol {
    * @returns {Promise<Array>} An array of deployment records.
    */
   async getDeployments(offset = 0, max = 500) {
+    let out = [];
     let records = await this.getListRecords("dl", "dli", offset, max, false);
-    // Early return if records is not an array (e.g., error message)
+
     if (!Array.isArray(records)) {
       return records;
     }
 
-    // Create a promise for each deployment retrieval and collect them
-    const deploymentPromises = records.map(record => this.getDeployment(record));
-    // Wait for all deployment retrieval promises to resolve
-    const out = await Promise.all(deploymentPromises);
+    for (let i = 0; i < records.length; i++) {
+      out.push(await this.getDeployment(records[i]));
+    }
+
     return out;
   }
   /**
@@ -295,6 +296,7 @@ export default class TapProtocol {
   async getHolders(ticker, offset = 0, max = 500) {
     let _ticker = JSON.stringify(ticker.toLowerCase());
 
+    let out = [];
     let records = await this.getListRecords(
       "h/" + _ticker,
       "hi/" + _ticker,
@@ -303,25 +305,18 @@ export default class TapProtocol {
       false
     );
 
-    // Early return if records is not an array (e.g., error message)
     if (!Array.isArray(records)) {
       return records;
     }
 
-    // Create a promise for each holder that resolves to an object containing the balance and transferable status
-    const holderPromises = records.map(record =>
-      Promise.all([
-        this.getBalance(record, ticker),
-        this.getTransferable(record, ticker)
-      ]).then(([balance, transferable]) => ({
-        address: record,
-        balance,
-        transferable
-      }))
-    );
-    
-    // Wait for all holder promises to resolve
-    const out = await Promise.all(holderPromises);
+    for (let i = 0; i < records.length; i++) {
+      out.push({
+        address: records[i],
+        balance: await this.getBalance(records[i], ticker),
+        transferable: await this.getTransferable(records[i], ticker),
+      });
+    }
+
     return out;
   }
   /**
@@ -1292,60 +1287,56 @@ export default class TapProtocol {
    * @returns {Promise<Array|Object|string>} A promise that resolves to an array of records, an error object, or a string message in case of invalid parameters.
    */
   async getListRecords(length_key, iterator_key, offset, max, return_json) {
-
-    if(typeof offset === "string" && this.isNumeric(offset))
-    {
+    if(typeof offset === "string" && this.isNumeric(offset)) {
       offset = parseInt(''+offset);
     }
 
-    if(typeof max === "string" && this.isNumeric(max))
-    {
+    if(typeof max === "string" && this.isNumeric(max)) {
       max = parseInt(''+max);
     }
 
-    if(typeof offset !== "string" && !this.isNumeric(offset))
-    {
+    if(typeof offset !== "string" && !this.isNumeric(offset)) {
       return null;
     }
 
-    if(typeof max !== "string" && !this.isNumeric(max))
-    {
+    if(typeof max !== "string" && !this.isNumeric(max)) {
       return null;
     }
-
 
     if (max > 500) {
       return "request too large";
     }
-  
+
     if (offset < 0) {
       return "invalid offset";
     }
-  
+
+    let out = [];
     const batch = this.tracManager.bee;
-  
+
     let length = await batch.get(length_key);
     if (length === null) {
       length = 0;
     } else {
       length = parseInt(length.value);
     }
-  
-    // Calculate the actual number of items to fetch, considering the length and max limit
-    const numItemsToFetch = Math.min(length - offset, max);
-  
-    // Generate an array of fetch promises for each item
-    const fetchPromises = Array.from({ length: numItemsToFetch }, (_, index) => {
-      const fetchIndex = offset + index;
-      return batch.get(iterator_key + "/" + fetchIndex).then(entry => {
-        if(entry === null || typeof entry.value === 'undefined') return null;
-        return return_json ? JSON.parse(entry.value) : entry.value;
-      });
-    });
-  
-    // Wait for all promises to resolve
-    const results = await Promise.all(fetchPromises);
-    return results;
+    let j = 0;
+    for (let i = offset; i < length; i++) {
+      if (j < max) {
+        let entry = await batch.get(iterator_key + "/" + i);
+        if (return_json) {
+          entry = JSON.parse(entry.value);
+        } else {
+          entry = entry.value;
+        }
+        out.push(entry);
+      } else {
+        break;
+      }
+      j++;
+    }
+
+    return out;
   }
   /**
    * Gets the length of a list based on a specified key.
