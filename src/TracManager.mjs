@@ -9,6 +9,7 @@ import RestModule from "./RestModule.mjs";
 import TapProtocol from "./TapProtocol.mjs";
 import BlockDownloader from "./BlockDownloader.mjs";
 import { printConsole } from "./helpers/mixed.mjs";
+
 // import { Node } from "hyperbee/lib/messages.js";
 
 /**
@@ -35,7 +36,6 @@ export default class TracManager {
     this.swarm = new Hyperswarm();
     this.bee = null;
     this.tapProtocol = new TapProtocol(this);
-    isCli ? process.env.NODE_CONFIG_DIR = './' : '';
 
     goodbye(() => {
       this.swarm.destroy();
