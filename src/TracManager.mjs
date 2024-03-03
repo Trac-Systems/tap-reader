@@ -141,7 +141,7 @@ export default class TracManager {
         }
 
         if(!banned && now - _this.banlist[pubKey].ts >= timeoutLimit &&
-            _this.banlist[pubKey].d < maxTries)
+            _this.banlist[pubKey].d <= maxTries)
         {
           delete this.banlist[pubKey];
           console.log('Lifted ban risk', pubKey, 'due to ban timeout');
