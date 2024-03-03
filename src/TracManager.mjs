@@ -59,6 +59,8 @@ export default class TracManager {
     console.log(figlet.textSync("Trac Core Reader"));
     console.log("Protocol: Ordinals/TAP");
 
+    this.banlist = {};
+
     this.core = this.store.get({
       key: process.argv[2]
         ? Buffer.from(process.argv[2], "hex")
@@ -111,34 +113,94 @@ export default class TracManager {
   async initHyperswarm(server, client) {
     this.swarm.on("connection", (connection, peerInfo) => {
       this.isConnected = true;
+      let _this = this;
+      let pubKey = connection.remotePublicKey.toString("hex");
+      let banned = false;
 
-      // temporary naughty list
-      if(connection.remotePublicKey.toString("hex") ===
-          '40849bd2e5b85726c957b58cfdf3453f7020ec31ff3ad4e422b5746829a7914e' ||
-            connection.remotePublicKey.toString("hex") ===
-              'e6e23434b7d9c9d9f67619986fcb7112b87ef5c2cb459f29574c5093c94c816a')
+      if(typeof this.banlist[pubKey] !== 'undefined')
       {
-        peerInfo.ban(true);
-        console.log('Banned', connection.remotePublicKey.toString("hex"));
+        let now = Math.floor(Date.now() / 1000);
+        let maxTries = 3;
+        let timeoutLimit = 1800;
+
+        if(_this.banlist[pubKey].b)
+        {
+          banned = true;
+          peerInfo.ban(true);
+          console.log('Peer is banned', pubKey);
+        }
+
+        if(!banned && now - _this.banlist[pubKey].ts < timeoutLimit &&
+            _this.banlist[pubKey].d >= maxTries)
+        {
+          banned = true;
+          peerInfo.ban(true);
+          _this.banlist[pubKey].b = true;
+          _this.banlist[pubKey].u = now + timeoutLimit;
+          console.log('Banned', pubKey, 'due to repeated inactivity. Earliest unban at timestamp', now + timeoutLimit);
+        }
+
+        if(!banned && now - _this.banlist[pubKey].ts >= timeoutLimit &&
+            _this.banlist[pubKey].d < maxTries)
+        {
+          delete this.banlist[pubKey];
+          console.log('Lifted ban risk', pubKey, 'due to ban timeout');
+        }
+
+        if(banned && now >= _this.banlist[pubKey].u)
+        {
+          banned = false;
+          peerInfo.ban(false);
+          delete _this.banlist[pubKey];
+          console.log('Unbanned', pubKey, 'due to probation period ending. Timestamp', _this.banlist[pubKey].u);
+        }
       }
 
       console.log(
           "Connected to peer:",
           connection.remotePublicKey.toString("hex")
       );
-      this.core.replicate(connection);
+
+      if(!banned)
+      {
+        this.core.replicate(connection);
+      }
+
       connection.on("close", () =>
           console.log(
               "Connection closed with peer:",
               connection.remotePublicKey.toString("hex")
           )
       );
-      connection.on("error", (error) =>
+
+      connection.on("error", function(error) {
+
           console.log(
               "Connection error with peer:",
               connection.remotePublicKey.toString("hex"),
               error
           )
+
+          if(typeof error.code !== 'undefined' &&
+              ( error.code.toLowerCase().includes('etimedout') || error.code.toLowerCase().includes('econnreset') ))
+          {
+            let pubKey = connection.remotePublicKey.toString("hex");
+
+            if(typeof _this.banlist[pubKey] === 'undefined')
+            {
+              _this.banlist[pubKey] = {
+                ts : Math.floor(Date.now() / 1000),
+                d : 0,
+                b : false,
+                u : 0
+              }
+            }
+
+            _this.banlist[pubKey].d += 1;
+
+            console.log(pubKey, _this.banlist[pubKey]);
+          }
+        }
       );
     });
 
@@ -146,6 +208,7 @@ export default class TracManager {
       server: server,
       client: client,
     });
+
     await discovery.flushed();
     const foundPeers = this.store.findingPeers();
     await this.swarm.flush();
