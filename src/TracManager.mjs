@@ -121,7 +121,7 @@ export default class TracManager {
       {
         let now = Math.floor(Date.now() / 1000);
         let maxTries = 3;
-        let timeoutLimit = 1800;
+        let timeoutLimit = 3600;
 
         if(_this.banlist[pubKey].b)
         {
