@@ -40,7 +40,7 @@ The most recent channel is always pre-defined in the reader's config of this rep
 - Linux, Windows, MacOS
 - NodeJS 20+
 - 2-4 CPU Cores, 8GB RAM
-- 50GB SSD drive (make sure it's a good one)
+- 150GB SSD drive (make sure it's a good one)
 
 Should work perfectly on Pi 4-5 and low Watts.
 
