@@ -2404,7 +2404,7 @@ export default class RestModule {
           schema: {
             description:
               "Retrieve details of a specific trade based on its inscription ID",
-            tags: ["Trade"],
+            tags: ["Trades"],
             params: {
               type: "object",
               required: ["inscription_id"],
@@ -2453,7 +2453,7 @@ export default class RestModule {
           schema: {
             description:
               "Get the total number of trades for a specific address and ticker",
-            tags: ["Trade"],
+            tags: ["Trades"],
             params: {
               type: "object",
               required: ["address", "ticker"],
@@ -2506,7 +2506,7 @@ export default class RestModule {
         {
           schema: {
             description: "Retrieve a list of received transactions for a specific address and ticker",
-            tags: ["Send"],
+            tags: ["Sent"],
             params: {
               type: "object",
               required: ["address", "ticker"],
@@ -2571,7 +2571,7 @@ export default class RestModule {
           schema: {
             description:
               "Retrieve a list of trades for a specific address and ticker",
-            tags: ["Trade"],
+            tags: ["Trades"],
             params: {
               type: "object",
               required: ["address", "ticker"],
@@ -2730,7 +2730,7 @@ export default class RestModule {
         {
           schema: {
             description: "Get the total number of redeems across all tokens",
-            tags: ["Redeem"],
+            tags: ["Token Authority: Redeem"],
             response: {
               200: {
                 description: "Successful response",
@@ -2767,7 +2767,7 @@ export default class RestModule {
           schema: {
             description:
               "Retrieve a list of all redeem records across all tokens",
-            tags: ["Redeem"],
+            tags: ["Token Authority: Redeem"],
             querystring: {
               type: "object",
               properties: {
@@ -2817,7 +2817,7 @@ export default class RestModule {
           schema: {
             description:
               "Get the total number of redeems performed by a specific address",
-            tags: ["Redeem"],
+            tags: ["Token Authority: Redeem"],
             params: {
               type: "object",
               required: ["address"],
@@ -2863,7 +2863,7 @@ export default class RestModule {
           schema: {
             description:
               "Retrieve a list of redeem records for a specific address",
-            tags: ["Redeem"],
+            tags: ["Token Authority: Redeem"],
             params: {
               type: "object",
               required: ["address"],
@@ -3112,7 +3112,7 @@ export default class RestModule {
         {
           schema: {
             description: "Get the total number of trades for a specific ticker",
-            tags: ["Trade"],
+            tags: ["Trades"],
             params: {
               type: "object",
               required: ["ticker"],
@@ -3157,7 +3157,7 @@ export default class RestModule {
         {
           schema: {
             description: "Retrieve a list of trades for a specific ticker",
-            tags: ["Trade"],
+            tags: ["Trades"],
             params: {
               type: "object",
               required: ["ticker"],
@@ -3215,7 +3215,7 @@ export default class RestModule {
         {
           schema: {
             description: "Get the total number of trades across all tickers",
-            tags: ["Trade"],
+            tags: ["Trades"],
             response: {
               200: {
                 description: "Successful response",
@@ -3252,7 +3252,7 @@ export default class RestModule {
           schema: {
             description:
               "Retrieve a list of all trade records across all tickers",
-            tags: ["Trade"],
+            tags: ["Trades"],
             querystring: {
               type: "object",
               properties: {
@@ -3601,7 +3601,7 @@ export default class RestModule {
           schema: {
             description:
               "Get the total number of sent transactions for a specific address and ticker",
-            tags: ["Send"],
+            tags: ["Sent"],
             params: {
               type: "object",
               required: ["address", "ticker"],
@@ -3649,7 +3649,7 @@ export default class RestModule {
           schema: {
             description:
               "Retrieve a list of sent transaction records for a specific address and ticker",
-            tags: ["Send"],
+            tags: ["Sent"],
             params: {
               type: "object",
               required: ["address", "ticker"],
@@ -3710,7 +3710,7 @@ export default class RestModule {
           schema: {
             description:
               "Get the total number of trades filled for a specific address and ticker",
-            tags: ["Trade"],
+            tags: ["Trades"],
             params: {
               type: "object",
               required: ["address", "ticker"],
@@ -3758,7 +3758,7 @@ export default class RestModule {
           schema: {
             description:
               "Retrieve a list of received trades filled for a specific address and ticker",
-            tags: ["Trade"],
+            tags: ["Trades"],
             params: {
               type: "object",
               required: ["address", "ticker"],
@@ -3819,7 +3819,7 @@ export default class RestModule {
           schema: {
             description:
               "Get the total number of trades filled for a specific address and ticker",
-            tags: ["Trade"],
+            tags: ["Trades"],
             params: {
               type: "object",
               required: ["address", "ticker"],
@@ -3867,7 +3867,7 @@ export default class RestModule {
           schema: {
             description:
               "Retrieve a list of trades filled for a specific address and ticker",
-            tags: ["Trade"],
+            tags: ["Trades"],
             params: {
               type: "object",
               required: ["address", "ticker"],
@@ -3928,7 +3928,7 @@ export default class RestModule {
           schema: {
             description:
               "Get the total number of trades filled for a specific ticker",
-            tags: ["Trade"],
+            tags: ["Trades"],
             params: {
               type: "object",
               required: ["ticker"],
@@ -3974,7 +3974,7 @@ export default class RestModule {
           schema: {
             description:
               "Retrieve a list of filled trade records for a specific ticker",
-            tags: ["Trade"],
+            tags: ["Trades"],
             params: {
               type: "object",
               required: ["ticker"],
@@ -4033,7 +4033,7 @@ export default class RestModule {
           schema: {
             description:
               "Get the total number of filled trades across all tickers",
-            tags: ["Trade"],
+            tags: ["Trades"],
             response: {
               200: {
                 description: "Successful response",
@@ -4067,7 +4067,7 @@ export default class RestModule {
       fastify.get("/getTradesFilledList", {
         schema: {
           description: "Retrieve a list of trades that have been filled",
-          tags: ["Trade"],
+          tags: ["Trades"],
           querystring: {
             type: 'object',
             properties: {
@@ -4114,7 +4114,7 @@ export default class RestModule {
         {
           schema: {
             description: "Get the total number of sent transactions for a given ticker",
-            tags: ["Send"],
+            tags: ["Sent"],
             params: {
               type: "object",
               required: ["ticker"],
@@ -4160,7 +4160,7 @@ export default class RestModule {
           schema: {
             description:
               "Retrieve a list of sent transactions for a specific ticker",
-            tags: ["Send"],
+            tags: ["Sent"],
             params: {
               type: "object",
               required: ["ticker"],
@@ -4216,7 +4216,7 @@ export default class RestModule {
       fastify.get("/getSentListLength", {
         schema: {
           description: "Get the total length of the sent transactions list",
-          tags: ["Send"],
+          tags: ["Sent"],
           response: {
             200: {
               description: 'Successful response',
@@ -4249,7 +4249,7 @@ export default class RestModule {
         {
           schema: {
             description: "Retrieve the list of all sent transactions",
-            tags: ["Send"],
+            tags: ["Sent"],
             querystring: {
               type: "object",
               properties: {
