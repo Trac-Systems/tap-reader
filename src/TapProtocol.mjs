@@ -47,6 +47,812 @@ export default class TapProtocol {
     return out;
   }
 
+
+
+
+
+
+
+
+
+
+  /**
+   * Returns the length of actual transferred inscriptions and internally sent tokens of a given tx hash.
+   *
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getTransferredListLength(transaction_hash) {
+    return this.getLength(
+        "tx/snd/" + transaction_hash
+    );
+  }
+
+  /**
+   * Returns actual transferred inscriptions and internally sent tokens of a given tx hash.
+   *
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTransferredList(transaction_hash, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "tx/snd/" + transaction_hash,
+        "txi/snd/" + transaction_hash,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of actual transferred inscriptions and internally sent tokens of a given ticker and tx hash.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getTickerTransferredListLength(ticker, transaction_hash) {
+    return this.getLength(
+        "txt/snd/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash
+    );
+  }
+
+  /**
+   * Returns actual transferred inscriptions and internally sent tokens of a given ticker and tx hash.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTickerTransferredList(ticker, transaction_hash, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "txt/snd/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash,
+        "txti/snd/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of actual transferred inscriptions and internally sent tokens of a given ticker and block.
+   *
+   * @param {string} ticker
+   * @param {int} block
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getTickerTransferredListByBlockLength(ticker, block) {
+    return this.getLength(
+        "blckt/snd/" + JSON.stringify(ticker.toLowerCase()) + '/' + block
+    );
+  }
+
+  /**
+   * Returns actual transferred inscriptions and internally sent tokens of a given ticker and block.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTickerTransferredListByBlock(ticker, block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blckt/snd/" + JSON.stringify(ticker.toLowerCase()) + '/' + block,
+        "blckti/snd/" + JSON.stringify(ticker.toLowerCase()) + '/' + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of actual transferred inscriptions and internally sent tokens of a given block.
+   *
+   * @param {int} block
+   * @returns {Promise<number>}
+   */
+  async getTransferredListByBlockLength(block) {
+    return this.getLength(
+        "blck/snd/" + block
+    );
+  }
+
+  /**
+   * Returns actual transferred inscriptions and internally sent tokens of a given block.
+   *
+   * @param {int} block
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTransferredListByBlock(block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blck/snd/" + block,
+        "blck/snd/" + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+
+
+
+
+
+
+
+  /**
+   * Returns the length of mint inscriptions of a given tx hash.
+   *
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getMintedListLength(transaction_hash) {
+    return this.getLength(
+        "tx/mnt/" + transaction_hash
+    );
+  }
+
+  /**
+   * Returns mint inscriptions of a given tx hash.
+   *
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getMintedList(transaction_hash, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "tx/mnt/" + transaction_hash,
+        "txi/mnt/" + transaction_hash,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of mint inscriptions of a given ticker and tx hash.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getTickerMintedListLength(ticker, transaction_hash) {
+    return this.getLength(
+        "txt/mnt/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash
+    );
+  }
+
+  /**
+   * Returns mint inscriptions of a given ticker and tx hash.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTickerMintedList(ticker, transaction_hash, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "txt/mnt/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash,
+        "txti/mnt/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of mint inscriptions of a given ticker and block.
+   *
+   * @param {string} ticker
+   * @param {int} block
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getTickerMintedListByBlockLength(ticker, block) {
+    return this.getLength(
+        "blckt/mnt/" + JSON.stringify(ticker.toLowerCase()) + '/' + block
+    );
+  }
+
+  /**
+   * Returns mint inscriptions of a given ticker and block.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTickerMintedListByBlock(ticker, block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blckt/mnt/" + JSON.stringify(ticker.toLowerCase()) + '/' + block,
+        "blckti/mnt/" + JSON.stringify(ticker.toLowerCase()) + '/' + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of mint inscriptions of a given block.
+   *
+   * @param {int} block
+   * @returns {Promise<number>}
+   */
+  async getMintedListByBlockLength(block) {
+    return this.getLength(
+        "blck/mnt/" + block
+    );
+  }
+
+  /**
+   * Returns mint inscriptions of a given block.
+   *
+   * @param {int} block
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getMintedListByBlock(block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blck/mnt/" + block,
+        "blck/mnt/" + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+
+
+
+
+
+
+
+
+
+  /**
+   * Returns the length of deployments of a given tx hash.
+   *
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getDeployedListLength(transaction_hash) {
+    return this.getLength(
+        "tx/dpl/" + transaction_hash
+    );
+  }
+
+  /**
+   * Returns deployments of a given tx hash.
+   *
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getDeployedList(transaction_hash, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "tx/dpl/" + transaction_hash,
+        "txi/dpl/" + transaction_hash,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        let dpl = await this.getDeployment(entry.value);
+        if(dpl !== null)
+        {
+          out.push(dpl);
+        }
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length deployments of a given ticker and tx hash.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getTickerDeployedListLength(ticker, transaction_hash) {
+    return this.getLength(
+        "txt/dpl/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash
+    );
+  }
+
+  /**
+   * Returns deployments of a given ticker and tx hash.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTickerDeployedList(ticker, transaction_hash, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "txt/dpl/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash,
+        "txti/dpl/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        let dpl = await this.getDeployment(entry.value);
+        if(dpl !== null)
+        {
+          out.push(dpl);
+        }
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of deployments of a given ticker and block.
+   *
+   * @param {string} ticker
+   * @param {int} block
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getTickerDeployedListByBlockLength(ticker, block) {
+    return this.getLength(
+        "blckt/dpl/" + JSON.stringify(ticker.toLowerCase()) + '/' + block
+    );
+  }
+
+  /**
+   * Returns deployments of a given ticker and block.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTickerDeployedListByBlock(ticker, block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blckt/dpl/" + JSON.stringify(ticker.toLowerCase()) + '/' + block,
+        "blckti/dpl/" + JSON.stringify(ticker.toLowerCase()) + '/' + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        let dpl = await this.getDeployment(entry.value);
+        if(dpl !== null)
+        {
+          out.push(dpl);
+        }
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of deployments of a given block.
+   *
+   * @param {int} block
+   * @returns {Promise<number>}
+   */
+  async getDeployedListByBlockLength(block) {
+    return this.getLength(
+        "blck/dpl/" + block
+    );
+  }
+
+  /**
+   * Returns deployments of a given block.
+   *
+   * @param {int} block
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getDeployedListByBlock(block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blck/dpl/" + block,
+        "blck/dpl/" + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        let dpl = await this.getDeployment(entry.value);
+        if(dpl !== null)
+        {
+          out.push(dpl);
+        }
+      }
+    }
+    return out;
+  }
+
+
+
+
+
+
+
+
+
+
+
+  /**
+   * Returns the length of transfer-inscriptions of a given tx hash.
+   *
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getInscribeTransferListLength(transaction_hash) {
+    return this.getLength(
+        "tx/trf/" + transaction_hash
+    );
+  }
+
+  /**
+   * Returns transfer-inscriptions of a given tx hash.
+   *
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getInscribeTransferList(transaction_hash, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "tx/trf/" + transaction_hash,
+        "txi/trf/" + transaction_hash,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of transfer-inscriptions of a given ticker and tx hash.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getTickerInscribeTransferListLength(ticker, transaction_hash) {
+    return this.getLength(
+        "txt/trf/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash
+    );
+  }
+
+  /**
+   * Returns transfer-inscriptions of a given ticker and tx hash.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTickerInscribeTransferList(ticker, transaction_hash, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "txt/trf/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash,
+        "txti/trf/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of transfer-inscriptions of a given ticker and block.
+   *
+   * @param {string} ticker
+   * @param {int} block
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getTickerInscribeTransferListByBlockLength(ticker, block) {
+    return this.getLength(
+        "blckt/trf/" + JSON.stringify(ticker.toLowerCase()) + '/' + block
+    );
+  }
+
+  /**
+   * Returns transfer-inscriptions of a given ticker and tx hash.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTickerInscribeTransferListByBlock(ticker, block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blckt/trf/" + JSON.stringify(ticker.toLowerCase()) + '/' + block,
+        "blckti/trf/" + JSON.stringify(ticker.toLowerCase()) + '/' + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of transfer-inscriptions of a given block.
+   *
+   * @param {int} block
+   * @returns {Promise<number>}
+   */
+  async getInscribeTransferListByBlockLength(block) {
+    return this.getLength(
+        "blck/trf/" + block
+    );
+  }
+
+  /**
+   * Returns transfer-inscriptions of a given block.
+   *
+   * @param {int} block
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getInscribeTransferListByBlock(block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blck/trf/" + block,
+        "blck/trf/" + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
   /**
    * Returns the amount of holder changes for a given DMT Mint.
    *
@@ -91,14 +897,15 @@ export default class TapProtocol {
   }
 
   /**
-   * Returns a history object with element, owner and block data but based on a given block instead of an inscription id.
+   * Returns a history object with element, owner and block data but based on a given ticker and block instead of an inscription id.
    *
+   * @param {string} ticker
    * @param {int} block
    * @returns {Promise<Object|null>}
    */
-  async getDmtMintHolderByBlock(block)
+  async getDmtMintHolderByBlock(ticker, block)
   {
-    let holder = await this.tracManager.bee.get('dmtmhb/'+parseInt(block));
+    let holder = await this.tracManager.bee.get('dmtmhb/'+JSON.stringify(ticker.toLowerCase())+'/'+parseInt(block));
     if (holder !== null) {
       holder = await this.tracManager.bee.get(holder.value);
       if(holder !== null)

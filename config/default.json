@@ -3,7 +3,7 @@
     "enableRestApiDocs": true,
     "restPort": 5099,
     "restCacheControl": {
-        "maxAge": 3600,
+        "maxAge": 1,
         "public": false
     },
     "restHeaders": [
@@ -13,6 +13,6 @@
     "enableWebsockets": true,
     "websocketPort": 5095,
     "websocketCORS": "*",
-    "channel": "4600e05f4b315ea2ac832aa893aed4872ca0d5e40cf35e22592de55efa460edd",
+    "channel": "14adeed7f5a40ed9217bd0e1e51aa99a41415158670d21b6307018e32f44301a",
     "enableBlockDownloader": false
 }
