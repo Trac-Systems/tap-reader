@@ -240,10 +240,10 @@ Initializes a Hyperswarm network connection for data synchronization.
 <dt><a href="#getAccountMintList">getAccountMintList(address, ticker)</a> ⇒ <code>Promise.&lt;number&gt;</code></dt>
 <dd><p>Gets the total number of mints performed by a specific address for a given ticker.</p>
 </dd>
-<dt><a href="#getTickerMintListLength">getTickerMintListLength(address, ticker)</a> ⇒ <code>Promise.&lt;number&gt;</code></dt>
+<dt><a href="#getTickerMintListLength">getTickerMintListLength(ticker)</a> ⇒ <code>Promise.&lt;number&gt;</code></dt>
 <dd><p>Gets the total number of mints performed by a specific address for a given ticker.</p>
 </dd>
-<dt><a href="#getTickerMintList">getTickerMintList(address, ticker, [offset], [max])</a> ⇒ <code>Promise.&lt;Array&gt;</code></dt>
+<dt><a href="#getTickerMintList">getTickerMintList(ticker, [offset], [max])</a> ⇒ <code>Promise.&lt;Array&gt;</code></dt>
 <dd><p>Retrieves a list of mint records for a specific address and ticker.</p>
 </dd>
 <dt><a href="#getMintListLength">getMintListLength(ticker)</a> ⇒ <code>Promise.&lt;number&gt;</code></dt>
