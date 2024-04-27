@@ -280,17 +280,32 @@ Initializes a Hyperswarm network connection for data synchronization.
 <dd><p>Retrieves a list of redeem records for a specific address.</p>
 </dd>
 <dt><a href="#getAccountAuthListLength">getAccountAuthListLength(address)</a> ⇒ <code>Promise.&lt;number&gt;</code></dt>
-<dd><p>Gets the total number of auth records for a specific address.</p>
+<dd><p>Gets the total number of token auth records for a specific address.</p>
 </dd>
 <dt><a href="#getAccountAuthList">getAccountAuthList(address, [offset], [max])</a> ⇒ <code>Promise.&lt;Array&gt;</code></dt>
-<dd><p>Retrieves a list of auth records for a specific address.</p>
+<dd><p>Retrieves a list of token auth records for a specific address.</p>
 </dd>
 <dt><a href="#getAuthListLength">getAuthListLength()</a> ⇒ <code>Promise.&lt;number&gt;</code></dt>
-<dd><p>Gets the total number of auth records across all addresses.</p>
+<dd><p>Gets the total number of token auth records across all addresses.</p>
 </dd>
 <dt><a href="#getAuthList">getAuthList([offset], [max])</a> ⇒ <code>Promise.&lt;Array&gt;</code></dt>
-<dd><p>Retrieves a list of all auth records across all addresses.</p>
+<dd><p>Retrieves a list of all token auth records across all addresses.</p>
 </dd>
+
+<dt><a href="#getAccountPrivilegeAuthListLength">getAccountgetPrivilegeAuthListAuthListLength(address)</a> ⇒ <code>Promise.&lt;number&gt;</code></dt>
+<dd><p>Gets the total number of privilege auth records for a specific address.</p>
+</dd>
+<dt><a href="#getAccountPrivilegeAuthList">getAccountgetPrivilegeAuthListAuthList(address, [offset], [max])</a> ⇒ <code>Promise.&lt;Array&gt;</code></dt>
+<dd><p>Retrieves a list of privilege auth records for a specific address.</p>
+</dd>
+<dt><a href="#getPrivilegeAuthListLength">getgetPrivilegeAuthListAuthListLength()</a> ⇒ <code>Promise.&lt;number&gt;</code></dt>
+<dd><p>Gets the total number of privilege auth records across all addresses.</p>
+</dd>
+<dt><a href="#getPrivilegeAuthList">getgetPrivilegeAuthListAuthList([offset], [max])</a> ⇒ <code>Promise.&lt;Array&gt;</code></dt>
+<dd><p>Retrieves a list of all privilege auth records across all addresses.</p>
+</dd>
+
+
 <dt><a href="#getTickerTradesListLength">getTickerTradesListLength(ticker)</a> ⇒ <code>Promise.&lt;number&gt;</code></dt>
 <dd><p>Gets the total number of trades for a specific ticker.</p>
 </dd>
@@ -871,6 +886,58 @@ Retrieves a list of all auth records across all addresses.
 | --- | --- | --- | --- |
 | [offset] | <code>number</code> | <code>0</code> | The starting index for retrieving auth records. |
 | [max] | <code>number</code> | <code>500</code> | The maximum number of auth records to retrieve. |
+
+
+
+
+<a name="getAccountPrivilegeAuthListLength"></a>
+
+## getAccountPrivilegeAuthListLength(address) ⇒ <code>Promise.&lt;number&gt;</code>
+Gets the total number of auth records for a specific address.
+
+**Kind**: global function  
+**Returns**: <code>Promise.&lt;number&gt;</code> - The number of auth records for the specified address.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| address | <code>string</code> | The address for which to retrieve the auth count. |
+
+<a name="getAccountPrivilegeAuthList"></a>
+
+## getAccountPrivilegeAuthList(address, [offset], [max]) ⇒ <code>Promise.&lt;Array&gt;</code>
+Retrieves a list of auth records for a specific address.
+
+**Kind**: global function  
+**Returns**: <code>Promise.&lt;Array&gt;</code> - An array of auth records for the specified address.  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| address | <code>string</code> |  | The address for which to retrieve auth records. |
+| [offset] | <code>number</code> | <code>0</code> | The starting index for retrieving auth records. |
+| [max] | <code>number</code> | <code>500</code> | The maximum number of auth records to retrieve. |
+
+<a name="getPrivilegeAuthListLength"></a>
+
+## getPrivilegeAuthListLength() ⇒ <code>Promise.&lt;number&gt;</code>
+Gets the total number of auth records across all addresses.
+
+**Kind**: global function  
+**Returns**: <code>Promise.&lt;number&gt;</code> - The total number of auth records.  
+<a name="getPrivilegeAuthList"></a>
+
+## getPrivilegeAuthList([offset], [max]) ⇒ <code>Promise.&lt;Array&gt;</code>
+Retrieves a list of all auth records across all addresses.
+
+**Kind**: global function  
+**Returns**: <code>Promise.&lt;Array&gt;</code> - An array of auth records.  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [offset] | <code>number</code> | <code>0</code> | The starting index for retrieving auth records. |
+| [max] | <code>number</code> | <code>500</code> | The maximum number of auth records to retrieve. |
+
+
+
 
 <a name="getTickerTradesListLength"></a>
 
