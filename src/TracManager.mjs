@@ -113,58 +113,11 @@ export default class TracManager {
   async initHyperswarm(server, client) {
     this.swarm.on("connection", (connection, peerInfo) => {
       this.isConnected = true;
-      let _this = this;
-      let pubKey = connection.remotePublicKey.toString("hex");
-      let banned = false;
-
-      if(typeof this.banlist[pubKey] !== 'undefined')
-      {
-        let now = Math.floor(Date.now() / 1000);
-        let maxTries = 3;
-        let timeoutLimit = 3600;
-
-        if(_this.banlist[pubKey].b)
-        {
-          banned = true;
-          peerInfo.ban(true);
-          console.log('Peer is banned', pubKey);
-        }
-
-        if(!banned && now - _this.banlist[pubKey].ts < timeoutLimit &&
-            _this.banlist[pubKey].d >= maxTries)
-        {
-          banned = true;
-          peerInfo.ban(true);
-          _this.banlist[pubKey].b = true;
-          _this.banlist[pubKey].u = now + timeoutLimit;
-          console.log('Banned', pubKey, 'due to repeated inactivity. Earliest unban at timestamp', now + timeoutLimit);
-        }
-
-        if(!banned && now - _this.banlist[pubKey].ts >= timeoutLimit &&
-            _this.banlist[pubKey].d <= maxTries)
-        {
-          delete this.banlist[pubKey];
-          console.log('Lifted ban risk', pubKey, 'due to ban timeout');
-        }
-
-        if(banned && now >= _this.banlist[pubKey].u)
-        {
-          banned = false;
-          peerInfo.ban(false);
-          delete _this.banlist[pubKey];
-          console.log('Unbanned', pubKey, 'due to probation period ending. Timestamp', _this.banlist[pubKey].u);
-        }
-      }
 
       console.log(
           "Connected to peer:",
           connection.remotePublicKey.toString("hex")
       );
-
-      if(!banned)
-      {
-        this.core.replicate(connection);
-      }
 
       connection.on("close", () =>
           console.log(
@@ -180,28 +133,10 @@ export default class TracManager {
               connection.remotePublicKey.toString("hex"),
               error
           )
-
-          if(typeof error.code !== 'undefined' &&
-              ( error.code.toLowerCase().includes('etimedout') || error.code.toLowerCase().includes('econnreset') ))
-          {
-            let pubKey = connection.remotePublicKey.toString("hex");
-
-            if(typeof _this.banlist[pubKey] === 'undefined')
-            {
-              _this.banlist[pubKey] = {
-                ts : Math.floor(Date.now() / 1000),
-                d : 0,
-                b : false,
-                u : 0
-              }
-            }
-
-            _this.banlist[pubKey].d += 1;
-
-            console.log(pubKey, _this.banlist[pubKey]);
-          }
         }
       );
+
+      this.core.replicate(connection);
     });
 
     const discovery = this.swarm.join(this.core.discoveryKey, {

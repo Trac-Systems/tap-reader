@@ -47,6 +47,812 @@ export default class TapProtocol {
     return out;
   }
 
+
+
+
+
+
+
+
+
+
+  /**
+   * Returns the length of actual transferred inscriptions and internally sent tokens of a given tx hash.
+   *
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getTransferredListLength(transaction_hash) {
+    return this.getLength(
+        "tx/snd/" + transaction_hash
+    );
+  }
+
+  /**
+   * Returns actual transferred inscriptions and internally sent tokens of a given tx hash.
+   *
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTransferredList(transaction_hash, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "tx/snd/" + transaction_hash,
+        "txi/snd/" + transaction_hash,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of actual transferred inscriptions and internally sent tokens of a given ticker and tx hash.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getTickerTransferredListLength(ticker, transaction_hash) {
+    return this.getLength(
+        "txt/snd/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash
+    );
+  }
+
+  /**
+   * Returns actual transferred inscriptions and internally sent tokens of a given ticker and tx hash.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTickerTransferredList(ticker, transaction_hash, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "txt/snd/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash,
+        "txti/snd/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of actual transferred inscriptions and internally sent tokens of a given ticker and block.
+   *
+   * @param {string} ticker
+   * @param {int} block
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getTickerTransferredListByBlockLength(ticker, block) {
+    return this.getLength(
+        "blckt/snd/" + JSON.stringify(ticker.toLowerCase()) + '/' + block
+    );
+  }
+
+  /**
+   * Returns actual transferred inscriptions and internally sent tokens of a given ticker and block.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTickerTransferredListByBlock(ticker, block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blckt/snd/" + JSON.stringify(ticker.toLowerCase()) + '/' + block,
+        "blckti/snd/" + JSON.stringify(ticker.toLowerCase()) + '/' + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of actual transferred inscriptions and internally sent tokens of a given block.
+   *
+   * @param {int} block
+   * @returns {Promise<number>}
+   */
+  async getTransferredListByBlockLength(block) {
+    return this.getLength(
+        "blck/snd/" + block
+    );
+  }
+
+  /**
+   * Returns actual transferred inscriptions and internally sent tokens of a given block.
+   *
+   * @param {int} block
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTransferredListByBlock(block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blck/snd/" + block,
+        "blcki/snd/" + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+
+
+
+
+
+
+
+  /**
+   * Returns the length of mint inscriptions of a given tx hash.
+   *
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getMintedListLength(transaction_hash) {
+    return this.getLength(
+        "tx/mnt/" + transaction_hash
+    );
+  }
+
+  /**
+   * Returns mint inscriptions of a given tx hash.
+   *
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getMintedList(transaction_hash, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "tx/mnt/" + transaction_hash,
+        "txi/mnt/" + transaction_hash,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of mint inscriptions of a given ticker and tx hash.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getTickerMintedListLength(ticker, transaction_hash) {
+    return this.getLength(
+        "txt/mnt/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash
+    );
+  }
+
+  /**
+   * Returns mint inscriptions of a given ticker and tx hash.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTickerMintedList(ticker, transaction_hash, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "txt/mnt/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash,
+        "txti/mnt/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of mint inscriptions of a given ticker and block.
+   *
+   * @param {string} ticker
+   * @param {int} block
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getTickerMintedListByBlockLength(ticker, block) {
+    return this.getLength(
+        "blckt/mnt/" + JSON.stringify(ticker.toLowerCase()) + '/' + block
+    );
+  }
+
+  /**
+   * Returns mint inscriptions of a given ticker and block.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTickerMintedListByBlock(ticker, block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blckt/mnt/" + JSON.stringify(ticker.toLowerCase()) + '/' + block,
+        "blckti/mnt/" + JSON.stringify(ticker.toLowerCase()) + '/' + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of mint inscriptions of a given block.
+   *
+   * @param {int} block
+   * @returns {Promise<number>}
+   */
+  async getMintedListByBlockLength(block) {
+    return this.getLength(
+        "blck/mnt/" + block
+    );
+  }
+
+  /**
+   * Returns mint inscriptions of a given block.
+   *
+   * @param {int} block
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getMintedListByBlock(block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blck/mnt/" + block,
+        "blcki/mnt/" + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+
+
+
+
+
+
+
+
+
+  /**
+   * Returns the length of deployments of a given tx hash.
+   *
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getDeployedListLength(transaction_hash) {
+    return this.getLength(
+        "tx/dpl/" + transaction_hash
+    );
+  }
+
+  /**
+   * Returns deployments of a given tx hash.
+   *
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getDeployedList(transaction_hash, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "tx/dpl/" + transaction_hash,
+        "txi/dpl/" + transaction_hash,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        let dpl = await this.getDeployment(entry.value);
+        if(dpl !== null)
+        {
+          out.push(dpl);
+        }
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length deployments of a given ticker and tx hash.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getTickerDeployedListLength(ticker, transaction_hash) {
+    return this.getLength(
+        "txt/dpl/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash
+    );
+  }
+
+  /**
+   * Returns deployments of a given ticker and tx hash.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTickerDeployedList(ticker, transaction_hash, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "txt/dpl/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash,
+        "txti/dpl/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        let dpl = await this.getDeployment(entry.value);
+        if(dpl !== null)
+        {
+          out.push(dpl);
+        }
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of deployments of a given ticker and block.
+   *
+   * @param {string} ticker
+   * @param {int} block
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getTickerDeployedListByBlockLength(ticker, block) {
+    return this.getLength(
+        "blckt/dpl/" + JSON.stringify(ticker.toLowerCase()) + '/' + block
+    );
+  }
+
+  /**
+   * Returns deployments of a given ticker and block.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTickerDeployedListByBlock(ticker, block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blckt/dpl/" + JSON.stringify(ticker.toLowerCase()) + '/' + block,
+        "blckti/dpl/" + JSON.stringify(ticker.toLowerCase()) + '/' + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        let dpl = await this.getDeployment(entry.value);
+        if(dpl !== null)
+        {
+          out.push(dpl);
+        }
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of deployments of a given block.
+   *
+   * @param {int} block
+   * @returns {Promise<number>}
+   */
+  async getDeployedListByBlockLength(block) {
+    return this.getLength(
+        "blck/dpl/" + block
+    );
+  }
+
+  /**
+   * Returns deployments of a given block.
+   *
+   * @param {int} block
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getDeployedListByBlock(block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blck/dpl/" + block,
+        "blcki/dpl/" + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        let dpl = await this.getDeployment(entry.value);
+        if(dpl !== null)
+        {
+          out.push(dpl);
+        }
+      }
+    }
+    return out;
+  }
+
+
+
+
+
+
+
+
+
+
+
+  /**
+   * Returns the length of transfer-inscriptions of a given tx hash.
+   *
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getInscribeTransferListLength(transaction_hash) {
+    return this.getLength(
+        "tx/trf/" + transaction_hash
+    );
+  }
+
+  /**
+   * Returns transfer-inscriptions of a given tx hash.
+   *
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getInscribeTransferList(transaction_hash, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "tx/trf/" + transaction_hash,
+        "txi/trf/" + transaction_hash,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of transfer-inscriptions of a given ticker and tx hash.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getTickerInscribeTransferListLength(ticker, transaction_hash) {
+    return this.getLength(
+        "txt/trf/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash
+    );
+  }
+
+  /**
+   * Returns transfer-inscriptions of a given ticker and tx hash.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTickerInscribeTransferList(ticker, transaction_hash, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "txt/trf/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash,
+        "txti/trf/" + JSON.stringify(ticker.toLowerCase()) + '/' + transaction_hash,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of transfer-inscriptions of a given ticker and block.
+   *
+   * @param {string} ticker
+   * @param {int} block
+   * @param {string} transaction_hash
+   * @returns {Promise<number>}
+   */
+  async getTickerInscribeTransferListByBlockLength(ticker, block) {
+    return this.getLength(
+        "blckt/trf/" + JSON.stringify(ticker.toLowerCase()) + '/' + block
+    );
+  }
+
+  /**
+   * Returns transfer-inscriptions of a given ticker and tx hash.
+   *
+   * @param {string} ticker
+   * @param {string} transaction_hash
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getTickerInscribeTransferListByBlock(ticker, block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blckt/trf/" + JSON.stringify(ticker.toLowerCase()) + '/' + block,
+        "blckti/trf/" + JSON.stringify(ticker.toLowerCase()) + '/' + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns the length of transfer-inscriptions of a given block.
+   *
+   * @param {int} block
+   * @returns {Promise<number>}
+   */
+  async getInscribeTransferListByBlockLength(block) {
+    return this.getLength(
+        "blck/trf/" + block
+    );
+  }
+
+  /**
+   * Returns transfer-inscriptions of a given block.
+   *
+   * @param {int} block
+   * @param {int} offset
+   * @param {int} max
+   * @returns {Promise<Object[]|string>}
+   */
+  async getInscribeTransferListByBlock(block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blck/trf/" + block,
+        "blcki/trf/" + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
   /**
    * Returns the amount of holder changes for a given DMT Mint.
    *
@@ -91,14 +897,127 @@ export default class TapProtocol {
   }
 
   /**
-   * Returns a history object with element, owner and block data but based on a given block instead of an inscription id.
+   * Returns if a certain verification signature has been verified by a given authority.
    *
+   * @param privilege_inscription_id
+   * @param collection_name
+   * @param verified_hash
+   * @param sequence
+   * @returns {Promise<boolean>}
+   */
+  async getPrivilegeAuthIsVerified(privilege_inscription_id, collection_name, verified_hash, sequence)
+  {
+    let verified = await this.tracManager.bee.get('prvvrfd/' + privilege_inscription_id + '/' + JSON.stringify(collection_name) + '/' + verified_hash + '/' + sequence);
+    if (verified !== null) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Get the length of all verifications done by an authority
+   *
+   * @param privilege_inscription_id
+   * @returns {Promise<number>}
+   */
+  async getPrivilegeAuthorityListLength(privilege_inscription_id) {
+    return this.getLength(
+        "prv/" + privilege_inscription_id
+    );
+  }
+
+  /**
+   * Get the verifications done by an authority
+   *
+   * @param privilege_inscription_id
+   * @param offset
+   * @param max
+   * @returns {Promise<*[]|string>}
+   */
+  async getPrivilegeAuthorityList(privilege_inscription_id, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "prv/" + privilege_inscription_id,
+        "prvi/" + privilege_inscription_id,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Get the length of the verified items of a collection verified by a privilege authority
+   *
+   * @param privilege_inscription_id
+   * @param collection_name
+   * @returns {Promise<number>}
+   */
+  async getPrivilegeAuthorityCollectionListLength(privilege_inscription_id, collection_name) {
+    return this.getLength(
+        'prvcol/' + privilege_inscription_id+ '/' + JSON.stringify(collection_name)
+    );
+  }
+
+  /**
+   * Get the verified items of a collection verified by a privilege authority
+   *
+   * @param privilege_inscription_id
+   * @param collection_name
+   * @param offset
+   * @param max
+   * @returns {Promise<*[]|string>}
+   */
+  async getPrivilegeAuthorityCollectionList(privilege_inscription_id, collection_name, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        'prvcol/' + privilege_inscription_id+ '/' + JSON.stringify(collection_name),
+        "prvcoli/" + privilege_inscription_id+ '/' + JSON.stringify(collection_name),
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  /**
+   * Returns a history object with element, owner and block data but based on a given ticker and block instead of an inscription id.
+   *
+   * @param {string} ticker
    * @param {int} block
    * @returns {Promise<Object|null>}
    */
-  async getDmtMintHolderByBlock(block)
+  async getDmtMintHolderByBlock(ticker, block)
   {
-    let holder = await this.tracManager.bee.get('dmtmhb/'+parseInt(block));
+    let holder = await this.tracManager.bee.get('dmtmhb/'+JSON.stringify(ticker.toLowerCase())+'/'+parseInt(block));
     if (holder !== null) {
       holder = await this.tracManager.bee.get(holder.value);
       if(holder !== null)
@@ -566,6 +1485,20 @@ export default class TapProtocol {
     return false;
   }
   /**
+   * Checks if a given privilege-auth inscription has been cancelled.
+   * @param {string} inscription_id - The ID of the token-auth inscription to check.
+   * @returns {Promise<boolean>} True if the inscription is cancelled, false otherwise.
+   */
+
+  async getPrivilegeAuthCancelled(inscription_id) {
+    const cancelled = await this.tracManager.bee.get("prac/" + inscription_id);
+
+    if (cancelled !== null) {
+      return true;
+    }
+    return false;
+  }
+  /**
    * Checks if a given hash exists in the token-auth system.
    * @param {string} hash - The hash to check for existence.
    * @returns {Promise<boolean>} True if the hash exists, false otherwise.
@@ -573,6 +1506,20 @@ export default class TapProtocol {
 
   async getAuthHashExists(hash) {
     hash = await this.tracManager.bee.get("tah/" + hash.trim().toLowerCase());
+
+    if (hash !== null) {
+      return true;
+    }
+    return false;
+  }
+  /**
+   * Checks if a given hash exists in the privilege-auth system.
+   * @param {string} hash - The hash to check for existence.
+   * @returns {Promise<boolean>} True if the hash exists, false otherwise.
+   */
+
+  async getPrivilegeAuthHashExists(hash) {
+    hash = await this.tracManager.bee.get("prah/" + hash.trim().toLowerCase());
 
     if (hash !== null) {
       return true;
@@ -644,7 +1591,7 @@ export default class TapProtocol {
     return out;
   }
   /**
-   * Gets the total number of auth records for a specific address.
+   * Gets the total number of token auth records for a specific address.
    * @param {string} address - The address for which to retrieve the auth count.
    * @returns {Promise<number>} The number of auth records for the specified address.
    */
@@ -652,7 +1599,15 @@ export default class TapProtocol {
     return this.getLength("ta/" + address);
   }
   /**
-   * Retrieves a list of auth records for a specific address.
+   * Gets the total number of privilege auth records for a specific address.
+   * @param {string} address - The address for which to retrieve the auth count.
+   * @returns {Promise<number>} The number of auth records for the specified address.
+   */
+  async getAccountPrivilegeAuthListLength(address) {
+    return this.getLength("pra/" + address);
+  }
+  /**
+   * Retrieves a list of token auth records for a specific address.
    * @param {string} address - The address for which to retrieve auth records.
    * @param {number} [offset=0] - The starting index for retrieving auth records.
    * @param {number} [max=500] - The maximum number of auth records to retrieve.
@@ -679,14 +1634,48 @@ export default class TapProtocol {
     return out;
   }
   /**
-   * Gets the total number of auth records across all addresses.
+   * Retrieves a list of privilege auth records for a specific address.
+   * @param {string} address - The address for which to retrieve auth records.
+   * @param {number} [offset=0] - The starting index for retrieving auth records.
+   * @param {number} [max=500] - The maximum number of auth records to retrieve.
+   * @returns {Promise<Array>} An array of auth records for the specified address.
+   */
+  async getAccountPrivilegeAuthList(address, offset = 0, max = 500) {
+    let out = [];
+    let records = await this.getListRecords(
+        "pra/" + address,
+        "prai/" + address,
+        offset,
+        max,
+        true
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      out.push(records[i]);
+    }
+
+    return out;
+  }
+  /**
+   * Gets the total number of token auth records across all addresses.
    * @returns {Promise<number>} The total number of auth records.
    */
   async getAuthListLength() {
     return this.getLength("sfta");
   }
   /**
-   * Retrieves a list of all auth records across all addresses.
+   * Gets the total number of privilege auth records across all addresses.
+   * @returns {Promise<number>} The total number of auth records.
+   */
+  async getPrivilegeAuthListLength() {
+    return this.getLength("sfpra");
+  }
+  /**
+   * Retrieves a list of all token auth records across all addresses.
    * @param {number} [offset=0] - The starting index for retrieving auth records.
    * @param {number} [max=500] - The maximum number of auth records to retrieve.
    * @returns {Promise<Array>} An array of auth records.
@@ -694,6 +1683,26 @@ export default class TapProtocol {
   async getAuthList(offset = 0, max = 500) {
     let out = [];
     let records = await this.getListRecords("sfta", "sftai", offset, max, true);
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      out.push(records[i]);
+    }
+
+    return out;
+  }
+  /**
+   * Retrieves a list of all privilege auth records across all addresses.
+   * @param {number} [offset=0] - The starting index for retrieving auth records.
+   * @param {number} [max=500] - The maximum number of auth records to retrieve.
+   * @returns {Promise<Array>} An array of auth records.
+   */
+  async getPrivilegeAuthList(offset = 0, max = 500) {
+    let out = [];
+    let records = await this.getListRecords("sfpra", "sfprai", offset, max, true);
 
     if (!Array.isArray(records)) {
       return records;
