@@ -992,6 +992,63 @@ export default class WebsocketModule {
               }
               result = await this.tracManager.tapProtocol.getTrade(cmd.args[0]);
               break;
+            case "privilegeAuthIsVerified":
+              if (cmd.args.length != 4) {
+                this.invalidCmd(cmd, socket);
+                return;
+              }
+              result =
+                  await this.tracManager.tapProtocol.getPrivilegeAuthIsVerified(
+                      cmd.args[0],
+                      cmd.args[1],
+                      cmd.args[2],
+                      cmd.args[3]
+                  );
+              break;
+            case "privilegeAuthorityListLength":
+              if (cmd.args.length != 1) {
+                this.invalidCmd(cmd, socket);
+                return;
+              }
+              result =
+                  await this.tracManager.tapProtocol.getPrivilegeAuthorityListLength(
+                      cmd.args[0]
+                  );
+              break;
+            case "privilegeAuthorityList":
+              if (cmd.args.length != 3) {
+                this.invalidCmd(cmd, socket);
+                return;
+              }
+              result = await this.tracManager.tapProtocol.getPrivilegeAuthorityList(
+                  cmd.args[0],
+                  cmd.args[1],
+                  cmd.args[2]
+              );
+              break;
+            case "privilegeAuthorityCollectionListLength":
+              if (cmd.args.length != 2) {
+                this.invalidCmd(cmd, socket);
+                return;
+              }
+              result =
+                  await this.tracManager.tapProtocol.getPrivilegeAuthorityCollectionListLength(
+                      cmd.args[0],
+                      cmd.args[1]
+                  );
+              break;
+            case "privilegeAuthorityCollectionList":
+              if (cmd.args.length != 3) {
+                this.invalidCmd(cmd, socket);
+                return;
+              }
+              result = await this.tracManager.tapProtocol.getPrivilegeAuthorityCollectionList(
+                  cmd.args[0],
+                  cmd.args[1],
+                  cmd.args[2],
+                  cmd.args[3]
+              );
+              break;
             case "accountAuthList":
               if (cmd.args.length != 3) {
                 this.invalidCmd(cmd, socket);
@@ -1001,6 +1058,17 @@ export default class WebsocketModule {
                 cmd.args[0],
                 cmd.args[1],
                 cmd.args[2]
+              );
+              break;
+            case "accountPrivilegeAuthList":
+              if (cmd.args.length != 3) {
+                this.invalidCmd(cmd, socket);
+                return;
+              }
+              result = await this.tracManager.tapProtocol.getAccountPrivilegeAuthList(
+                  cmd.args[0],
+                  cmd.args[1],
+                  cmd.args[2]
               );
               break;
             case "accountAuthListLength":
@@ -1013,6 +1081,16 @@ export default class WebsocketModule {
                   cmd.args[0]
                 );
               break;
+            case "accountPrivilegeAuthListLength":
+              if (cmd.args.length != 1) {
+                this.invalidCmd(cmd, socket);
+                return;
+              }
+              result =
+                  await this.tracManager.tapProtocol.getAccountPrivilegeAuthListLength(
+                      cmd.args[0]
+                  );
+              break;
             case "authList":
               if (cmd.args.length != 2) {
                 this.invalidCmd(cmd, socket);
@@ -1023,12 +1101,29 @@ export default class WebsocketModule {
                 cmd.args[1]
               );
               break;
+            case "privilegeAuthList":
+              if (cmd.args.length != 2) {
+                this.invalidCmd(cmd, socket);
+                return;
+              }
+              result = await this.tracManager.tapProtocol.getPrivilegeAuthList(
+                  cmd.args[0],
+                  cmd.args[1]
+              );
+              break;
             case "authListLength":
               if (cmd.args.length != 0) {
                 this.invalidCmd(cmd, socket);
                 return;
               }
               result = await this.tracManager.tapProtocol.getAuthListLength();
+              break;
+            case "privilegeAuthListLength":
+              if (cmd.args.length != 0) {
+                this.invalidCmd(cmd, socket);
+                return;
+              }
+              result = await this.tracManager.tapProtocol.getPrivilegeAuthListLength();
               break;
             case "accountRedeemList":
               if (cmd.args.length != 3) {
@@ -1077,6 +1172,15 @@ export default class WebsocketModule {
                 cmd.args[0]
               );
               break;
+            case "privilegeAuthHashExists":
+              if (cmd.args.length != 1) {
+                this.invalidCmd(cmd, socket);
+                return;
+              }
+              result = await this.tracManager.tapProtocol.getPrivilegeAuthHashExists(
+                  cmd.args[0]
+              );
+              break;
             case "authCancelled":
               if (cmd.args.length != 1) {
                 this.invalidCmd(cmd, socket);
@@ -1084,6 +1188,15 @@ export default class WebsocketModule {
               }
               result = await this.tracManager.tapProtocol.getAuthCancelled(
                 cmd.args[0]
+              );
+              break;
+            case "privilegeAuthCancelled":
+              if (cmd.args.length != 1) {
+                this.invalidCmd(cmd, socket);
+                return;
+              }
+              result = await this.tracManager.tapProtocol.getPrivilegeAuthCancelled(
+                  cmd.args[0]
               );
               break;
             case "dmtElementsList":

@@ -2679,6 +2679,34 @@ export default class RestModule {
         }
       );
 
+      fastify.get(
+          "/getPrivilegeAuthCancelled/:inscription_id",
+          {
+            schema: {
+              description:
+                  "Check if a given privilege-auth inscription has been cancelled",
+              tags: ["Privilege Authority"],
+              params: {
+                type: "object",
+                required: ["inscription_id"],
+                properties: {
+                  inscription_id: { type: "string" },
+                },
+              },
+            },
+          },
+          async (request, reply) => {
+            try {
+              const result = await this.tracManager.tapProtocol.getPrivilegeAuthCancelled(
+                  request.params.inscription_id
+              );
+              reply.send({ result });
+            } catch (e) {
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
+      );
+
       // getAuthHashExists
       fastify.get(
         "/getAuthHashExists/:hash",
@@ -2722,6 +2750,34 @@ export default class RestModule {
             reply.status(500).send({ error: "Internal Server Error" });
           }
         }
+      );
+
+      fastify.get(
+          "/getPrivilegeAuthHashExists/:hash",
+          {
+            schema: {
+              description:
+                  "Check if a given hash exists in the privilege-auth system",
+              tags: ["Privilege Authority"],
+              params: {
+                type: "object",
+                required: ["hash"],
+                properties: {
+                  hash: { type: "string" },
+                },
+              },
+            },
+          },
+          async (request, reply) => {
+            try {
+              const result = await this.tracManager.tapProtocol.getPrivilegeAuthHashExists(
+                  request.params.hash
+              );
+              reply.send({ result });
+            } catch (e) {
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
       );
 
       // getRedeemListLength
@@ -2921,7 +2977,7 @@ export default class RestModule {
         {
           schema: {
             description:
-              "Get the total number of auth records for a specific address",
+              "Get the total number of token auth records for a specific address",
             tags: ["Token Authority"],
             params: {
               type: "object",
@@ -2961,13 +3017,58 @@ export default class RestModule {
         }
       );
 
+      fastify.get(
+          "/getAccountPrivilegeAuthListLength/:address",
+          {
+            schema: {
+              description:
+                  "Get the total number of privilege auth records for a specific address",
+              tags: ["Privilege Authority"],
+              params: {
+                type: "object",
+                required: ["address"],
+                properties: {
+                  address: { type: "string" },
+                },
+              },
+              response: {
+                200: {
+                  description: "Successful response",
+                  type: "object",
+                  properties: {
+                    result: { type: "number" },
+                  },
+                },
+                500: {
+                  description: "Internal server error",
+                  type: "object",
+                  properties: {
+                    error: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+          async (request, reply) => {
+            try {
+              const result =
+                  await this.tracManager.tapProtocol.getAccountPrivilegeAuthListLength(
+                      request.params.address
+                  );
+              reply.send({ result });
+            } catch (e) {
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
+      );
+
       // getAccountAuthList
       fastify.get(
         "/getAccountAuthList/:address",
         {
           schema: {
             description:
-              "Retrieve a list of auth records for a specific address",
+              "Retrieve a list of token auth records for a specific address",
             tags: ["Token Authority"],
             params: {
               type: "object",
@@ -3020,13 +3121,52 @@ export default class RestModule {
         }
       );
 
+      fastify.get(
+          "/getAccountPrivilegeAuthList/:address",
+          {
+            schema: {
+              description:
+                  "Retrieve a list of privilege auth records for a specific address",
+              tags: ["Privilege Authority"],
+              params: {
+                type: "object",
+                required: ["address"],
+                properties: {
+                  address: { type: "string" },
+                },
+              },
+              querystring: {
+                type: "object",
+                properties: {
+                  offset: { type: "integer", default: 0 },
+                  max: { type: "integer", default: 500 },
+                },
+              },
+            },
+          },
+          async (request, reply) => {
+            let { offset, max } = request.query;
+            try {
+              const result =
+                  await this.tracManager.tapProtocol.getAccountPrivilegeAuthList(
+                      request.params.address,
+                      offset,
+                      max
+                  );
+              reply.send({ result });
+            } catch (e) {
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
+      );
+
       // getAuthListLength
       fastify.get(
         "/getAuthListLength",
         {
           schema: {
             description:
-              "Get the total number of auth records across all addresses",
+              "Get the total number of token auth records across all addresses",
             tags: ["Token Authority"],
             response: {
               200: {
@@ -3055,6 +3195,42 @@ export default class RestModule {
             reply.status(500).send({ error: "Internal Server Error" });
           }
         }
+      );
+
+      fastify.get(
+          "/getPrivilegeAuthListLength",
+          {
+            schema: {
+              description:
+                  "Get the total number of privilege auth records across all addresses",
+              tags: ["Privilege Authority"],
+              response: {
+                200: {
+                  description: "Successful response",
+                  type: "object",
+                  properties: {
+                    result: { type: "number" },
+                  },
+                },
+                500: {
+                  description: "Internal server error",
+                  type: "object",
+                  properties: {
+                    error: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+          async (request, reply) => {
+            try {
+              const result =
+                  await this.tracManager.tapProtocol.getPrivilegeAuthListLength();
+              reply.send({ result });
+            } catch (e) {
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
       );
 
       // getAuthList
@@ -3105,6 +3281,202 @@ export default class RestModule {
             reply.status(500).send({ error: "Internal Server Error" });
           }
         }
+      );
+
+      fastify.get(
+          "/getPrivilegeAuthList",
+          {
+            schema: {
+              description:
+                  "Retrieve a list of all privilege auth records across all addresses",
+              tags: ["Privilege Authority"],
+              querystring: {
+                type: "object",
+                properties: {
+                  offset: { type: "integer", default: 0 },
+                  max: { type: "integer", default: 500 },
+                },
+              },
+            },
+          },
+          async (request, reply) => {
+            let { offset, max } = request.query;
+            try {
+              const result = await this.tracManager.tapProtocol.getPrivilegeAuthList(
+                  offset,
+                  max
+              );
+              reply.send({ result });
+            } catch (e) {
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
+      );
+
+      fastify.get(
+          "/getPrivilegeAuthIsVerified/:privilege_inscription_id/:collection_name/:verified_hash/:sequence",
+          {
+            schema: {
+              description: "Check if a signature has been verified by an authority",
+              tags: ["Privilege Authority: Verified"],
+              params: {
+                type: "object",
+                required: ["privilege_inscription_id", "collection_name", "verified_hash", "sequence"],
+                properties: {
+                  privilege_inscription_id: { type: "string" },
+                  collection_name: { type: "string" },
+                  verified_hash: { type: "string" },
+                  sequence: { type: "integer" },
+                },
+              },
+            },
+          },
+          async (request, reply) => {
+            try {
+              const result = await this.tracManager.tapProtocol.getPrivilegeAuthIsVerified(
+                  request.params.privilege_inscription_id,
+                  request.params.collection_name,
+                  request.params.verified_hash,
+                  request.params.sequence
+              );
+              reply.send({ result });
+            } catch (e) {
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
+      );
+
+      fastify.get(
+          "/getPrivilegeAuthorityListLength/:privilege_inscription_id",
+          {
+            schema: {
+              description: "Returns the amount of verified signatures of a privilege authority.",
+              tags: ["Privilege Authority: Verified"],
+              params: {
+                type: "object",
+                required: ["privilege_inscription_id"],
+                properties: {
+                  privilege_inscription_id: { type: "string" },
+                },
+              },
+            },
+          },
+          async (request, reply) => {
+            try {
+              const result = await this.tracManager.tapProtocol.getPrivilegeAuthorityListLength(request.params.privilege_inscription_id);
+              reply.send({ result });
+            } catch (e) {
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
+      );
+
+      fastify.get(
+          "/getPrivilegeAuthorityList/:privilege_inscription_id",
+          {
+            schema: {
+              description: "Returns the verified items of a privilege authority.",
+              tags: ["Privilege Authority: Verified"],
+              params: {
+                type: "object",
+                required: ["privilege_inscription_id"],
+                properties: {
+                  privilege_inscription_id: { type: "string" },
+                },
+              },
+              querystring: {
+                type: "object",
+                properties: {
+                  offset: { type: "integer", default: 0 },
+                  max: { type: "integer", default: 500 },
+                },
+              },
+            },
+          },
+          async (request, reply) => {
+            try {
+              let { offset, max } = request.query;
+              offset = offset ? offset : 0;
+              max = max ? max : 500;
+              const result = await this.tracManager.tapProtocol.getPrivilegeAuthorityList(
+                  request.params.privilege_inscription_id,
+                  offset,
+                  max
+              );
+              reply.send({ result });
+            } catch (e) {
+              console.error(e);
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
+      );
+
+      fastify.get(
+          "/getPrivilegeAuthorityCollectionListLength/:privilege_inscription_id/:collection_name",
+          {
+            schema: {
+              description: "Returns the amount of verified signatures in a collection of a privilege authority.",
+              tags: ["Privilege Authority: Verified"],
+              params: {
+                type: "object",
+                required: ["privilege_inscription_id", "collection_name"],
+                properties: {
+                  privilege_inscription_id: { type: "string" },
+                  collection_name: { type: "string" },
+                },
+              },
+            },
+          },
+          async (request, reply) => {
+            try {
+              const result = await this.tracManager.tapProtocol.getPrivilegeAuthorityCollectionListLength(request.params.privilege_inscription_id, request.params.collection_name);
+              reply.send({ result });
+            } catch (e) {
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
+      );
+
+      fastify.get(
+          "/getPrivilegeAuthorityCollectionList/:privilege_inscription_id/:collection_name",
+          {
+            schema: {
+              description: "Returns the verified items of verified signatures in a collection of a privilege authority.",
+              tags: ["Privilege Authority: Verified"],
+              params: {
+                type: "object",
+                required: ["privilege_inscription_id", "collection_name"],
+                properties: {
+                  privilege_inscription_id: { type: "string" },
+                  collection_name: { type: "string" },
+                },
+              },
+              querystring: {
+                type: "object",
+                properties: {
+                  offset: { type: "integer", default: 0 },
+                  max: { type: "integer", default: 500 },
+                },
+              },
+            },
+          },
+          async (request, reply) => {
+            try {
+              let { offset, max } = request.query;
+              offset = offset ? offset : 0;
+              max = max ? max : 500;
+              const result = await this.tracManager.tapProtocol.getPrivilegeAuthorityCollectionList(
+                  request.params.privilege_inscription_id,
+                  request.params.collection_name,
+                  offset,
+                  max
+              );
+              reply.send({ result });
+            } catch (e) {
+              console.error(e);
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
       );
 
       fastify.get(
