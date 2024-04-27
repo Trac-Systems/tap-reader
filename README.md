@@ -110,12 +110,12 @@ Just swap out the given domain in that endpoint example above with your websocke
     "enableWebsockets": false,
     "websocketPort": 5095,
     "websocketCORS": "*",
-    "channel": "4600e05f4b315ea2ac832aa893aed4872ca0d5e40cf35e22592de55efa460edd",
+    "channel": "c7f8d0b1ed711d870fab135639981a4489509498f5308912c1b1505990c95e2d",
     "enableBlockDownloader": false
 }
 ```
 
-> Distributed Data Channel "4600e05f4b315ea2ac832aa893aed4872ca0d5e40cf35e22592de55efa460edd" is the currently active one for TAP Protocol.  
+> Distributed Data Channel "c7f8d0b1ed711d870fab135639981a4489509498f5308912c1b1505990c95e2d" is the currently active live channel for TAP Protocol.  
 
 ## Trac Core Manager API
 
