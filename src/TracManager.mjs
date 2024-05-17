@@ -163,6 +163,7 @@ export default class TracManager {
       if(this.blocked_connections.includes(connection.rawStream.id) ||
         this.blocked_peers.includes(connection.remotePublicKey.toString("hex")) ||
           peerInfo.banned){
+        peerInfo.ban(true);
         console.log('Replication denied', connection.remotePublicKey.toString("hex"));
       } else {
         console.log(
