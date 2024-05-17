@@ -43,7 +43,7 @@
     "graceful-goodbye": "^1.2.1",
     "hyperbee": "2.15.0",
     "hypercore": "10.32.8",
-    "hyperdht": "^6.11.6",
+    "hyperdht": "^6.14.0",
     "hyperdrive": "11.6.3",
     "hyperswarm": "4.7.14",
     "localdrive": "1.11.4",

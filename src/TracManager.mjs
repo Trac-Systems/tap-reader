@@ -1,6 +1,7 @@
 import Corestore from "corestore";
 import Hyperswarm from "hyperswarm";
 import Hyperbee from "hyperbee";
+import HyperDHT from "hyperdht";
 import goodbye from "graceful-goodbye";
 import config from "config";
 import figlet from "figlet";
@@ -29,11 +30,18 @@ export default class TracManager {
    */
   restServer;
   constructor() {
+    const dht = new HyperDHT({
+      // Optionally overwrite the default bootstrap servers, just need to be an array of any known dht node(s)
+      // Defaults to ['node1.hyperdht.org:49737', 'node2.hyperdht.org:49737', 'node3.hyperdht.org:49737']
+      bootstrap: ['116.202.214.143:10001','116.202.214.149:10001','node1.hyperdht.org:49737', 'node2.hyperdht.org:49737', 'node3.hyperdht.org:49737']
+    });
     this.isConnected = false;
     this.store = new Corestore("./tapstore");
-    this.swarm = new Hyperswarm();
+    this.swarm = new Hyperswarm({maxPeers : 256, maxParallel: 128, dht : dht});
     this.bee = null;
     this.tapProtocol = new TapProtocol(this);
+    this.blocked_connections = [];
+    this.blocked_peers = [];
 
     goodbye(() => {
       this.swarm.destroy();
@@ -58,8 +66,6 @@ export default class TracManager {
     // Initialize Corestore and Hyperswarm
     console.log(figlet.textSync("Trac Core Reader"));
     console.log("Protocol: Ordinals/TAP");
-
-    this.banlist = {};
 
     this.core = this.store.get({
       key: process.argv[2]
@@ -112,12 +118,31 @@ export default class TracManager {
    */
   async initHyperswarm(server, client) {
     this.swarm.on("connection", (connection, peerInfo) => {
-      this.isConnected = true;
 
-      console.log(
-          "Connected to peer:",
-          connection.remotePublicKey.toString("hex")
-      );
+      for(let key in this.core.peers){
+        let peer = this.core.replicator.peers[key];
+
+        if(this.core.length !== 0 &&
+            peer.remoteLength !== 0 &&
+            peer.length !== 0 &&
+            peer.remoteLength !== this.core.length &&
+            !this.blocked_peers.includes(peer.remotePublicKey.toString("hex"))){
+          let ban_peer = this.swarm._upsertPeer(peer.remotePublicKey, null)
+          ban_peer.ban(true);
+          this.swarm.leavePeer(peer.remotePublicKey);
+          this.swarm.explicitPeers.delete(ban_peer);
+          this.swarm.peers.delete(peer.remotePublicKey.toString("hex"));
+          if(!this.blocked_connections.includes(peer.stream.rawStream.id)){
+            this.blocked_connections.push(peer.stream.rawStream.id);
+          }
+          if(!this.blocked_peers.includes(peer.remotePublicKey.toString("hex"))){
+            this.blocked_peers.push(peer.remotePublicKey.toString("hex"));
+          }
+          peer.channel._close(true);
+          this.swarm.connections.delete(peer.stream);
+          this.swarm._allConnections.delete(peer.stream);
+        }
+      }
 
       connection.on("close", () =>
           console.log(
@@ -127,16 +152,25 @@ export default class TracManager {
       );
 
       connection.on("error", function(error) {
-
-          console.log(
-              "Connection error with peer:",
-              connection.remotePublicKey.toString("hex"),
-              error
-          )
-        }
+            console.log(
+                "Connection error with peer:",
+                connection.remotePublicKey.toString("hex"),
+                error
+            )
+          }
       );
 
-      this.core.replicate(connection);
+      if(this.blocked_connections.includes(connection.rawStream.id) ||
+        this.blocked_peers.includes(connection.remotePublicKey.toString("hex")) ||
+          peerInfo.banned){
+        console.log('Replication denied', connection.remotePublicKey.toString("hex"));
+      } else {
+        console.log(
+            "Connected to peer:",
+            connection.remotePublicKey.toString("hex")
+        );
+        this.core.replicate(connection);
+      }
     });
 
     const discovery = this.swarm.join(this.core.discoveryKey, {
