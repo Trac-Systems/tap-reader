@@ -5,7 +5,7 @@ export default class BlockDownloader {
       this.downloadedBlocks = [];
       this.totalBlocks;
       this.progress = 0;
-      this.chunkSize = 1_000;
+      this.chunkSize = 100;
     }
     setIsRunning(flag) {
       this.isRunning = flag;
@@ -37,7 +37,7 @@ export default class BlockDownloader {
           this.progress = (totalDownloadedSize / this.totalBlocks) * 100;
           console.log(`Progress: ${this.progress}%`);
   
-          await this.sleep(1000);
+          await this.sleep(10);
         }
       }
     }
