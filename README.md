@@ -119,6 +119,8 @@ Just swap out the given domain in that endpoint example above with your websocke
 
 > Distributed TESTNET Data Channel "f505c35965a89d62cb4144f9523fc4ede43186c7c37a66b77388eaede210e051" is the currently active TEST channel for TAP Protocol.
 
+> Distributed SIGNET Data Channel "3665c09b9e6c173ba0302bee91ad036981d66a6dd9b51d83bc443c8ec2a6efd8" is the currently active TEST channel for TAP Protocol.
+
 ## Trac Core Manager API
 
 <dl>
