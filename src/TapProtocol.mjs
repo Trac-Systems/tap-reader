@@ -1270,7 +1270,7 @@ export default class TapProtocol {
     }
 
     for (let i = 0; i < records.length; i++) {
-      out.push(records[i]);
+      out.push(records[i].toLowerCase());
     }
 
     return out;
