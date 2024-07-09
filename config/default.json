@@ -6,6 +6,11 @@
         "maxAge": 1,
         "public": false
     },
+    "enableRestSSL" : false,
+    "sslCert" : {
+        "cert" : "/path/to/fastify.crt",
+        "key" : "/path/to/fastify.key"
+    },
     "restHeaders": [
         { "name": "X-Powered-By", "value": "TracCore" },
         { "name": "Access-Control-Allow-Origin", "value": "*" }

@@ -3,6 +3,12 @@ import Fastify from "fastify";
 import TracManager from "./TracManager.mjs";
 import swagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
+import * as path from 'path';
+import * as fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default class RestModule {
   /**
@@ -15,7 +21,29 @@ export default class RestModule {
   fastify;
   constructor(tracManager) {
     this.tracManager = tracManager;
-    this.fastify = Fastify({ logger: false });
+
+    if(config.get("enableRestSSL"))
+    {
+
+      const cert = config.get("sslCert");
+
+      this.fastify = Fastify(
+          {
+            logger: false,
+            https: {
+              allowHTTP1: true,
+              key: fs.readFileSync(cert.key),
+              cert: fs.readFileSync(cert.cert),
+            },
+          });
+    }
+    else
+    {
+      this.fastify = Fastify(
+          {
+            logger: false
+          });
+    }
 
     if(config.get("enableRestApiDocs")) {
 
