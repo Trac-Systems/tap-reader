@@ -5027,7 +5027,7 @@ export default class RestModule {
   async start() {
     try {
       const port = config.get("restPort") || 3000; // Defaulting to 3000 if not configured
-      await this.fastify.listen({ host: '0.0.0.0', port });
+      await this.fastify.listen({ host: config.get("host"), port });
       // this.fastify.swagger();
       console.log(`REST server listening on port ${port}`);
     } catch (err) {

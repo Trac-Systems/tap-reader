@@ -8,8 +8,8 @@
     },
     "enableRestSSL" : false,
     "sslCert" : {
-        "cert" : "/path/to/fastify.crt",
-        "key" : "/path/to/fastify.key"
+        "cert" : "/path/to/cert.crt",
+        "key" : "/path/to/cert.key"
     },
     "restHeaders": [
         { "name": "X-Powered-By", "value": "TracCore" },
@@ -19,5 +19,6 @@
     "websocketPort": 5095,
     "websocketCORS": "*",
     "channel": "c7f8d0b1ed711d870fab135639981a4489509498f5308912c1b1505990c95e2d",
-    "enableBlockDownloader": false
+    "enableBlockDownloader": false,
+    "host" : "0.0.0.0"
 }
