@@ -42,6 +42,7 @@ export default class TracManager {
     this.tapProtocol = new TapProtocol(this);
     this.blocked_connections = [];
     this.blocked_peers = [];
+    this.peerCount = 1;
 
     goodbye(() => {
       this.swarm.destroy();
@@ -119,36 +120,24 @@ export default class TracManager {
   async initHyperswarm(server, client) {
     this.swarm.on("connection", (connection, peerInfo) => {
 
-      for(let key in this.core.peers){
-        let peer = this.core.replicator.peers[key];
+      const _this = this;
+      _this.peerCount += 1;
 
-        if(this.core.length !== 0 &&
-            peer.remoteLength !== 0 &&
-            peer.length !== 0 &&
-            peer.remoteLength !== this.core.length &&
-            !this.blocked_peers.includes(peer.remotePublicKey.toString("hex"))){
-          let ban_peer = this.swarm._upsertPeer(peer.remotePublicKey, null)
-          ban_peer.ban(true);
-          this.swarm.leavePeer(peer.remotePublicKey);
-          this.swarm.explicitPeers.delete(ban_peer);
-          this.swarm.peers.delete(peer.remotePublicKey.toString("hex"));
-          if(!this.blocked_connections.includes(peer.stream.rawStream.id)){
-            this.blocked_connections.push(peer.stream.rawStream.id);
-          }
-          if(!this.blocked_peers.includes(peer.remotePublicKey.toString("hex"))){
-            this.blocked_peers.push(peer.remotePublicKey.toString("hex"));
-          }
-          peer.channel._close(true);
-          this.swarm.connections.delete(peer.stream);
-          this.swarm._allConnections.delete(peer.stream);
-        }
+      if (_this.peerCount >= 25) {
+        _this.peerCount = 1;
       }
 
-      connection.on("close", () =>
-          console.log(
-              "Connection closed with peer:",
-              connection.remotePublicKey.toString("hex")
-          )
+      connection.on("close", function() {
+            if (_this.peerCount < 1) {
+              _this.peerCount = 1;
+            } else {
+              _this.peerCount += 1;
+            }
+            console.log(
+                "Connection closed with peer:",
+                connection.remotePublicKey.toString("hex")
+            )
+          }
       );
 
       connection.on("error", function(error) {
@@ -160,18 +149,47 @@ export default class TracManager {
           }
       );
 
-      if(this.blocked_connections.includes(connection.rawStream.id) ||
-        this.blocked_peers.includes(connection.remotePublicKey.toString("hex")) ||
-          peerInfo.banned){
-        peerInfo.ban(true);
-        console.log('Replication denied', connection.remotePublicKey.toString("hex"));
-      } else {
-        console.log(
-            "Connected to peer:",
-            connection.remotePublicKey.toString("hex")
-        );
-        this.core.replicate(connection);
-      }
+      setTimeout(function(){
+        for(let key in _this.core.peers){
+          let peer = _this.core.replicator.peers[key];
+
+          if(_this.core.length !== 0 &&
+              peer.remoteLength !== 0 &&
+              peer.length !== 0 &&
+              peer.remoteLength !== _this.core.length &&
+              !_this.blocked_peers.includes(peer.remotePublicKey.toString("hex"))){
+            let ban_peer = _this.swarm._upsertPeer(peer.remotePublicKey, null)
+            ban_peer.ban(true);
+            _this.swarm.leavePeer(peer.remotePublicKey);
+            _this.swarm.explicitPeers.delete(ban_peer);
+            _this.swarm.peers.delete(peer.remotePublicKey.toString("hex"));
+            if(!_this.blocked_connections.includes(peer.stream.rawStream.id)){
+              _this.blocked_connections.push(peer.stream.rawStream.id);
+            }
+            if(!_this.blocked_peers.includes(peer.remotePublicKey.toString("hex"))){
+              _this.blocked_peers.push(peer.remotePublicKey.toString("hex"));
+            }
+            peer.channel._close(true);
+            _this.swarm.connections.delete(peer.stream);
+            _this.swarm._allConnections.delete(peer.stream);
+          }
+        }
+
+        if(_this.blocked_connections.includes(connection.rawStream.id) ||
+            _this.blocked_peers.includes(connection.remotePublicKey.toString("hex")) ||
+            peerInfo.banned){
+          peerInfo.ban(true);
+          console.log('Replication denied', connection.remotePublicKey.toString("hex"));
+        } else {
+          console.log(
+              "Connected to peer:",
+              connection.remotePublicKey.toString("hex")
+          );
+
+          _this.core.replicate(connection);
+        }
+
+      }, _this.peerCount * 2000);
     });
 
     const discovery = this.swarm.join(this.core.discoveryKey, {
