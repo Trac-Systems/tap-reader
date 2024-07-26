@@ -1276,6 +1276,59 @@ export default class TapProtocol {
     return out;
   }
 
+   /**
+   * Retrieves a list of tokens and total balance, transferable of each by an address
+   * @param {string} address - The address for which to retrieve tokens.
+   * @param {number} [offset=0] - The starting index for rich retieving tokens.
+   * @param {number} [max=500] - The maximum number of tokens to retrieve.
+   * @returns {Promise<{ total: number, list:[ ]}>} Have total tokens and an array of token tickers with balance.
+   */
+   async getAccountTokensWithBalance(address, offset = 0, max = 500) {
+    const total = await this.getAccountTokensLength(address);
+    const tokens = await this.getAccountTokens(address, offset, max);
+
+    const list = await Promise.all(
+      tokens.map(async (token) => {
+        const overallBalance = await this.getBalance(address, token);
+        const transferableBalance = await this.getTransferable(address, token);
+        return {
+          ticker: token,
+          overallBalance,
+          transferableBalance,
+        };
+      })
+    );
+    return {
+      total,
+      list,
+    };
+  }
+
+   /**
+   * Retrieve token info , total balance, transferable balance, tokens transfers list (include sent or not) by specific token of an account
+   * @param {string} address - The address for which to retrieve tokens.
+   * @param {string} ticker - The ticker for which to retrieve tokens.
+   * @returns {Promise<{Object}>} Have token info and balance.
+   */
+   async getAccountTokenDetail(address, ticker) {
+    const tokenInfo = await this.getDeployment(ticker);
+    if (!tokenInfo) return;
+    const overallBalance = await this.getBalance(address, ticker);
+    const transferableBalance = await this.getTransferable(address, ticker);
+
+    const transferList = await this.getAccountTransferList(address, ticker);
+    const tokenBalance = {
+      ticker,
+      overallBalance,
+      transferableBalance,
+    };
+    return {
+      tokenInfo,
+      tokenBalance,
+      transferList,
+    };
+  }
+
   /**
    * Gets the total number of DMT elements.
    * @returns {Promise<number>} The total number of DMT elements.

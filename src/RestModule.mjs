@@ -1983,6 +1983,112 @@ export default class RestModule {
       );
 
       fastify.get(
+        "/getAccountTokensBalance/:address",
+        {
+          schema: {
+            description:
+              "Retrieves a list of tokens and total balance, transferable of each by an address",
+            tags: ["Token"],
+            params: {
+              type: "object",
+              required: ["address"],
+              properties: {
+                address: { type: "string" },
+              },
+            },
+            querystring: {
+              type: "object",
+              properties: {
+                offset: { type: "integer", default: 0 },
+                max: { type: "integer", default: 500 },
+              },
+            },
+            response: {
+              200: {
+                description: "Successful response",
+                type: "object",
+                properties: {
+                  data: {
+                    type: "object",
+                    properties: {
+                      total: { type: "integer" },
+                      list: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            ticker: { type: "string" },
+                            overallBalance: { type: "string" },
+                            transferableBalance: { type: "string" },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              500: {
+                description: "Internal server error",
+                type: "object",
+                properties: {
+                  error: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        async (request, reply) => {
+          try {
+            let { offset, max } = request.query;
+            offset = offset ? offset : 0;
+            max = max ? max : 500;
+
+            const result =
+              await this.tracManager.tapProtocol.getAccountTokensWithBalance(
+                request.params.address,
+                offset,
+                max
+              );
+            reply.send({ data: result });
+          } catch (e) {
+            console.error(e);
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+      );
+
+      fastify.get(
+        "/getAccountTokenDetail/:address/:ticker",
+        {
+          schema: {
+            description: "Retrieve token info , total balance, transferable balance, tokens transfers list (include sent or not) by specific token of an account",
+            tags: ["Token"],
+            params: {
+              type: "object",
+              required: ["address", "ticker"],
+              properties: {
+                address: { type: "string" },
+                ticker: { type: "string" },
+              },
+            },
+          },
+        },
+        async (request, reply) => {
+          try {
+            const result =
+              await this.tracManager.tapProtocol.getAccountTokenDetail(
+                request.params.address,
+                request.params.ticker
+              );
+            reply.send({ data: result });
+          } catch (e) {
+            console.error(e);
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+      );
+
+      fastify.get(
         "/getDmtElementsListLength",
         {
           schema: {
