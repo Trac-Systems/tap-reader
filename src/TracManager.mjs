@@ -120,7 +120,7 @@ export default class TracManager {
   async initHyperswarm(server, client) {
     this.swarm.on("connection", (connection, peerInfo) => {
 
-      const _this = this;
+      let _this = this;
       _this.peerCount += 1;
 
       if (_this.peerCount >= 25) {
@@ -133,6 +133,7 @@ export default class TracManager {
             } else {
               _this.peerCount += 1;
             }
+            _this = null;
             console.log(
                 "Connection closed with peer:",
                 connection.remotePublicKey.toString("hex")
@@ -150,6 +151,7 @@ export default class TracManager {
       );
 
       setTimeout(function(){
+        if(_this === null) return;
         for(let key in _this.core.peers){
           let peer = _this.core.replicator.peers[key];
 
