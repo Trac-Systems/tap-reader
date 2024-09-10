@@ -905,7 +905,25 @@ export default class TapProtocol {
    * @param sequence
    * @returns {Promise<boolean>}
    */
-  async getPrivilegeAuthIsVerified(privilege_inscription_id, collection_name, verified_hash, sequence)
+  async getPrivilegeAuthorityVerifiedInscription(privilege_inscription_id, collection_name, verified_hash, sequence)
+  {
+    let verified = await this.tracManager.bee.get('prvins/' + privilege_inscription_id + '/' + JSON.stringify(collection_name) + '/' + verified_hash + '/' + sequence);
+    if (verified !== null) {
+      return verified.value;
+    }
+    return null;
+  }
+
+  async getPrivilegeAuthorityVerifiedByInscription(verified_inscription_id)
+  {
+    let verified = await this.tracManager.bee.get('prvins/' + verified_inscription_id);
+    if (verified !== null) {
+      return verified.value;
+    }
+    return null;
+  }
+
+  async getPrivilegeAuthorityIsVerified(privilege_inscription_id, collection_name, verified_hash, sequence)
   {
     let verified = await this.tracManager.bee.get('prvvrfd/' + privilege_inscription_id + '/' + JSON.stringify(collection_name) + '/' + verified_hash + '/' + sequence);
     if (verified !== null) {
@@ -1008,6 +1026,103 @@ export default class TapProtocol {
     return out;
   }
 
+  async getPrivilegeAuthorityEventByPrivColBlockLength(privilege_authority_inscription_id, collection_name, block) {
+    let col_key = JSON.stringify(collection_name);
+    return this.getLength(
+        "blckpc/pravth/" + privilege_authority_inscription_id + '/' + col_key + '/' + block
+    );
+  }
+
+  async getPrivilegeAuthorityEventByPrivColBlock(privilege_authority_inscription_id, collection_name, block, offset = 0, max = 500) {
+
+    let col_key = JSON.stringify(collection_name);
+    let out = [];
+    let records = await this.getListRecords(
+        "blckpc/pravth/" + privilege_authority_inscription_id + '/' + col_key + '/' + block,
+        "blckpci/pravth/" + privilege_authority_inscription_id + '/' + col_key + '/' + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  async getPrivilegeAuthorityEventByPrivBlockLength(privilege_authority_inscription_id, block) {
+    return this.getLength(
+        "blckp/pravth/" + privilege_authority_inscription_id + '/' + block
+    );
+  }
+
+  async getPrivilegeAuthorityEventByPrivBlock(privilege_authority_inscription_id, block, offset = 0, max = 500) {
+    let out = [];
+    let records = await this.getListRecords(
+        "blckp/pravth/" + privilege_authority_inscription_id + '/' + block,
+        "blckpi/pravth/" + privilege_authority_inscription_id + '/' + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  async getPrivilegeAuthorityEventByBlockLength(block) {
+    return this.getLength(
+        "blck/pravth/" + block
+    );
+  }
+
+  async getPrivilegeAuthorityEventByBlock(block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blck/pravth/" + block,
+        "blcki/pravth/" + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
   /**
    * Returns a history object with element, owner and block data but based on a given ticker and block instead of an inscription id.
    *
@@ -1046,6 +1161,122 @@ export default class TapProtocol {
       return holder;
     }
     return null;
+  }
+
+
+  async getBitmap(bitmap_block)
+  {
+    let bm = await this.tracManager.bee.get('bm/'+bitmap_block);
+    if (bm !== null) {
+      return JSON.parse(bm.value);
+    }
+    return null;
+  }
+
+  async getBitmapByInscription(inscription_id)
+  {
+    let bm = await this.tracManager.bee.get('bmh/'+inscription_id);
+    if (bm !== null) {
+      bm = bm.value;
+      bm = await this.tracManager.bee.get(bm);
+      if(bm !== null)
+      {
+        return JSON.parse(bm.value);
+      }
+    }
+    return null;
+  }
+
+  async getBitmapEventByBlockLength(block) {
+    return this.getLength(
+        "blck/bm/" + block
+    );
+  }
+
+  async getBitmapEventByBlock(block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blck/bm/" + block,
+        "blcki/bm/" + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  async getDmtEventByBlockLength(block) {
+    return this.getLength(
+        "blck/dmt-md/" + block
+    );
+  }
+
+  async getDmtEventByBlock(block, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "blck/dmt-md/" + block,
+        "blcki/dmt-md/" + block,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      let entry = await this.tracManager.bee.get(records[i]);
+      if(entry !== null)
+      {
+        out.push(JSON.parse(entry.value));
+      }
+    }
+
+    return out;
+  }
+
+  async getBitmapWalletHistoricListLength(address) {
+    return this.getLength(
+        "bml/" + address
+    );
+  }
+
+  async getBitmapWalletHistoricList(address, offset = 0, max = 500) {
+
+    let out = [];
+    let records = await this.getListRecords(
+        "bml/" + address,
+        "bmli/" + address,
+        offset,
+        max,
+        false
+    );
+
+    if (!Array.isArray(records)) {
+      return records;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      out.push(records[i]);
+    }
+
+    return out;
   }
 
   /**
@@ -1198,6 +1429,15 @@ export default class TapProtocol {
     }
     return null;
   }
+
+  async getSingleTransferable(inscription_id) {
+    let transferable = await this.tracManager.bee.get('tamt/' + inscription_id);
+    if (transferable !== null) {
+      return transferable.value;
+    }
+    return null;
+  }
+
   /**
    * Gets the total number of holders for a given ticker.
    * @param {string} ticker - The ticker for which to retrieve the number of holders.
@@ -1206,6 +1446,11 @@ export default class TapProtocol {
   async getHoldersLength(ticker) {
     return this.getLength("h/" + JSON.stringify(ticker.toLowerCase()));
   }
+
+  async getHistoricHoldersLength(ticker) {
+    return await this.getHoldersLength(ticker);
+  }
+
   /**
    * Retrieves a list of holders for a specific ticker.
    * @param {string} ticker - The ticker for which to retrieve holders.
@@ -1240,6 +1485,11 @@ export default class TapProtocol {
 
     return out;
   }
+
+  async getHistoricHolders(ticker, offset = 0, max = 500) {
+    return await this.getHolders(ticker, offset, max);
+  }
+
   /**
    * Gets the total number of tokens held by a specific address.
    * @param {string} address - The address for which to retrieve the token count.
@@ -1512,6 +1762,16 @@ export default class TapProtocol {
     }
     return false;
   }
+
+  async getAuthCompactHexExists(hash) {
+    hash = await this.tracManager.bee.get("tah/" + hash.trim().toLowerCase());
+
+    if (hash !== null) {
+      return true;
+    }
+    return false;
+  }
+
   /**
    * Checks if a given hash exists in the privilege-auth system.
    * @param {string} hash - The hash to check for existence.
@@ -1526,6 +1786,16 @@ export default class TapProtocol {
     }
     return false;
   }
+
+  async getPrivilegeAuthCompactHexExists(hash) {
+    hash = await this.tracManager.bee.get("prah/" + hash.trim().toLowerCase());
+
+    if (hash !== null) {
+      return true;
+    }
+    return false;
+  }
+
   /**
    * Gets the total number of redeems across all tokens.
    * @returns {Promise<number>} The total number of redeems.
