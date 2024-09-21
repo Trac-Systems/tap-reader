@@ -96,22 +96,28 @@ Just swap out the given domain in that endpoint example above with your websocke
 
 ```json
 {
-    "enableRest": true,
-    "enableRestApiDocs": true,
-    "restPort": 5099,
-    "restCacheControl": {
-        "maxAge": 3600,
-        "public": false
-    },
-    "restHeaders": [
-        { "name": "X-Powered-By", "value": "TracCore" },
-        { "name": "Access-Control-Allow-Origin", "value": "*" }
-    ],
-    "enableWebsockets": false,
-    "websocketPort": 5095,
-    "websocketCORS": "*",
-    "channel": "53b2c0e70485790d7f086edbbbb8e624a165667bc74b12034d9774c2f3ce503c",
-    "enableBlockDownloader": false
+  "enableRest": true,
+  "enableRestApiDocs": true,
+  "restPort": 5099,
+  "restCacheControl": {
+    "maxAge": 1,
+    "public": false
+  },
+  "enableRestSSL" : false,
+  "sslCert" : {
+    "cert" : "/path/to/cert.crt",
+    "key" : "/path/to/cert.key"
+  },
+  "restHeaders": [
+    { "name": "X-Powered-By", "value": "TracCore" },
+    { "name": "Access-Control-Allow-Origin", "value": "*" }
+  ],
+  "enableWebsockets": false,
+  "websocketPort": 5095,
+  "websocketCORS": "*",
+  "channel": "53b2c0e70485790d7f086edbbbb8e624a165667bc74b12034d9774c2f3ce503c",
+  "enableBlockDownloader": false,
+  "host" : "0.0.0.0"
 }
 ```
 
