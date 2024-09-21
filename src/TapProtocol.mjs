@@ -1490,6 +1490,13 @@ export default class TapProtocol {
     return await this.getHolders(ticker, offset, max);
   }
 
+  async getAccountBlockedTransferables(address) {
+    if(null !== await this.tracManager.bee.get("bltr/" + address)){
+      return true;
+    }
+    return false;
+  }
+
   /**
    * Gets the total number of tokens held by a specific address.
    * @param {string} address - The address for which to retrieve the token count.
@@ -1562,7 +1569,7 @@ export default class TapProtocol {
    */
    async getAccountTokenDetail(address, ticker) {
     const tokenInfo = await this.getDeployment(ticker);
-    if (!tokenInfo) return;
+    if (!tokenInfo) return null;
     const overallBalance = await this.getBalance(address, ticker);
     const transferableBalance = await this.getTransferable(address, ticker);
 

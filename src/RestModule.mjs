@@ -2144,6 +2144,51 @@ export default class RestModule {
       );
 
       fastify.get(
+          "/getAccountBlockedTransferables/:address",
+          {
+            schema: {
+              description:
+                  "Returns true if the given address blocks the creation of transferables.",
+              tags: ["Token"],
+              params: {
+                type: "object",
+                required: ["address"],
+                properties: {
+                  address: { type: "string" },
+                },
+              },
+              response: {
+                200: {
+                  description: "Successful response",
+                  type: "object",
+                  properties: {
+                    result: { type: "boolean" },
+                  },
+                },
+                500: {
+                  description: "Internal server error",
+                  type: "object",
+                  properties: {
+                    error: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+          async (request, reply) => {
+            try {
+              const result =
+                  await this.tracManager.tapProtocol.getAccountBlockedTransferables(
+                      request.params.address
+                  );
+              reply.send({ result });
+            } catch (e) {
+              reply.status(500).send({ error: "Internal Server Error" });
+            }
+          }
+      );
+
+      fastify.get(
         "/getAccountTokensLength/:address",
         {
           schema: {
@@ -2176,18 +2221,12 @@ export default class RestModule {
           },
         },
         async (request, reply) => {
-          // /getAccountTokensLength/gib
           try {
             const result =
               await this.tracManager.tapProtocol.getAccountTokensLength(
                 request.params.address
               );
             reply.send({ result });
-            /*
-                                {
-                                    "result": "0"
-                                }
-                            */
           } catch (e) {
             reply.status(500).send({ error: "Internal Server Error" });
           }
