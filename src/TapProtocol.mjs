@@ -1312,13 +1312,13 @@ export default class TapProtocol {
    *
    * @returns {Promise<number|null>}
    */
-    async getCurrentBlock() {
-      let reorgs = await this.tracManager.bee.get('block');
-      if (reorgs !== null) {
-        return JSON.parse(reorgs.value);
-      }
-      return null;
+  async getCurrentBlock() {
+    let reorgs = await this.tracManager.bee.get('block');
+    if (reorgs !== null) {
+      return JSON.parse(reorgs.value);
     }
+    return null;
+  }
 
   /**
    * Retrieves the transfer amount for a given inscription ID.
@@ -1368,7 +1368,7 @@ export default class TapProtocol {
 
   async getDeployment(ticker) {
     let deployment = await this.tracManager.bee.get(
-      "d/" + JSON.stringify(ticker.toLowerCase())
+        "d/" + JSON.stringify(ticker.toLowerCase())
     );
 
     if (deployment !== null) {
@@ -1385,7 +1385,7 @@ export default class TapProtocol {
 
   async getMintTokensLeft(ticker) {
     let tokens_left = await this.tracManager.bee.get(
-      "dc/" + JSON.stringify(ticker.toLowerCase())
+        "dc/" + JSON.stringify(ticker.toLowerCase())
     );
 
     if (tokens_left !== null) {
@@ -1404,7 +1404,7 @@ export default class TapProtocol {
 
   async getBalance(address, ticker) {
     let balance = await this.tracManager.bee.get(
-      "b/" + address + "/" + JSON.stringify(ticker.toLowerCase())
+        "b/" + address + "/" + JSON.stringify(ticker.toLowerCase())
     );
 
     if (balance !== null) {
@@ -1421,7 +1421,7 @@ export default class TapProtocol {
 
   async getTransferable(address, ticker) {
     let transferable = await this.tracManager.bee.get(
-      "t/" + address + "/" + JSON.stringify(ticker.toLowerCase())
+        "t/" + address + "/" + JSON.stringify(ticker.toLowerCase())
     );
 
     if (transferable !== null) {
@@ -1515,11 +1515,11 @@ export default class TapProtocol {
   async getAccountTokens(address, offset = 0, max = 500) {
     let out = [];
     let records = await this.getListRecords(
-      "atl/" + address,
-      "atli/" + address,
-      offset,
-      max,
-      false
+        "atl/" + address,
+        "atli/" + address,
+        offset,
+        max,
+        false
     );
 
     if (!Array.isArray(records)) {
@@ -1533,27 +1533,27 @@ export default class TapProtocol {
     return out;
   }
 
-   /**
+  /**
    * Retrieves a list of tokens and total balance, transferable of each by an address
    * @param {string} address - The address for which to retrieve tokens.
    * @param {number} [offset=0] - The starting index for rich retieving tokens.
    * @param {number} [max=500] - The maximum number of tokens to retrieve.
    * @returns {Promise<{ total: number, list:[ ]}>} Have total tokens and an array of token tickers with balance.
    */
-   async getAccountTokensWithBalance(address, offset = 0, max = 500) {
+  async getAccountTokensWithBalance(address, offset = 0, max = 500) {
     const total = await this.getAccountTokensLength(address);
     const tokens = await this.getAccountTokens(address, offset, max);
 
     const list = await Promise.all(
-      tokens.map(async (token) => {
-        const overallBalance = await this.getBalance(address, token);
-        const transferableBalance = await this.getTransferable(address, token);
-        return {
-          ticker: token,
-          overallBalance,
-          transferableBalance,
-        };
-      })
+        tokens.map(async (token) => {
+          const overallBalance = await this.getBalance(address, token);
+          const transferableBalance = await this.getTransferable(address, token);
+          return {
+            ticker: token,
+            overallBalance,
+            transferableBalance,
+          };
+        })
     );
     return {
       total,
@@ -1561,13 +1561,13 @@ export default class TapProtocol {
     };
   }
 
-   /**
+  /**
    * Retrieve token info , total balance, transferable balance, tokens transfers list (include sent or not) by specific token of an account
    * @param {string} address - The address for which to retrieve tokens.
    * @param {string} ticker - The ticker for which to retrieve tokens.
    * @returns {Promise<{Object}>} Have token info and balance.
    */
-   async getAccountTokenDetail(address, ticker) {
+  async getAccountTokenDetail(address, ticker) {
     const tokenInfo = await this.getDeployment(ticker);
     if (!tokenInfo) return null;
     const overallBalance = await this.getBalance(address, ticker);
@@ -1603,16 +1603,16 @@ export default class TapProtocol {
   async getDmtElementsList(offset = 0, max = 500) {
     let out = [];
     let records = await this.getListRecords(
-      "dmt-ell",
-      "dmt-elli",
-      offset,
-      max,
-      false
+        "dmt-ell",
+        "dmt-elli",
+        offset,
+        max,
+        false
     );
 
     for (let i = 0; i < records.length; i++) {
       let element = await this.tracManager.bee.get(
-        "dmt-el/" + JSON.stringify(records[i])
+          "dmt-el/" + JSON.stringify(records[i])
       );
       if (element !== null) {
         out.push(JSON.parse(element.value));
@@ -1630,7 +1630,7 @@ export default class TapProtocol {
    */
   async getAccountMintListLength(address, ticker) {
     return this.getLength(
-      "aml/" + address + "/" + JSON.stringify(ticker.toLowerCase())
+        "aml/" + address + "/" + JSON.stringify(ticker.toLowerCase())
     );
   }
   /**
@@ -1643,11 +1643,11 @@ export default class TapProtocol {
     ticker = JSON.stringify(ticker.toLowerCase());
     let out = [];
     let records = await this.getListRecords(
-      "aml/" + address + "/" + ticker,
-      "amli/" + address + "/" + ticker,
-      offset,
-      max,
-      true
+        "aml/" + address + "/" + ticker,
+        "amli/" + address + "/" + ticker,
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -1680,11 +1680,11 @@ export default class TapProtocol {
     ticker = JSON.stringify(ticker.toLowerCase());
     let out = [];
     let records = await this.getListRecords(
-      "fml/" + ticker,
-      "fmli/" + ticker,
-      offset,
-      max,
-      true
+        "fml/" + ticker,
+        "fmli/" + ticker,
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -1747,7 +1747,7 @@ export default class TapProtocol {
    */
   async getAccountTradesListLength(address, ticker) {
     return this.getLength(
-      "atrof/" + address + "/" + JSON.stringify(ticker.toLowerCase())
+        "atrof/" + address + "/" + JSON.stringify(ticker.toLowerCase())
     );
   }
   /**
@@ -1763,11 +1763,11 @@ export default class TapProtocol {
     ticker = JSON.stringify(ticker.toLowerCase());
     let out = [];
     let records = await this.getListRecords(
-      "atrof/" + address + "/" + ticker,
-      "atrofi/" + address + "/" + ticker,
-      offset,
-      max,
-      true
+        "atrof/" + address + "/" + ticker,
+        "atrofi/" + address + "/" + ticker,
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -1903,11 +1903,11 @@ export default class TapProtocol {
   async getAccountRedeemList(address, offset = 0, max = 500) {
     let out = [];
     let records = await this.getListRecords(
-      "tr/" + address,
-      "tri/" + address,
-      offset,
-      max,
-      true
+        "tr/" + address,
+        "tri/" + address,
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -1946,11 +1946,11 @@ export default class TapProtocol {
   async getAccountAuthList(address, offset = 0, max = 500) {
     let out = [];
     let records = await this.getListRecords(
-      "ta/" + address,
-      "tai/" + address,
-      offset,
-      max,
-      true
+        "ta/" + address,
+        "tai/" + address,
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -2063,11 +2063,11 @@ export default class TapProtocol {
     ticker = JSON.stringify(ticker.toLowerCase());
     let out = [];
     let records = await this.getListRecords(
-      "fatrof/" + ticker,
-      "fatrofi/" + ticker,
-      offset,
-      max,
-      true
+        "fatrof/" + ticker,
+        "fatrofi/" + ticker,
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -2096,11 +2096,11 @@ export default class TapProtocol {
   async getTradesList(offset = 0, max = 500) {
     let out = [];
     let records = await this.getListRecords(
-      "sfatrof",
-      "sfatrofi",
-      offset,
-      max,
-      true
+        "sfatrof",
+        "sfatrofi",
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -2121,7 +2121,7 @@ export default class TapProtocol {
    */
   async getAccountTransferListLength(address, ticker) {
     return this.getLength(
-      "atrl/" + address + "/" + JSON.stringify(ticker.toLowerCase())
+        "atrl/" + address + "/" + JSON.stringify(ticker.toLowerCase())
     );
   }
   /**
@@ -2136,11 +2136,11 @@ export default class TapProtocol {
     ticker = JSON.stringify(ticker.toLowerCase());
     let out = [];
     let records = await this.getListRecords(
-      "atrl/" + address + "/" + ticker,
-      "atrli/" + address + "/" + ticker,
-      offset,
-      max,
-      true
+        "atrl/" + address + "/" + ticker,
+        "atrli/" + address + "/" + ticker,
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -2172,11 +2172,11 @@ export default class TapProtocol {
     ticker = JSON.stringify(ticker.toLowerCase());
     let out = [];
     let records = await this.getListRecords(
-      "ftrl/" + ticker,
-      "ftrli/" + ticker,
-      offset,
-      max,
-      true
+        "ftrl/" + ticker,
+        "ftrli/" + ticker,
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -2205,11 +2205,11 @@ export default class TapProtocol {
   async getTransferList(offset = 0, max = 500) {
     let out = [];
     let records = await this.getListRecords(
-      "sftrl",
-      "sftrli",
-      offset,
-      max,
-      true
+        "sftrl",
+        "sftrli",
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -2230,7 +2230,7 @@ export default class TapProtocol {
    */
   async getAccountSentListLength(address, ticker) {
     return this.getLength(
-      "strl/" + address + "/" + JSON.stringify(ticker.toLowerCase())
+        "strl/" + address + "/" + JSON.stringify(ticker.toLowerCase())
     );
   }
   /**
@@ -2245,11 +2245,11 @@ export default class TapProtocol {
     ticker = JSON.stringify(ticker.toLowerCase());
     let out = [];
     let records = await this.getListRecords(
-      "strl/" + address + "/" + ticker,
-      "strli/" + address + "/" + ticker,
-      offset,
-      max,
-      true
+        "strl/" + address + "/" + ticker,
+        "strli/" + address + "/" + ticker,
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -2270,7 +2270,7 @@ export default class TapProtocol {
    */
   async getAccountReceiveTradesFilledListLength(address, ticker) {
     return this.getLength(
-      "rbtrof/" + address + "/" + JSON.stringify(ticker.toLowerCase())
+        "rbtrof/" + address + "/" + JSON.stringify(ticker.toLowerCase())
     );
   }
   /**
@@ -2282,19 +2282,19 @@ export default class TapProtocol {
    * @returns {Promise<Array>} An array of received trades filled records for the specified address and ticker.
    */
   async getAccountReceiveTradesFilledList(
-    address,
-    ticker,
-    offset = 0,
-    max = 500
+      address,
+      ticker,
+      offset = 0,
+      max = 500
   ) {
     ticker = JSON.stringify(ticker.toLowerCase());
     let out = [];
     let records = await this.getListRecords(
-      "rbtrof/" + address + "/" + ticker,
-      "rbtrofi/" + address + "/" + ticker,
-      offset,
-      max,
-      true
+        "rbtrof/" + address + "/" + ticker,
+        "rbtrofi/" + address + "/" + ticker,
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -2315,7 +2315,7 @@ export default class TapProtocol {
    */
   async getAccountTradesFilledListLength(address, ticker) {
     return this.getLength(
-      "btrof/" + address + "/" + JSON.stringify(ticker.toLowerCase())
+        "btrof/" + address + "/" + JSON.stringify(ticker.toLowerCase())
     );
   }
   /**
@@ -2330,11 +2330,11 @@ export default class TapProtocol {
     ticker = JSON.stringify(ticker.toLowerCase());
     let out = [];
     let records = await this.getListRecords(
-      "btrof/" + address + "/" + ticker,
-      "btrofi/" + address + "/" + ticker,
-      offset,
-      max,
-      true
+        "btrof/" + address + "/" + ticker,
+        "btrofi/" + address + "/" + ticker,
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -2366,11 +2366,11 @@ export default class TapProtocol {
     ticker = JSON.stringify(ticker.toLowerCase());
     let out = [];
     let records = await this.getListRecords(
-      "fbtrof/" + ticker,
-      "fbtrofi/" + ticker,
-      offset,
-      max,
-      true
+        "fbtrof/" + ticker,
+        "fbtrofi/" + ticker,
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -2400,11 +2400,11 @@ export default class TapProtocol {
   async getTradesFilledList(offset = 0, max = 500) {
     let out = [];
     let records = await this.getListRecords(
-      "sfbtrof",
-      "sfbtrofi",
-      offset,
-      max,
-      true
+        "sfbtrof",
+        "sfbtrofi",
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -2427,7 +2427,7 @@ export default class TapProtocol {
    */
   async getAccountReceiveListLength(address, ticker) {
     return this.getLength(
-      "rstrl/" + address + "/" + JSON.stringify(ticker.toLowerCase())
+        "rstrl/" + address + "/" + JSON.stringify(ticker.toLowerCase())
     );
   }
   /**
@@ -2443,11 +2443,11 @@ export default class TapProtocol {
     ticker = JSON.stringify(ticker.toLowerCase());
     let out = [];
     let records = await this.getListRecords(
-      "rstrl/" + address + "/" + ticker,
-      "rstrli/" + address + "/" + ticker,
-      offset,
-      max,
-      true
+        "rstrl/" + address + "/" + ticker,
+        "rstrli/" + address + "/" + ticker,
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -2481,11 +2481,11 @@ export default class TapProtocol {
     ticker = JSON.stringify(ticker.toLowerCase());
     let out = [];
     let records = await this.getListRecords(
-      "fstrl/" + ticker,
-      "fstrli/" + ticker,
-      offset,
-      max,
-      true
+        "fstrl/" + ticker,
+        "fstrli/" + ticker,
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -2518,11 +2518,11 @@ export default class TapProtocol {
   async getSentList(offset = 0, max = 500) {
     let out = [];
     let records = await this.getListRecords(
-      "sfstrl",
-      "sfstrli",
-      offset,
-      max,
-      true
+        "sfstrl",
+        "sfstrli",
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -2569,11 +2569,11 @@ export default class TapProtocol {
   async getAccountAccumulatorList(address, offset = 0, max = 500) {
     let out = [];
     let records = await this.getListRecords(
-      "ali/" + address,
-      "ali/" + address,
-      offset,
-      max,
-      true
+        "ali/" + address,
+        "ali/" + address,
+        offset,
+        max,
+        true
     );
 
     if (!Array.isArray(records)) {
@@ -2671,7 +2671,6 @@ export default class TapProtocol {
           entry = entry.value;
         }
         out.push(entry);
-        await this.sleep(1);
       } else {
         break;
       }

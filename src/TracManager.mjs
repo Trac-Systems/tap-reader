@@ -37,12 +37,14 @@ export default class TracManager {
     });
     this.isConnected = false;
     this.store = new Corestore("./tapstore");
-    this.swarm = new Hyperswarm({maxPeers : 256, maxParallel: 128, dht : dht});
+    this.swarm = new Hyperswarm({maxPeers : 12, maxParallel: 6, dht : dht});
     this.bee = null;
     this.tapProtocol = new TapProtocol(this);
     this.blocked_connections = [];
     this.blocked_peers = [];
     this.peerCount = 1;
+    this.repCount = 0;
+    this.reps = {};
 
     goodbye(() => {
       this.swarm.destroy();
@@ -128,25 +130,36 @@ export default class TracManager {
       }
 
       connection.on("close", function() {
+
             if (_this.peerCount < 1) {
               _this.peerCount = 1;
             } else {
               _this.peerCount += 1;
             }
+
+            if (_this.repCount < 0) {
+              _this.repCount = 0;
+            } else if(_this.reps[connection.remotePublicKey.toString("hex")]) {
+              _this.repCount -= 1;
+              delete _this.reps[connection.remotePublicKey.toString("hex")];
+              console.log(
+                  "Connection closed with replicating peer:",
+                  connection.remotePublicKey.toString("hex")
+              )
+            }
+
             _this = null;
-            console.log(
-                "Connection closed with peer:",
-                connection.remotePublicKey.toString("hex")
-            )
           }
       );
 
       connection.on("error", function(error) {
-            console.log(
-                "Connection error with peer:",
-                connection.remotePublicKey.toString("hex"),
-                error
-            )
+            if (_this.reps[connection.remotePublicKey.toString("hex")]) {
+              console.log(
+                  "Connection error with replicating peer:",
+                  connection.remotePublicKey.toString("hex"),
+                  error
+              )
+            }
           }
       );
 
@@ -188,7 +201,12 @@ export default class TracManager {
               connection.remotePublicKey.toString("hex")
           );
 
-          _this.core.replicate(connection);
+          if(_this.repCount <= 12)
+          {
+            _this.core.replicate(connection);
+            _this.reps[connection.remotePublicKey.toString("hex")] = true;
+            _this.repCount += 1;
+          }
         }
 
       }, _this.peerCount * 2000);
