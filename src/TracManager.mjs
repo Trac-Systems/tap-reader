@@ -201,7 +201,7 @@ export default class TracManager {
               connection.remotePublicKey.toString("hex")
           );
 
-          if(_this.repCount <= 12)
+          if(_this.repCount < 12)
           {
             _this.core.replicate(connection);
             _this.reps[connection.remotePublicKey.toString("hex")] = true;
