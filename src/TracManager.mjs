@@ -196,16 +196,15 @@ export default class TracManager {
           peerInfo.ban(true);
           console.log('Replication denied', connection.remotePublicKey.toString("hex"));
         } else {
-          console.log(
-              "Connected to peer:",
-              connection.remotePublicKey.toString("hex")
-          );
-
           if(_this.repCount < 12)
           {
             _this.core.replicate(connection);
             _this.reps[connection.remotePublicKey.toString("hex")] = true;
             _this.repCount += 1;
+            console.log(
+                "Connected to peer:",
+                connection.remotePublicKey.toString("hex")
+            );
           }
         }
 
