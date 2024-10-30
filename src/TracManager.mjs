@@ -37,7 +37,7 @@ export default class TracManager {
     });
     this.isConnected = false;
     this.store = new Corestore("./tapstore");
-    this.swarm = new Hyperswarm({maxPeers : 12, maxParallel: 6, dht : dht});
+    this.swarm = new Hyperswarm({maxPeers : 1024, maxParallel: 512, maxServerConnections : 256, dht : dht});
     this.bee = null;
     this.tapProtocol = new TapProtocol(this);
     this.blocked_connections = [];
@@ -163,7 +163,7 @@ export default class TracManager {
           }
       );
 
-      setTimeout(function(){
+      setTimeout(async function(){
         if(_this === null) return;
         for(let key in _this.core.peers){
           let peer = _this.core.replicator.peers[key];
@@ -175,7 +175,7 @@ export default class TracManager {
               !_this.blocked_peers.includes(peer.remotePublicKey.toString("hex"))){
             let ban_peer = _this.swarm._upsertPeer(peer.remotePublicKey, null)
             ban_peer.ban(true);
-            _this.swarm.leavePeer(peer.remotePublicKey);
+            _this.swarm._allConnections.delete(peer.stream);
             _this.swarm.explicitPeers.delete(ban_peer);
             _this.swarm.peers.delete(peer.remotePublicKey.toString("hex"));
             if(!_this.blocked_connections.includes(peer.stream.rawStream.id)){
@@ -186,7 +186,7 @@ export default class TracManager {
             }
             peer.channel._close(true);
             _this.swarm.connections.delete(peer.stream);
-            _this.swarm._allConnections.delete(peer.stream);
+            _this.swarm.leavePeer(peer.remotePublicKey);
           }
         }
 
@@ -196,6 +196,7 @@ export default class TracManager {
           peerInfo.ban(true);
           console.log('Replication denied', connection.remotePublicKey.toString("hex"));
         } else {
+
           if(_this.repCount < 12)
           {
             _this.core.replicate(connection);

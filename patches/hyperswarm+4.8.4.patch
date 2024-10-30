@@ -1,0 +1,16 @@
+diff --git a/node_modules/hyperswarm/index.js b/node_modules/hyperswarm/index.js
+index cbe2250..555417b 100644
+--- a/node_modules/hyperswarm/index.js
++++ b/node_modules/hyperswarm/index.js
+@@ -306,7 +306,10 @@ module.exports = class Hyperswarm extends EventEmitter {
+       const keepNew = existingIsOutdated || (expectedInitiator === conn.isInitiator)
+ 
+       if (keepNew === false) {
+-        existing.sendKeepAlive()
++        if(typeof existing.sendKeepAlive == 'function')
++        {
++          existing.sendKeepAlive()
++        }
+         conn.on('error', noop)
+         conn.destroy(new Error(ERR_DUPLICATE))
+         return
