@@ -121,6 +121,7 @@ export default class TracManager {
           connection.remotePublicKey.toString("hex")
       );
 
+
       this.core.replicate(connection);
     });
 
