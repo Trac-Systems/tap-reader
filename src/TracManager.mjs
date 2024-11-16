@@ -35,16 +35,10 @@ export default class TracManager {
       // Defaults to ['node1.hyperdht.org:49737', 'node2.hyperdht.org:49737', 'node3.hyperdht.org:49737']
       bootstrap: ['116.202.214.143:10001','116.202.214.149:10001','node1.hyperdht.org:49737', 'node2.hyperdht.org:49737', 'node3.hyperdht.org:49737']
     });
-    this.isConnected = false;
     this.store = new Corestore("./tapstore");
     this.swarm = new Hyperswarm({maxPeers : 1024, maxParallel: 512, maxServerConnections : 256, dht : dht});
     this.bee = null;
     this.tapProtocol = new TapProtocol(this);
-    this.blocked_connections = [];
-    this.blocked_peers = [];
-    this.peerCount = 1;
-    this.repCount = 0;
-    this.reps = {};
 
     goodbye(() => {
       this.swarm.destroy();
@@ -122,90 +116,12 @@ export default class TracManager {
   async initHyperswarm(server, client) {
     this.swarm.on("connection", (connection, peerInfo) => {
 
-      let _this = this;
-      _this.peerCount += 1;
-
-      if (_this.peerCount >= 25) {
-        _this.peerCount = 1;
-      }
-
-      connection.on("close", function() {
-
-            if (_this.peerCount < 1) {
-              _this.peerCount = 1;
-            } else {
-              _this.peerCount += 1;
-            }
-
-            if (_this.repCount < 0) {
-              _this.repCount = 0;
-            } else if(_this.reps[connection.remotePublicKey.toString("hex")]) {
-              _this.repCount -= 1;
-              delete _this.reps[connection.remotePublicKey.toString("hex")];
-              console.log(
-                  "Connection closed with replicating peer:",
-                  connection.remotePublicKey.toString("hex")
-              )
-            }
-
-            _this = null;
-          }
+      console.log(
+          "Connected to peer:",
+          connection.remotePublicKey.toString("hex")
       );
 
-      connection.on("error", function(error) {
-            if (_this.reps[connection.remotePublicKey.toString("hex")]) {
-              console.log(
-                  "Connection error with replicating peer:",
-                  connection.remotePublicKey.toString("hex"),
-                  error
-              )
-            }
-          }
-      );
-
-      setTimeout(async function(){
-        if(_this === null) return;
-        for(let key in _this.core.peers){
-          let peer = _this.core.replicator.peers[key];
-
-          if(_this.core.length !== 0 &&
-              peer.remoteLength !== 0 &&
-              peer.length !== 0 &&
-              peer.remoteLength !== _this.core.length &&
-              !_this.blocked_peers.includes(peer.remotePublicKey.toString("hex"))){
-            let ban_peer = _this.swarm._upsertPeer(peer.remotePublicKey, null)
-            ban_peer.ban(true);
-            _this.swarm._allConnections.delete(peer.stream);
-            _this.swarm.explicitPeers.delete(ban_peer);
-            _this.swarm.peers.delete(peer.remotePublicKey.toString("hex"));
-            if(!_this.blocked_connections.includes(peer.stream.rawStream.id)){
-              _this.blocked_connections.push(peer.stream.rawStream.id);
-            }
-            if(!_this.blocked_peers.includes(peer.remotePublicKey.toString("hex"))){
-              _this.blocked_peers.push(peer.remotePublicKey.toString("hex"));
-            }
-            peer.channel._close(true);
-            _this.swarm.connections.delete(peer.stream);
-            _this.swarm.leavePeer(peer.remotePublicKey);
-          }
-        }
-
-        if(_this.blocked_connections.includes(connection.rawStream.id) ||
-            _this.blocked_peers.includes(connection.remotePublicKey.toString("hex")) ||
-            peerInfo.banned){
-          peerInfo.ban(true);
-          console.log('Replication denied', connection.remotePublicKey.toString("hex"));
-        } else {
-          _this.core.replicate(connection);
-          _this.reps[connection.remotePublicKey.toString("hex")] = true;
-          _this.repCount += 1;
-          console.log(
-              "Connected to peer:",
-              connection.remotePublicKey.toString("hex")
-          );
-        }
-
-      }, _this.peerCount * 2000);
+      this.core.replicate(connection);
     });
 
     const discovery = this.swarm.join(this.core.discoveryKey, {
