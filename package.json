@@ -42,12 +42,12 @@
     "figlet": "^1.7.0",
     "graceful-fs": "^4.2.11",
     "graceful-goodbye": "^1.2.1",
-    "hyperbee": "2.20.4",
-    "hypercore": "10.37.25",
-    "hyperdht": "^6.14.0",
-    "hyperdrive": "11.13.0",
+    "hyperbee": "2.20.7",
+    "hypercore": "10.38.1",
+    "hyperdht": "6.20.1",
+    "hyperdrive": "11.13.3",
     "hyperswarm": "4.8.4",
-    "localdrive": "1.12.1",
+    "localdrive": "2.0.0",
     "socket.io": "^4.7.4"
   },
   "devDependencies": {

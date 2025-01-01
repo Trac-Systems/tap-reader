@@ -19,7 +19,10 @@ export default class BlockDownloader {
       while (true) {
 
         if(this.progress >= 95){
-          console.log(`Reached 95% block downloads. Done.`);
+          console.log(`Reached 95% block downloads. Done. Restarting.`);
+          this.progress = 0;
+          this.downloadedBlocks = [];
+          this.startRangeDownload();
           break;
         }
 
