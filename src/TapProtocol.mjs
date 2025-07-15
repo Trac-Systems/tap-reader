@@ -2569,7 +2569,7 @@ export default class TapProtocol {
   async getAccountAccumulatorList(address, offset = 0, max = 500) {
     let out = [];
     let records = await this.getListRecords(
-        "ali/" + address,
+        "al/" + address,
         "ali/" + address,
         offset,
         max,
