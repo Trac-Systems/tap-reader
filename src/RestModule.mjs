@@ -5653,7 +5653,261 @@ export default class RestModule {
         }
       );
 
-      // getListRecords
+	      // token action locks
+	      fastify.get("/getLock/:lock_id", async (request, reply) => {
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getLock(request.params.lock_id) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getLockConsume/:lock_id", async (request, reply) => {
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getLockConsume(request.params.lock_id) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getLockedBalance/:address/:ticker", async (request, reply) => {
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getLockedBalance(request.params.address, request.params.ticker) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getLockListLength", async (_request, reply) => {
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getLockListLength() });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getLockList", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getLockList(offset, max) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getLockConsumeListLength", async (_request, reply) => {
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getLockConsumeListLength() });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getLockConsumeList", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getLockConsumeList(offset, max) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getDelegationCancel/:auth/:nonce", async (request, reply) => {
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getDelegationCancel(request.params.auth, request.params.nonce) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getDelegationCancelListLength", async (_request, reply) => {
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getDelegationCancelListLength() });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getDelegationCancelList", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getDelegationCancelList(offset, max) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getAccountLocksLength/:address", async (request, reply) => {
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getAccountLocksLength(request.params.address) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getAccountLocks/:address", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getAccountLocks(request.params.address, offset, max) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getAccountDelegationCancelListLength/:address", async (request, reply) => {
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getAccountDelegationCancelListLength(request.params.address) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getAccountDelegationCancelList/:address", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getAccountDelegationCancelList(request.params.address, offset, max) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getAuthDelegationCancelListLength/:auth", async (request, reply) => {
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getAuthDelegationCancelListLength(request.params.auth) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getAuthDelegationCancelList/:auth", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getAuthDelegationCancelList(request.params.auth, offset, max) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getTickerLocksLength/:ticker", async (request, reply) => {
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getTickerLocksLength(request.params.ticker) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getTickerLocks/:ticker", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getTickerLocks(request.params.ticker, offset, max) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getLockEventsByBlockLength/:block", async (request, reply) => {
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getLockEventsByBlockLength(request.params.block) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getLockEventsByBlock/:block", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getLockEventsByBlock(request.params.block, offset, max) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getLockConsumeEventsByBlockLength/:block", async (request, reply) => {
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getLockConsumeEventsByBlockLength(request.params.block) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getLockConsumeEventsByBlock/:block", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getLockConsumeEventsByBlock(request.params.block, offset, max) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getDelegationCancelEventsByBlockLength/:block", async (request, reply) => {
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getDelegationCancelEventsByBlockLength(request.params.block) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getDelegationCancelEventsByBlock/:block", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getDelegationCancelEventsByBlock(request.params.block, offset, max) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getLockEventsByTransactionLength/:transaction_hash", async (request, reply) => {
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getLockEventsByTransactionLength(request.params.transaction_hash) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getLockEventsByTransaction/:transaction_hash", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getLockEventsByTransaction(request.params.transaction_hash, offset, max) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getLockConsumeEventsByTransactionLength/:transaction_hash", async (request, reply) => {
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getLockConsumeEventsByTransactionLength(request.params.transaction_hash) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getLockConsumeEventsByTransaction/:transaction_hash", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getLockConsumeEventsByTransaction(request.params.transaction_hash, offset, max) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getDelegationCancelEventsByTransactionLength/:transaction_hash", async (request, reply) => {
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getDelegationCancelEventsByTransactionLength(request.params.transaction_hash) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      fastify.get("/getDelegationCancelEventsByTransaction/:transaction_hash", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try {
+	          reply.send({ result: await this.tracManager.tapProtocol.getDelegationCancelEventsByTransaction(request.params.transaction_hash, offset, max) });
+	        } catch (e) {
+	          reply.status(500).send({ error: "Internal Server Error" });
+	        }
+	      });
+
+	      // getListRecords
       fastify.get(
         "/getListRecords",
         {

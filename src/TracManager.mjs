@@ -74,7 +74,9 @@ export default class TracManager {
     console.log("Channel:", this.core.key.toString("hex"));
 
     await this.core.ready();
-    await this.initHyperswarm(server, client);
+    if (process.env.TAP_READER_DISABLE_SWARM !== "1") {
+      await this.initHyperswarm(server, client);
+    }
 
     this.bee = new Hyperbee(this.core, {
       keyEncoding: "utf-8",

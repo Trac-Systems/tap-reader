@@ -1430,15 +1430,185 @@ export default class TapProtocol {
     return null;
   }
 
-  async getSingleTransferable(inscription_id) {
-    let transferable = await this.tracManager.bee.get('tamt/' + inscription_id);
-    if (transferable !== null) {
-      return transferable.value;
-    }
-    return null;
-  }
+	  async getSingleTransferable(inscription_id) {
+	    let transferable = await this.tracManager.bee.get('tamt/' + inscription_id);
+	    if (transferable !== null) {
+	      return transferable.value;
+	    }
+	    return null;
+	  }
 
-  /**
+	  /// TOKEN ACTION LOCKS
+	  async getLock(lock_id) {
+	    const lock = await this.tracManager.bee.get("l/" + lock_id);
+	    return lock === null ? null : JSON.parse(lock.value);
+	  }
+
+	  async getLockConsume(lock_id) {
+	    const consume = await this.tracManager.bee.get("lc/" + lock_id);
+	    return consume === null ? null : JSON.parse(consume.value);
+	  }
+
+	  async getLockedBalance(address, ticker) {
+	    const locked = await this.tracManager.bee.get(
+	        "ll/" + address + "/" + JSON.stringify(ticker.toLowerCase())
+	    );
+	    return locked === null ? "0" : locked.value;
+	  }
+
+	  async getLockListLength() {
+	    return this.getLength("sl");
+	  }
+
+	  async getLockList(offset = 0, max = 500) {
+	    return this.getListRecords("sl", "sli", offset, max, true);
+	  }
+
+	  async getLockConsumeListLength() {
+	    return this.getLength("slc");
+	  }
+
+	  async getLockConsumeList(offset = 0, max = 500) {
+	    return this.getListRecords("slc", "slci", offset, max, true);
+	  }
+
+	  async getDelegationCancel(auth, nonce) {
+	    const cancel = await this.tracManager.bee.get("tdcr/" + auth + "/" + nonce);
+	    return cancel === null ? null : JSON.parse(cancel.value);
+	  }
+
+	  async getDelegationCancelListLength() {
+	    return this.getLength("sftdc");
+	  }
+
+	  async getDelegationCancelList(offset = 0, max = 500) {
+	    return this.getListRecords("sftdc", "sftdci", offset, max, true);
+	  }
+
+	  async getAccountLocksLength(address) {
+	    return this.getLength("la/" + address);
+	  }
+
+	  async getAccountLocks(address, offset = 0, max = 500) {
+	    return this.getListRecords("la/" + address, "lai/" + address, offset, max, true);
+	  }
+
+	  async getAccountDelegationCancelListLength(address) {
+	    return this.getLength("tdca/" + address);
+	  }
+
+	  async getAccountDelegationCancelList(address, offset = 0, max = 500) {
+	    return this.getListRecords("tdca/" + address, "tdcai/" + address, offset, max, true);
+	  }
+
+	  async getAuthDelegationCancelListLength(auth) {
+	    return this.getLength("tdcath/" + auth);
+	  }
+
+	  async getAuthDelegationCancelList(auth, offset = 0, max = 500) {
+	    return this.getListRecords("tdcath/" + auth, "tdcathi/" + auth, offset, max, true);
+	  }
+
+	  async getTickerLocksLength(ticker) {
+	    return this.getLength("lt/" + JSON.stringify(ticker.toLowerCase()));
+	  }
+
+	  async getTickerLocks(ticker, offset = 0, max = 500) {
+	    const tick = JSON.stringify(ticker.toLowerCase());
+	    return this.getListRecords("lt/" + tick, "lti/" + tick, offset, max, true);
+	  }
+
+	  async getLockEventsByBlockLength(block) {
+	    return this.getLength("blck/lck/" + block);
+	  }
+
+	  async getLockEventsByBlock(block, offset = 0, max = 500) {
+	    const pointers = await this.getListRecords("blck/lck/" + block, "blcki/lck/" + block, offset, max, false);
+	    if (!Array.isArray(pointers)) return pointers;
+	    const out = [];
+	    for (const ptr of pointers) {
+	      const entry = await this.tracManager.bee.get(ptr);
+	      if (entry !== null) out.push(JSON.parse(entry.value));
+	    }
+	    return out;
+	  }
+
+	  async getLockConsumeEventsByBlockLength(block) {
+	    return this.getLength("blck/lckc/" + block);
+	  }
+
+	  async getLockConsumeEventsByBlock(block, offset = 0, max = 500) {
+	    const pointers = await this.getListRecords("blck/lckc/" + block, "blcki/lckc/" + block, offset, max, false);
+	    if (!Array.isArray(pointers)) return pointers;
+	    const out = [];
+	    for (const ptr of pointers) {
+	      const entry = await this.tracManager.bee.get(ptr);
+	      if (entry !== null) out.push(JSON.parse(entry.value));
+	    }
+	    return out;
+	  }
+
+	  async getDelegationCancelEventsByBlockLength(block) {
+	    return this.getLength("blck/tdc/" + block);
+	  }
+
+	  async getDelegationCancelEventsByBlock(block, offset = 0, max = 500) {
+	    const pointers = await this.getListRecords("blck/tdc/" + block, "blcki/tdc/" + block, offset, max, false);
+	    if (!Array.isArray(pointers)) return pointers;
+	    const out = [];
+	    for (const ptr of pointers) {
+	      const entry = await this.tracManager.bee.get(ptr);
+	      if (entry !== null) out.push(JSON.parse(entry.value));
+	    }
+	    return out;
+	  }
+
+	  async getLockEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/lck/" + transaction_hash);
+	  }
+
+	  async getLockEventsByTransaction(transaction_hash, offset = 0, max = 500) {
+	    const pointers = await this.getListRecords("tx/lck/" + transaction_hash, "txi/lck/" + transaction_hash, offset, max, false);
+	    if (!Array.isArray(pointers)) return pointers;
+	    const out = [];
+	    for (const ptr of pointers) {
+	      const entry = await this.tracManager.bee.get(ptr);
+	      if (entry !== null) out.push(JSON.parse(entry.value));
+	    }
+	    return out;
+	  }
+
+	  async getLockConsumeEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/lckc/" + transaction_hash);
+	  }
+
+	  async getLockConsumeEventsByTransaction(transaction_hash, offset = 0, max = 500) {
+	    const pointers = await this.getListRecords("tx/lckc/" + transaction_hash, "txi/lckc/" + transaction_hash, offset, max, false);
+	    if (!Array.isArray(pointers)) return pointers;
+	    const out = [];
+	    for (const ptr of pointers) {
+	      const entry = await this.tracManager.bee.get(ptr);
+	      if (entry !== null) out.push(JSON.parse(entry.value));
+	    }
+	    return out;
+	  }
+
+	  async getDelegationCancelEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/tdc/" + transaction_hash);
+	  }
+
+	  async getDelegationCancelEventsByTransaction(transaction_hash, offset = 0, max = 500) {
+	    const pointers = await this.getListRecords("tx/tdc/" + transaction_hash, "txi/tdc/" + transaction_hash, offset, max, false);
+	    if (!Array.isArray(pointers)) return pointers;
+	    const out = [];
+	    for (const ptr of pointers) {
+	      const entry = await this.tracManager.bee.get(ptr);
+	      if (entry !== null) out.push(JSON.parse(entry.value));
+	    }
+	    return out;
+	  }
+
+	  /**
    * Gets the total number of holders for a given ticker.
    * @param {string} ticker - The ticker for which to retrieve the number of holders.
    * @returns {Promise<number>} The number of holders for the specified ticker.
