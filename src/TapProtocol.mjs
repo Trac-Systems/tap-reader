@@ -1593,6 +1593,98 @@ export default class TapProtocol {
 	    return out;
 	  }
 
+	  /// TOKEN AUTHORITY CONFIG / STAKING
+	  async getAuthorityById(authority_id) {
+	    const entry = await this.tracManager.bee.get("ah/" + authority_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getAuthorityListLength() {
+	    return this.getLength("ahl");
+	  }
+
+	  async getAuthorityList(offset = 0, max = 500) {
+	    return this.getListRecords("ahl", "ahli", offset, max, true);
+	  }
+
+	  async getAuthoritiesByKindLength(kind) {
+	    return this.getLength("ahk/" + kind);
+	  }
+
+	  async getAuthoritiesByKind(kind, offset = 0, max = 500) {
+	    return this.getListRecords("ahk/" + kind, "ahki/" + kind, offset, max, true);
+	  }
+
+	  async getAuthorityBalanceByTick(authority_id, ticker) {
+	    const tick = JSON.stringify(ticker.toLowerCase());
+	    const entry = await this.tracManager.bee.get("ab/" + authority_id + "/" + tick);
+	    return entry === null ? "0" : entry.value;
+	  }
+
+	  async getAuthorityBalancesLength(authority_id) {
+	    return this.getLength("abl/" + authority_id);
+	  }
+
+	  async getAuthorityBalances(authority_id, offset = 0, max = 500) {
+	    const ticks = await this.getListRecords("abl/" + authority_id, "abli/" + authority_id, offset, max, true);
+	    if (!Array.isArray(ticks)) return ticks;
+	    const out = [];
+	    for (const tick of ticks) {
+	      const balance = await this.tracManager.bee.get("ab/" + authority_id + "/" + JSON.stringify(String(tick).toLowerCase()));
+	      out.push({ tick, bal: balance === null ? "0" : balance.value });
+	    }
+	    return out;
+	  }
+
+	  async getStakePositionById(position_id) {
+	    const entry = await this.tracManager.bee.get("sp/" + position_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getStakePositionsByAddressLength(address) {
+	    return this.getLength("spa/" + address);
+	  }
+
+	  async getStakePositionsByAddress(address, offset = 0, max = 500) {
+	    return this.getListRecords("spa/" + address, "spai/" + address, offset, max, true);
+	  }
+
+	  async getStakePositionsByAuthorityLength(authority_id) {
+	    return this.getLength("sph/" + authority_id);
+	  }
+
+	  async getStakePositionsByAuthority(authority_id, offset = 0, max = 500) {
+	    return this.getListRecords("sph/" + authority_id, "sphi/" + authority_id, offset, max, true);
+	  }
+
+	  async getRewardClaimListLength() {
+	    return this.getLength("rcl");
+	  }
+
+	  async getRewardClaimList(offset = 0, max = 500) {
+	    return this.getListRecords("rcl", "rcli", offset, max, true);
+	  }
+
+	  async getPendingRewardsByPosition(position_id) {
+	    const position = await this.getStakePositionById(position_id);
+	    if (position === null || position.status !== "open") return [];
+	    const authority = await this.getAuthorityById(position.auth);
+	    if (authority === null || !Array.isArray(authority.rt)) return [];
+	    const precision = 1000000000000000000n;
+	    const shares = BigInt(position.shares || "0");
+	    const out = [];
+	    for (const rewardTick of authority.rt) {
+	      const tick = String(rewardTick).toLowerCase();
+	      const tickKey = JSON.stringify(tick);
+	      const accEntry = await this.tracManager.bee.get("ahrps/" + position.auth + "/" + tickKey);
+	      const acc = accEntry === null ? 0n : BigInt(accEntry.value);
+	      const paid = position.debt && typeof position.debt[tick] !== "undefined" ? BigInt(position.debt[tick]) : 0n;
+	      const pending = shares * acc / precision - paid;
+	      out.push({ auth: position.auth, pos: position.id, rt: tick, amt: (pending > 0n ? pending : 0n).toString() });
+	    }
+	    return out;
+	  }
+
 	  async getDelegationCancelEventsByTransactionLength(transaction_hash) {
 	    return this.getLength("tx/tdc/" + transaction_hash);
 	  }

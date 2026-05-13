@@ -5907,6 +5907,77 @@ export default class RestModule {
 	        }
 	      });
 
+	      fastify.get("/getAuthorityById/:authority_id", async (request, reply) => {
+	        try { reply.send({ result: await this.tracManager.tapProtocol.getAuthorityById(request.params.authority_id) }); }
+	        catch (e) { reply.status(500).send({ error: "Internal Server Error" }); }
+	      });
+	      fastify.get("/getAuthorityListLength", async (_request, reply) => {
+	        try { reply.send({ result: await this.tracManager.tapProtocol.getAuthorityListLength() }); }
+	        catch (e) { reply.status(500).send({ error: "Internal Server Error" }); }
+	      });
+	      fastify.get("/getAuthorityList", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try { reply.send({ result: await this.tracManager.tapProtocol.getAuthorityList(offset, max) }); }
+	        catch (e) { reply.status(500).send({ error: "Internal Server Error" }); }
+	      });
+	      fastify.get("/getAuthoritiesByKindLength/:kind", async (request, reply) => {
+	        try { reply.send({ result: await this.tracManager.tapProtocol.getAuthoritiesByKindLength(request.params.kind) }); }
+	        catch (e) { reply.status(500).send({ error: "Internal Server Error" }); }
+	      });
+	      fastify.get("/getAuthoritiesByKind/:kind", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try { reply.send({ result: await this.tracManager.tapProtocol.getAuthoritiesByKind(request.params.kind, offset, max) }); }
+	        catch (e) { reply.status(500).send({ error: "Internal Server Error" }); }
+	      });
+	      fastify.get("/getAuthorityBalanceByTick/:authority_id/:ticker", async (request, reply) => {
+	        try { reply.send({ result: await this.tracManager.tapProtocol.getAuthorityBalanceByTick(request.params.authority_id, request.params.ticker) }); }
+	        catch (e) { reply.status(500).send({ error: "Internal Server Error" }); }
+	      });
+	      fastify.get("/getAuthorityBalancesLength/:authority_id", async (request, reply) => {
+	        try { reply.send({ result: await this.tracManager.tapProtocol.getAuthorityBalancesLength(request.params.authority_id) }); }
+	        catch (e) { reply.status(500).send({ error: "Internal Server Error" }); }
+	      });
+	      fastify.get("/getAuthorityBalances/:authority_id", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try { reply.send({ result: await this.tracManager.tapProtocol.getAuthorityBalances(request.params.authority_id, offset, max) }); }
+	        catch (e) { reply.status(500).send({ error: "Internal Server Error" }); }
+	      });
+	      fastify.get("/getStakePositionById/:position_id", async (request, reply) => {
+	        try { reply.send({ result: await this.tracManager.tapProtocol.getStakePositionById(request.params.position_id) }); }
+	        catch (e) { reply.status(500).send({ error: "Internal Server Error" }); }
+	      });
+	      fastify.get("/getStakePositionsByAddressLength/:address", async (request, reply) => {
+	        try { reply.send({ result: await this.tracManager.tapProtocol.getStakePositionsByAddressLength(request.params.address) }); }
+	        catch (e) { reply.status(500).send({ error: "Internal Server Error" }); }
+	      });
+	      fastify.get("/getStakePositionsByAddress/:address", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try { reply.send({ result: await this.tracManager.tapProtocol.getStakePositionsByAddress(request.params.address, offset, max) }); }
+	        catch (e) { reply.status(500).send({ error: "Internal Server Error" }); }
+	      });
+	      fastify.get("/getStakePositionsByAuthorityLength/:authority_id", async (request, reply) => {
+	        try { reply.send({ result: await this.tracManager.tapProtocol.getStakePositionsByAuthorityLength(request.params.authority_id) }); }
+	        catch (e) { reply.status(500).send({ error: "Internal Server Error" }); }
+	      });
+	      fastify.get("/getStakePositionsByAuthority/:authority_id", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try { reply.send({ result: await this.tracManager.tapProtocol.getStakePositionsByAuthority(request.params.authority_id, offset, max) }); }
+	        catch (e) { reply.status(500).send({ error: "Internal Server Error" }); }
+	      });
+	      fastify.get("/getPendingRewardsByPosition/:position_id", async (request, reply) => {
+	        try { reply.send({ result: await this.tracManager.tapProtocol.getPendingRewardsByPosition(request.params.position_id) }); }
+	        catch (e) { reply.status(500).send({ error: "Internal Server Error" }); }
+	      });
+	      fastify.get("/getRewardClaimListLength", async (_request, reply) => {
+	        try { reply.send({ result: await this.tracManager.tapProtocol.getRewardClaimListLength() }); }
+	        catch (e) { reply.status(500).send({ error: "Internal Server Error" }); }
+	      });
+	      fastify.get("/getRewardClaimList", async (request, reply) => {
+	        const { offset, max } = request.query;
+	        try { reply.send({ result: await this.tracManager.tapProtocol.getRewardClaimList(offset, max) }); }
+	        catch (e) { reply.status(500).send({ error: "Internal Server Error" }); }
+	      });
+
 	      // getListRecords
       fastify.get(
         "/getListRecords",
