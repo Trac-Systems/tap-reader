@@ -1673,7 +1673,17 @@ export default class TapProtocol {
 	    const precision = 1000000000000000000n;
 	    const shares = BigInt(position.shares || "0");
 	    const out = [];
-	    for (const rewardTick of authority.rt) {
+	    let rewardTicks = authority.rt;
+	    if (rewardTicks.length === 0) {
+	      rewardTicks = [];
+	      const length = await this.getAuthorityBalancesLength(position.auth);
+	      for (let offset = 0; offset < length; offset += 25) {
+	        const balances = await this.getAuthorityBalances(position.auth, offset, Math.min(25, length - offset));
+	        if (!Array.isArray(balances)) return balances;
+	        rewardTicks.push(...balances.map((entry) => entry.tick));
+	      }
+	    }
+	    for (const rewardTick of rewardTicks) {
 	      const tick = String(rewardTick).toLowerCase();
 	      const tickKey = JSON.stringify(tick);
 	      const accEntry = await this.tracManager.bee.get("ahrps/" + position.auth + "/" + tickKey);
