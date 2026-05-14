@@ -1472,6 +1472,15 @@ export default class TapProtocol {
 	    return this.getListRecords("slc", "slci", offset, max, true);
 	  }
 
+	  async getLocksByKindLength(kind) {
+	    return this.getLength("lk/" + kind.toLowerCase());
+	  }
+
+	  async getLocksByKind(kind, offset = 0, max = 500) {
+	    const k = kind.toLowerCase();
+	    return this.getListRecords("lk/" + k, "lki/" + k, offset, max, true);
+	  }
+
 	  async getDelegationCancel(auth, nonce) {
 	    const cancel = await this.tracManager.bee.get("tdcr/" + auth + "/" + nonce);
 	    return cancel === null ? null : JSON.parse(cancel.value);
@@ -1491,6 +1500,15 @@ export default class TapProtocol {
 
 	  async getAccountLocks(address, offset = 0, max = 500) {
 	    return this.getListRecords("la/" + address, "lai/" + address, offset, max, true);
+	  }
+
+	  async getAccountLocksByKindLength(address, kind) {
+	    return this.getLength("lak/" + address + "/" + kind.toLowerCase());
+	  }
+
+	  async getAccountLocksByKind(address, kind, offset = 0, max = 500) {
+	    const k = kind.toLowerCase();
+	    return this.getListRecords("lak/" + address + "/" + k, "laki/" + address + "/" + k, offset, max, true);
 	  }
 
 	  async getAccountDelegationCancelListLength(address) {
@@ -1516,6 +1534,61 @@ export default class TapProtocol {
 	  async getTickerLocks(ticker, offset = 0, max = 500) {
 	    const tick = JSON.stringify(ticker.toLowerCase());
 	    return this.getListRecords("lt/" + tick, "lti/" + tick, offset, max, true);
+	  }
+
+	  async getTickerLocksByKindLength(ticker, kind) {
+	    return this.getLength("ltk/" + JSON.stringify(ticker.toLowerCase()) + "/" + kind.toLowerCase());
+	  }
+
+	  async getTickerLocksByKind(ticker, kind, offset = 0, max = 500) {
+	    const tick = JSON.stringify(ticker.toLowerCase());
+	    const k = kind.toLowerCase();
+	    return this.getListRecords("ltk/" + tick + "/" + k, "ltki/" + tick + "/" + k, offset, max, true);
+	  }
+
+	  async getAccountLockConsumesLength(address) {
+	    return this.getLength("lca/" + address);
+	  }
+
+	  async getAccountLockConsumes(address, offset = 0, max = 500) {
+	    return this.getListRecords("lca/" + address, "lcai/" + address, offset, max, true);
+	  }
+
+	  async getTickerLockConsumesLength(ticker) {
+	    return this.getLength("lct/" + JSON.stringify(ticker.toLowerCase()));
+	  }
+
+	  async getTickerLockConsumes(ticker, offset = 0, max = 500) {
+	    const tick = JSON.stringify(ticker.toLowerCase());
+	    return this.getListRecords("lct/" + tick, "lcti/" + tick, offset, max, true);
+	  }
+
+	  async getLockConsumesByKindLength(kind) {
+	    return this.getLength("lck/" + kind.toLowerCase());
+	  }
+
+	  async getLockConsumesByKind(kind, offset = 0, max = 500) {
+	    const k = kind.toLowerCase();
+	    return this.getListRecords("lck/" + k, "lcki/" + k, offset, max, true);
+	  }
+
+	  async getAccountLockConsumesByKindLength(address, kind) {
+	    return this.getLength("lcak/" + address + "/" + kind.toLowerCase());
+	  }
+
+	  async getAccountLockConsumesByKind(address, kind, offset = 0, max = 500) {
+	    const k = kind.toLowerCase();
+	    return this.getListRecords("lcak/" + address + "/" + k, "lcaki/" + address + "/" + k, offset, max, true);
+	  }
+
+	  async getTickerLockConsumesByKindLength(ticker, kind) {
+	    return this.getLength("lctk/" + JSON.stringify(ticker.toLowerCase()) + "/" + kind.toLowerCase());
+	  }
+
+	  async getTickerLockConsumesByKind(ticker, kind, offset = 0, max = 500) {
+	    const tick = JSON.stringify(ticker.toLowerCase());
+	    const k = kind.toLowerCase();
+	    return this.getListRecords("lctk/" + tick + "/" + k, "lctki/" + tick + "/" + k, offset, max, true);
 	  }
 
 	  async getLockEventsByBlockLength(block) {
@@ -1663,6 +1736,144 @@ export default class TapProtocol {
 
 	  async getRewardClaimList(offset = 0, max = 500) {
 	    return this.getListRecords("rcl", "rcli", offset, max, true);
+	  }
+
+	  async getRewardClaimsByAddressLength(address) {
+	    return this.getLength("rca/" + address);
+	  }
+
+	  async getRewardClaimsByAddress(address, offset = 0, max = 500) {
+	    return this.getListRecords("rca/" + address, "rcai/" + address, offset, max, true);
+	  }
+
+	  async getRewardClaimsByAuthorityLength(authority_id) {
+	    return this.getLength("rch/" + authority_id);
+	  }
+
+	  async getRewardClaimsByAuthority(authority_id, offset = 0, max = 500) {
+	    return this.getListRecords("rch/" + authority_id, "rchi/" + authority_id, offset, max, true);
+	  }
+
+	  async getSaleStatus(authority_id) {
+	    const entry = await this.tracManager.bee.get("sale/" + authority_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getSaleContributionsLength() {
+	    return this.getLength("sconl");
+	  }
+
+	  async getSaleContribution(id) {
+	    const entry = await this.tracManager.bee.get("scon/" + id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getSaleContributions(offset = 0, max = 500) {
+	    return this.getListRecords("sconl", "sconli", offset, max, true);
+	  }
+
+	  async getSaleContributionsByAuthorityLength(authority_id) {
+	    return this.getLength("scona/" + authority_id);
+	  }
+
+	  async getSaleContributionsByAuthority(authority_id, offset = 0, max = 500) {
+	    return this.getListRecords("scona/" + authority_id, "sconai/" + authority_id, offset, max, true);
+	  }
+
+	  async getSaleContributionsByAddressLength(address) {
+	    return this.getLength("sconaddr/" + address);
+	  }
+
+	  async getSaleContributionsByAddress(address, offset = 0, max = 500) {
+	    return this.getListRecords("sconaddr/" + address, "sconaddri/" + address, offset, max, true);
+	  }
+
+	  async getSaleContributionsByClaimLength(address) {
+	    return this.getLength("sconcl/" + address);
+	  }
+
+	  async getSaleContributionsByClaim(address, offset = 0, max = 500) {
+	    return this.getListRecords("sconcl/" + address, "sconcli/" + address, offset, max, true);
+	  }
+
+	  async getSaleClaimsLength() {
+	    return this.getLength("sclaiml");
+	  }
+
+	  async getSaleClaims(offset = 0, max = 500) {
+	    return this.getListRecords("sclaiml", "sclaimli", offset, max, true);
+	  }
+
+	  async getSaleClaimsByAuthorityLength(authority_id) {
+	    return this.getLength("scla/" + authority_id);
+	  }
+
+	  async getSaleClaimsByAuthority(authority_id, offset = 0, max = 500) {
+	    return this.getListRecords("scla/" + authority_id, "sclai/" + authority_id, offset, max, true);
+	  }
+
+	  async getSaleClaimsByAddressLength(address) {
+	    return this.getLength("scladdr/" + address);
+	  }
+
+	  async getSaleClaimsByAddress(address, offset = 0, max = 500) {
+	    return this.getListRecords("scladdr/" + address, "scladdri/" + address, offset, max, true);
+	  }
+
+	  async getSaleRefundsLength() {
+	    return this.getLength("srefl");
+	  }
+
+	  async getSaleRefunds(offset = 0, max = 500) {
+	    return this.getListRecords("srefl", "srefli", offset, max, true);
+	  }
+
+	  async getSaleRefundsByAuthorityLength(authority_id) {
+	    return this.getLength("srefa/" + authority_id);
+	  }
+
+	  async getSaleRefundsByAuthority(authority_id, offset = 0, max = 500) {
+	    return this.getListRecords("srefa/" + authority_id, "srefai/" + authority_id, offset, max, true);
+	  }
+
+	  async getSaleRefundsByAddressLength(address) {
+	    return this.getLength("srefaddr/" + address);
+	  }
+
+	  async getSaleRefundsByAddress(address, offset = 0, max = 500) {
+	    return this.getListRecords("srefaddr/" + address, "srefaddri/" + address, offset, max, true);
+	  }
+
+	  async getSaleCancelsLength() {
+	    return this.getLength("scanl");
+	  }
+
+	  async getSaleCancels(offset = 0, max = 500) {
+	    return this.getListRecords("scanl", "scanli", offset, max, true);
+	  }
+
+	  async getSaleCancelsByAuthorityLength(authority_id) {
+	    return this.getLength("scana/" + authority_id);
+	  }
+
+	  async getSaleCancelsByAuthority(authority_id, offset = 0, max = 500) {
+	    return this.getListRecords("scana/" + authority_id, "scanai/" + authority_id, offset, max, true);
+	  }
+
+	  async getSaleWithdrawalsLength() {
+	    return this.getLength("swdrl");
+	  }
+
+	  async getSaleWithdrawals(offset = 0, max = 500) {
+	    return this.getListRecords("swdrl", "swdrli", offset, max, true);
+	  }
+
+	  async getSaleWithdrawalsByAuthorityLength(authority_id) {
+	    return this.getLength("swdra/" + authority_id);
+	  }
+
+	  async getSaleWithdrawalsByAuthority(authority_id, offset = 0, max = 500) {
+	    return this.getListRecords("swdra/" + authority_id, "swdrai/" + authority_id, offset, max, true);
 	  }
 
 	  async getPendingRewardsByPosition(position_id) {
