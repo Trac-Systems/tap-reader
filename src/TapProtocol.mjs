@@ -1709,6 +1709,216 @@ export default class TapProtocol {
 	    return out;
 	  }
 
+	  async getAmmPool(pool_id) {
+	    const entry = await this.tracManager.bee.get("amm/" + pool_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getAmmPoolListLength() {
+	    return this.getLength("amml");
+	  }
+
+	  async getAmmPoolList(offset = 0, max = 25) {
+	    return this.getPointerListRecords("amml", "ammli", offset, Math.min(max, 25));
+	  }
+
+	  async getAmmPoolsByAssetLength(asset_key) {
+	    return this.getLength("ammat/" + asset_key);
+	  }
+
+	  async getAmmPoolsByAsset(asset_key, offset = 0, max = 25) {
+	    return this.getPointerListRecords("ammat/" + asset_key, "ammati/" + asset_key, offset, Math.min(max, 25));
+	  }
+
+	  async getAmmPosition(pool_id, target_type, target) {
+	    const entry = await this.tracManager.bee.get("ammpr/" + pool_id + "/" + target_type + "/" + target);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getAmmPositionsByTargetLength(target_type, target) {
+	    return this.getLength("amma/" + target_type + "/" + target);
+	  }
+
+	  async getAmmPositionsByTarget(target_type, target, offset = 0, max = 25) {
+	    return this.getPointerListRecords(
+	        "amma/" + target_type + "/" + target,
+	        "ammai/" + target_type + "/" + target,
+	        offset,
+	        Math.min(max, 25)
+	    );
+	  }
+
+	  async getAmmEventsByPoolLength(pool_id) {
+	    return this.getLength("amme/" + pool_id);
+	  }
+
+	  async getAmmEventsByPool(pool_id, offset = 0, max = 25) {
+	    return this.getListRecords("amme/" + pool_id, "ammei/" + pool_id, offset, Math.min(max, 25), true);
+	  }
+
+	  async getAmmEventsByBlockLength(block) {
+	    return this.getLength("ammbe/" + block);
+	  }
+
+	  async getAmmEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getListRecords("ammbe/" + block, "ammbei/" + block, offset, Math.min(max, 25), true);
+	  }
+
+	  async getAmmEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/amm/" + transaction_hash);
+	  }
+
+	  async getAmmEventsByTransaction(transaction_hash, offset = 0, max = 25) {
+	    return this.getPointerListRecords(
+	        "tx/amm/" + transaction_hash,
+	        "txi/amm/" + transaction_hash,
+	        offset,
+	        Math.min(max, 25)
+	    );
+	  }
+
+	  async getAmmExternalSnapshot(pool_id, snapshot_id) {
+	    const entry = await this.tracManager.bee.get("amms/" + pool_id + "/" + snapshot_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  /// TOKEN ACTION OBLIGATIONS
+	  obligationEntityKey(entity_type, entity_id) {
+	    return entity_type + "/" + entity_id;
+	  }
+
+	  ammObligationEntityKey(pool_id, side) {
+	    return "amm/" + pool_id + "/" + side;
+	  }
+
+	  async getObligation(obligation_id) {
+	    const entry = await this.tracManager.bee.get("ob/" + obligation_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getObligationConsume(obligation_id) {
+	    const entry = await this.tracManager.bee.get("obc/" + obligation_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getObligationLockedBalance(source_type, source_id, ticker) {
+	    const tick = JSON.stringify(ticker.toLowerCase());
+	    const entry = await this.tracManager.bee.get(
+	        "oll/" + this.obligationEntityKey(source_type, source_id) + "/" + tick
+	    );
+	    return entry === null ? "0" : entry.value;
+	  }
+
+	  async getAmmObligationLockedBalance(pool_id, side, ticker) {
+	    const tick = JSON.stringify(ticker.toLowerCase());
+	    const entry = await this.tracManager.bee.get(
+	        "oll/" + this.ammObligationEntityKey(pool_id, side) + "/" + tick
+	    );
+	    return entry === null ? "0" : entry.value;
+	  }
+
+	  async getObligationListLength() {
+	    return this.getLength("obl");
+	  }
+
+	  async getObligationList(offset = 0, max = 25) {
+	    return this.getListRecords("obl", "obli", offset, Math.min(max, 25), true);
+	  }
+
+	  async getObligationConsumeListLength() {
+	    return this.getLength("obcl");
+	  }
+
+	  async getObligationConsumeList(offset = 0, max = 25) {
+	    return this.getListRecords("obcl", "obcli", offset, Math.min(max, 25), true);
+	  }
+
+	  async getObligationsBySourceLength(source_type, source_id) {
+	    return this.getLength("obsrc/" + this.obligationEntityKey(source_type, source_id));
+	  }
+
+	  async getObligationsBySource(source_type, source_id, offset = 0, max = 25) {
+	    const key = this.obligationEntityKey(source_type, source_id);
+	    return this.getListRecords("obsrc/" + key, "obsrci/" + key, offset, Math.min(max, 25), true);
+	  }
+
+	  async getAmmObligationsBySourceLength(pool_id, side) {
+	    return this.getLength("obsrc/" + this.ammObligationEntityKey(pool_id, side));
+	  }
+
+	  async getAmmObligationsBySource(pool_id, side, offset = 0, max = 25) {
+	    const key = this.ammObligationEntityKey(pool_id, side);
+	    return this.getListRecords("obsrc/" + key, "obsrci/" + key, offset, Math.min(max, 25), true);
+	  }
+
+	  async getObligationsByTargetLength(target_type, target_id) {
+	    return this.getLength("oba/" + this.obligationEntityKey(target_type, target_id));
+	  }
+
+	  async getObligationsByTarget(target_type, target_id, offset = 0, max = 25) {
+	    const key = this.obligationEntityKey(target_type, target_id);
+	    return this.getListRecords("oba/" + key, "obai/" + key, offset, Math.min(max, 25), true);
+	  }
+
+	  async getAmmObligationsByTargetLength(pool_id, side) {
+	    return this.getLength("oba/" + this.ammObligationEntityKey(pool_id, side));
+	  }
+
+	  async getAmmObligationsByTarget(pool_id, side, offset = 0, max = 25) {
+	    const key = this.ammObligationEntityKey(pool_id, side);
+	    return this.getListRecords("oba/" + key, "obai/" + key, offset, Math.min(max, 25), true);
+	  }
+
+	  async getObligationsByContextLength(context_key) {
+	    return this.getLength("obctx/" + context_key);
+	  }
+
+	  async getObligationsByContext(context_key, offset = 0, max = 25) {
+	    return this.getListRecords("obctx/" + context_key, "obctxi/" + context_key, offset, Math.min(max, 25), true);
+	  }
+
+	  async getObligationEventsByBlockLength(block) {
+	    return this.getLength("blck/ob/" + block);
+	  }
+
+	  async getObligationEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getPointerListRecords("blck/ob/" + block, "blcki/ob/" + block, offset, Math.min(max, 25));
+	  }
+
+	  async getObligationConsumeEventsByBlockLength(block) {
+	    return this.getLength("blck/obc/" + block);
+	  }
+
+	  async getObligationConsumeEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getPointerListRecords("blck/obc/" + block, "blcki/obc/" + block, offset, Math.min(max, 25));
+	  }
+
+	  async getObligationEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/ob/" + transaction_hash);
+	  }
+
+	  async getObligationEventsByTransaction(transaction_hash, offset = 0, max = 25) {
+	    return this.getPointerListRecords(
+	        "tx/ob/" + transaction_hash,
+	        "txi/ob/" + transaction_hash,
+	        offset,
+	        Math.min(max, 25)
+	    );
+	  }
+
+	  async getObligationConsumeEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/obc/" + transaction_hash);
+	  }
+
+	  async getObligationConsumeEventsByTransaction(transaction_hash, offset = 0, max = 25) {
+	    return this.getPointerListRecords(
+	        "tx/obc/" + transaction_hash,
+	        "txi/obc/" + transaction_hash,
+	        offset,
+	        Math.min(max, 25)
+	    );
+	  }
+
 	  async getStakePositionById(position_id) {
 	    const entry = await this.tracManager.bee.get("sp/" + position_id);
 	    return entry === null ? null : JSON.parse(entry.value);
@@ -3160,6 +3370,17 @@ export default class TapProtocol {
       j++;
     }
 
+    return out;
+  }
+
+  async getPointerListRecords(length_key, iterator_key, offset, max) {
+    const pointers = await this.getListRecords(length_key, iterator_key, offset, max, false);
+    if (!Array.isArray(pointers)) return pointers;
+    const out = [];
+    for (const ptr of pointers) {
+      const entry = await this.tracManager.bee.get(ptr);
+      if (entry !== null) out.push(JSON.parse(entry.value));
+    }
     return out;
   }
   /**
