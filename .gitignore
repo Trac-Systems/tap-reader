@@ -2,4 +2,5 @@
 /tap-reader/
 tapstore/
 node_modules/
+node_modules
 /cert/
