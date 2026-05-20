@@ -2953,6 +2953,53 @@ export default class RestModule {
       );
 
       fastify.get(
+        "/getAccountReceiveListLength/:address/:ticker",
+        {
+          schema: {
+            description:
+              "Get the total number of received transactions for a specific address and ticker",
+            tags: ["Sent"],
+            params: {
+              type: "object",
+              required: ["address", "ticker"],
+              properties: {
+                address: { type: "string" },
+                ticker: { type: "string" },
+              },
+            },
+            response: {
+              200: {
+                description: "Successful response",
+                type: "object",
+                properties: {
+                  result: { type: "number" },
+                },
+              },
+              500: {
+                description: "Internal server error",
+                type: "object",
+                properties: {
+                  error: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        async (request, reply) => {
+          try {
+            const result =
+              await this.tracManager.tapProtocol.getAccountReceiveListLength(
+                request.params.address,
+                request.params.ticker
+              );
+            reply.send({ result });
+          } catch (e) {
+            reply.status(500).send({ error: "Internal Server Error" });
+          }
+        }
+      );
+
+      fastify.get(
         "/getAccountReceiveList/:address/:ticker",
         {
           schema: {

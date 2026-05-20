@@ -175,6 +175,316 @@ Initializes a Hyperswarm network connection for data synchronization.
 | server | <code>boolean</code> | Indicates if this instance should act as a server. |
 | client | <code>boolean</code> | Indicates if this instance should act as a client. |
 
+<!-- BEGIN GENERATED TAP REST ENDPOINT INVENTORY -->
+# Current REST Endpoint Inventory
+
+This inventory is generated from `src/RestModule.mjs` and covers the 278 current REST routes. List endpoints accept `offset` and `max` query parameters unless the route is a single-record lookup. Length endpoints return `{ "result": <number> }`. Compared with `ord-tap`, tap-reader exposes `/getSyncStatus`; `ord-tap` exposes a regex backend helper route.
+
+### General/helpers
+- GET `/getCurrentBlock`
+- GET `/getLength/:length_key`
+- GET `/getListRecords`
+- GET `/getReorgs`
+- GET `/getSyncStatus`
+
+### Bitmap and DMT
+- GET `/getBitmap/:bitmap_block`
+- GET `/getBitmapByInscription/:inscription_id`
+- GET `/getBitmapEventByBlock/:block`
+- GET `/getBitmapEventByBlockLength/:block`
+- GET `/getBitmapWalletHistoricList/:address`
+- GET `/getBitmapWalletHistoricListLength/:address`
+- GET `/getDmtElementsList`
+- GET `/getDmtElementsListLength`
+- GET `/getDmtEventByBlock/:block`
+- GET `/getDmtEventByBlockLength/:block`
+- GET `/getDmtMintHolder/:inscription_id`
+- GET `/getDmtMintHolderByBlock/:ticker/:block`
+- GET `/getDmtMintHoldersHistoryList/:inscription_id`
+- GET `/getDmtMintHoldersHistoryListLength/:inscription_id`
+- GET `/getDmtMintWalletHistoricList/:address`
+- GET `/getDmtMintWalletHistoricListLength/:address`
+
+### Deployments and mints
+- GET `/getAccountMintList/:address/:ticker`
+- GET `/getAccountMintListLength/:address/:ticker`
+- GET `/getDeployedList/:transaction_hash`
+- GET `/getDeployedListByBlock/:block`
+- GET `/getDeployedListByBlockLength/:block`
+- GET `/getDeployedListLength/:transaction_hash`
+- GET `/getDeployment/:ticker`
+- GET `/getDeployments`
+- GET `/getDeploymentsLength`
+- GET `/getMintedList/:transaction_hash`
+- GET `/getMintedListByBlock/:block`
+- GET `/getMintedListByBlockLength/:block`
+- GET `/getMintedListLength/:transaction_hash`
+- GET `/getMintList`
+- GET `/getMintListLength`
+- GET `/getMintTokensLeft/:ticker`
+- GET `/getTickerDeployedList/:ticker/:transaction_hash`
+- GET `/getTickerDeployedListByBlock/:ticker/:block`
+- GET `/getTickerDeployedListByBlockLength/:ticker/:block`
+- GET `/getTickerDeployedListLength/:ticker/:transaction_hash`
+- GET `/getTickerMintedList/:ticker/:transaction_hash`
+- GET `/getTickerMintedListByBlock/:ticker/:block`
+- GET `/getTickerMintedListByBlockLength/:ticker/:block`
+- GET `/getTickerMintedListLength/:ticker/:transaction_hash`
+- GET `/getTickerMintList/:ticker`
+- GET `/getTickerMintListLength/:ticker`
+
+### Balances, holders, account views
+- GET `/getAccountBlockedTransferables/:address`
+- GET `/getAccountTokenDetail/:address/:ticker`
+- GET `/getAccountTokens/:address`
+- GET `/getAccountTokensBalance/:address`
+- GET `/getAccountTokensLength/:address`
+- GET `/getAmmObligationLockedBalance/:pool_id/:side/:ticker`
+- GET `/getAuthorityBalanceByTick/:authority_id/:ticker`
+- GET `/getAuthorityBalances/:authority_id`
+- GET `/getAuthorityBalancesLength/:authority_id`
+- GET `/getBalance/:address/:ticker`
+- GET `/getHistoricHolders/:ticker`
+- GET `/getHistoricHoldersLength/:ticker`
+- GET `/getHolders/:ticker`
+- GET `/getHoldersLength/:ticker`
+- GET `/getLockedBalance/:address/:ticker`
+- GET `/getObligationLockedBalance/:source_type/:source_id/:ticker`
+- GET `/getSingleTransferable/:inscription_id`
+- GET `/getTransferable/:address/:ticker`
+
+### Transfers and sends
+- GET `/getAccountReceiveList/:address/:ticker`
+- GET `/getAccountReceiveListLength/:address/:ticker`
+- GET `/getAccountSentList/:address/:ticker`
+- GET `/getAccountSentListLength/:address/:ticker`
+- GET `/getAccountTransferList/:address/:ticker`
+- GET `/getAccountTransferListLength/:address/:ticker`
+- GET `/getInscribeTransferList/:transaction_hash`
+- GET `/getInscribeTransferListByBlock/:block`
+- GET `/getInscribeTransferListByBlockLength/:block`
+- GET `/getInscribeTransferListLength/:transaction_hash`
+- GET `/getSentList`
+- GET `/getSentListLength`
+- GET `/getTickerInscribeTransferList/:ticker/:transaction_hash`
+- GET `/getTickerInscribeTransferListByBlock/:ticker/:block`
+- GET `/getTickerInscribeTransferListByBlockLength/:ticker/:block`
+- GET `/getTickerInscribeTransferListLength/:ticker/:transaction_hash`
+- GET `/getTickerSentList/:ticker`
+- GET `/getTickerSentListLength/:ticker`
+- GET `/getTickerTransferList/:ticker`
+- GET `/getTickerTransferListLength/:ticker`
+- GET `/getTickerTransferredList/:ticker/:transaction_hash`
+- GET `/getTickerTransferredListByBlock/:ticker/:block`
+- GET `/getTickerTransferredListByBlockLength/:ticker/:block`
+- GET `/getTickerTransferredListLength/:ticker/:transaction_hash`
+- GET `/getTransferAmountByInscription/:inscription_id`
+- GET `/getTransferList`
+- GET `/getTransferListLength`
+- GET `/getTransferredList/:transaction_hash`
+- GET `/getTransferredListByBlock/:block`
+- GET `/getTransferredListByBlockLength/:block`
+- GET `/getTransferredListLength/:transaction_hash`
+
+### Trades
+- GET `/getAccountReceiveTradesFilledList/:address/:ticker`
+- GET `/getAccountReceiveTradesFilledListLength/:address/:ticker`
+- GET `/getAccountTradesFilledList/:address/:ticker`
+- GET `/getAccountTradesFilledListLength/:address/:ticker`
+- GET `/getAccountTradesList/:address/:ticker`
+- GET `/getAccountTradesListLength/:address/:ticker`
+- GET `/getTickerTradesFilledList/:ticker`
+- GET `/getTickerTradesFilledListLength/:ticker`
+- GET `/getTickerTradesList/:ticker`
+- GET `/getTickerTradesListLength/:ticker`
+- GET `/getTrade/:inscription_id`
+- GET `/getTradesFilledList`
+- GET `/getTradesFilledListLength`
+- GET `/getTradesList`
+- GET `/getTradesListLength`
+
+### Auth and privilege authority
+- GET `/getAccountAuthList/:address`
+- GET `/getAccountAuthListLength/:address`
+- GET `/getAccountPrivilegeAuthList/:address`
+- GET `/getAccountPrivilegeAuthListLength/:address`
+- GET `/getAuthCancelled/:inscription_id`
+- GET `/getAuthCompactHexExists/:hash`
+- GET `/getAuthDelegationCancelList/:auth`
+- GET `/getAuthDelegationCancelListLength/:auth`
+- GET `/getAuthHashExists/:hash`
+- GET `/getAuthList`
+- GET `/getAuthListLength`
+- GET `/getAuthoritiesByKind/:kind`
+- GET `/getAuthoritiesByKindLength/:kind`
+- GET `/getAuthorityById/:authority_id`
+- GET `/getAuthorityList`
+- GET `/getAuthorityListLength`
+- GET `/getPrivilegeAuthCancelled/:inscription_id`
+- GET `/getPrivilegeAuthCompactHexExists/:hash`
+- GET `/getPrivilegeAuthHashExists/:hash`
+- GET `/getPrivilegeAuthList`
+- GET `/getPrivilegeAuthListLength`
+- GET `/getPrivilegeAuthorityCollectionList/:privilege_inscription_id/:collection_name`
+- GET `/getPrivilegeAuthorityCollectionListLength/:privilege_inscription_id/:collection_name`
+- GET `/getPrivilegeAuthorityEventByBlock/:block`
+- GET `/getPrivilegeAuthorityEventByBlockLength/:block`
+- GET `/getPrivilegeAuthorityEventByPrivBlock/:privilege_authority_inscription_id/:block`
+- GET `/getPrivilegeAuthorityEventByPrivBlockLength/:privilege_authority_inscription_id/:block`
+- GET `/getPrivilegeAuthorityEventByPrivColBlock/:privilege_authority_inscription_id/:collection_name/:block`
+- GET `/getPrivilegeAuthorityEventByPrivColBlockLength/:privilege_authority_inscription_id/:collection_name/:block`
+- GET `/getPrivilegeAuthorityIsVerified/:privilege_inscription_id/:collection_name/:verified_hash/:sequence`
+- GET `/getPrivilegeAuthorityList/:privilege_inscription_id`
+- GET `/getPrivilegeAuthorityListLength/:privilege_inscription_id`
+- GET `/getPrivilegeAuthorityVerifiedByInscription/:verified_inscription_id`
+- GET `/getPrivilegeAuthorityVerifiedInscription/:privilege_inscription_id/:collection_name/:verified_hash/:sequence`
+- GET `/getRewardClaimsByAuthority/:authority_id`
+- GET `/getRewardClaimsByAuthorityLength/:authority_id`
+- GET `/getSaleCancelsByAuthority/:authority_id`
+- GET `/getSaleCancelsByAuthorityLength/:authority_id`
+- GET `/getSaleClaimsByAuthority/:authority_id`
+- GET `/getSaleClaimsByAuthorityLength/:authority_id`
+- GET `/getSaleContributionsByAuthority/:authority_id`
+- GET `/getSaleContributionsByAuthorityLength/:authority_id`
+- GET `/getSaleRefundsByAuthority/:authority_id`
+- GET `/getSaleRefundsByAuthorityLength/:authority_id`
+- GET `/getSaleWithdrawalsByAuthority/:authority_id`
+- GET `/getSaleWithdrawalsByAuthorityLength/:authority_id`
+- GET `/getStakePositionsByAuthority/:authority_id`
+- GET `/getStakePositionsByAuthorityLength/:authority_id`
+
+### Locks and delegation cancellation
+- GET `/getAccountDelegationCancelList/:address`
+- GET `/getAccountDelegationCancelListLength/:address`
+- GET `/getAccountLockConsumes/:address`
+- GET `/getAccountLockConsumesByKind/:address/:kind`
+- GET `/getAccountLockConsumesByKindLength/:address/:kind`
+- GET `/getAccountLockConsumesLength/:address`
+- GET `/getAccountLocks/:address`
+- GET `/getAccountLocksByKind/:address/:kind`
+- GET `/getAccountLocksByKindLength/:address/:kind`
+- GET `/getAccountLocksLength/:address`
+- GET `/getDelegationCancel/:auth/:nonce`
+- GET `/getDelegationCancelEventsByBlock/:block`
+- GET `/getDelegationCancelEventsByBlockLength/:block`
+- GET `/getDelegationCancelEventsByTransaction/:transaction_hash`
+- GET `/getDelegationCancelEventsByTransactionLength/:transaction_hash`
+- GET `/getDelegationCancelList`
+- GET `/getDelegationCancelListLength`
+- GET `/getLock/:lock_id`
+- GET `/getLockConsume/:lock_id`
+- GET `/getLockConsumeEventsByBlock/:block`
+- GET `/getLockConsumeEventsByBlockLength/:block`
+- GET `/getLockConsumeEventsByTransaction/:transaction_hash`
+- GET `/getLockConsumeEventsByTransactionLength/:transaction_hash`
+- GET `/getLockConsumeList`
+- GET `/getLockConsumeListLength`
+- GET `/getLockConsumesByKind/:kind`
+- GET `/getLockConsumesByKindLength/:kind`
+- GET `/getLockEventsByBlock/:block`
+- GET `/getLockEventsByBlockLength/:block`
+- GET `/getLockEventsByTransaction/:transaction_hash`
+- GET `/getLockEventsByTransactionLength/:transaction_hash`
+- GET `/getLockList`
+- GET `/getLockListLength`
+- GET `/getLocksByKind/:kind`
+- GET `/getLocksByKindLength/:kind`
+- GET `/getTickerLockConsumes/:ticker`
+- GET `/getTickerLockConsumesByKind/:ticker/:kind`
+- GET `/getTickerLockConsumesByKindLength/:ticker/:kind`
+- GET `/getTickerLockConsumesLength/:ticker`
+- GET `/getTickerLocks/:ticker`
+- GET `/getTickerLocksByKind/:ticker/:kind`
+- GET `/getTickerLocksByKindLength/:ticker/:kind`
+- GET `/getTickerLocksLength/:ticker`
+
+### AMM
+- GET `/getAmmEventsByBlock/:block`
+- GET `/getAmmEventsByBlockLength/:block`
+- GET `/getAmmEventsByPool/:pool_id`
+- GET `/getAmmEventsByPoolLength/:pool_id`
+- GET `/getAmmEventsByTransaction/:transaction_hash`
+- GET `/getAmmEventsByTransactionLength/:transaction_hash`
+- GET `/getAmmExternalSnapshot/:pool_id/:snapshot_id`
+- GET `/getAmmObligationsBySource/:pool_id/:side`
+- GET `/getAmmObligationsBySourceLength/:pool_id/:side`
+- GET `/getAmmObligationsByTarget/:pool_id/:side`
+- GET `/getAmmObligationsByTargetLength/:pool_id/:side`
+- GET `/getAmmPool/:pool_id`
+- GET `/getAmmPoolList`
+- GET `/getAmmPoolListLength`
+- GET `/getAmmPoolsByAsset/:asset_key`
+- GET `/getAmmPoolsByAssetLength/:asset_key`
+- GET `/getAmmPosition/:pool_id/:target_type/:target`
+- GET `/getAmmPositionsByTarget/:target_type/:target`
+- GET `/getAmmPositionsByTargetLength/:target_type/:target`
+
+### Obligations
+- GET `/getObligation/:obligation_id`
+- GET `/getObligationConsume/:obligation_id`
+- GET `/getObligationConsumeEventsByBlock/:block`
+- GET `/getObligationConsumeEventsByBlockLength/:block`
+- GET `/getObligationConsumeEventsByTransaction/:transaction_hash`
+- GET `/getObligationConsumeEventsByTransactionLength/:transaction_hash`
+- GET `/getObligationConsumeList`
+- GET `/getObligationConsumeListLength`
+- GET `/getObligationEventsByBlock/:block`
+- GET `/getObligationEventsByBlockLength/:block`
+- GET `/getObligationEventsByTransaction/:transaction_hash`
+- GET `/getObligationEventsByTransactionLength/:transaction_hash`
+- GET `/getObligationList`
+- GET `/getObligationListLength`
+- GET `/getObligationsByContext/:context_key`
+- GET `/getObligationsByContextLength/:context_key`
+- GET `/getObligationsBySource/:source_type/:source_id`
+- GET `/getObligationsBySourceLength/:source_type/:source_id`
+- GET `/getObligationsByTarget/:target_type/:target_id`
+- GET `/getObligationsByTargetLength/:target_type/:target_id`
+
+### Staking and reward claims
+- GET `/getPendingRewardsByPosition/:position_id`
+- GET `/getRewardClaimList`
+- GET `/getRewardClaimListLength`
+- GET `/getRewardClaimsByAddress/:address`
+- GET `/getRewardClaimsByAddressLength/:address`
+- GET `/getStakePositionById/:position_id`
+- GET `/getStakePositionsByAddress/:address`
+- GET `/getStakePositionsByAddressLength/:address`
+
+### Sales
+- GET `/getSaleCancels`
+- GET `/getSaleCancelsLength`
+- GET `/getSaleClaims`
+- GET `/getSaleClaimsByAddress/:address`
+- GET `/getSaleClaimsByAddressLength/:address`
+- GET `/getSaleClaimsLength`
+- GET `/getSaleContribution/:id`
+- GET `/getSaleContributions`
+- GET `/getSaleContributionsByAddress/:address`
+- GET `/getSaleContributionsByAddressLength/:address`
+- GET `/getSaleContributionsByClaim/:address`
+- GET `/getSaleContributionsByClaimLength/:address`
+- GET `/getSaleContributionsLength`
+- GET `/getSaleRefunds`
+- GET `/getSaleRefundsByAddress/:address`
+- GET `/getSaleRefundsByAddressLength/:address`
+- GET `/getSaleRefundsLength`
+- GET `/getSaleStatus/:authority_id`
+- GET `/getSaleWithdrawals`
+- GET `/getSaleWithdrawalsLength`
+
+### Other legacy TAP endpoints
+- GET `/getAccountAccumulatorList/:address`
+- GET `/getAccountAccumulatorListLength/:address`
+- GET `/getAccountRedeemList/:address`
+- GET `/getAccountRedeemListLength/:address`
+- GET `/getAccumulator/:inscription`
+- GET `/getAccumulatorList`
+- GET `/getAccumulatorListLength`
+- GET `/getRedeemList`
+- GET `/getRedeemListLength`
+<!-- END GENERATED TAP REST ENDPOINT INVENTORY -->
+
 # Tap Protocol API
 
 <dl>
@@ -1366,4 +1676,3 @@ Gets the length of a list based on a specified key.
 | Param | Type | Description |
 | --- | --- | --- |
 | length_key | <code>string</code> | The key to determine the length of the list. |
-
