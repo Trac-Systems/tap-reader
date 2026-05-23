@@ -998,7 +998,7 @@ export default class WebsocketModule {
                 return;
               }
               result =
-                  await this.tracManager.tapProtocol.getPrivilegeAuthIsVerified(
+                  await this.tracManager.tapProtocol.getPrivilegeAuthorityIsVerified(
                       cmd.args[0],
                       cmd.args[1],
                       cmd.args[2],
