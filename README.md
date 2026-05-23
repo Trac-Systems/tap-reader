@@ -189,6 +189,7 @@ The REST API exposes the same TAP data through topic-based route families. Each 
 - Trades: TAP token-trade offers, fills, account trade history, ticker trade history, and global trade lists.
 - Auth and privilege authority: token authorities, privilege authorities, authority cancellations, hash existence checks, verified privilege records, and authority-scoped reward/staking/sale views.
 - Locks and delegation cancellation: token lock records, lock-consume records, HTLC/OTC style lock history, delegation cancellation records, and block/transaction scoped lock events.
+- Certified-control lock data: opted-in lock records may include `control`; certified lock-consume records may include `cert`. Legacy lock records omit both fields.
 - AMM: AMM pool metadata, pool lists, pool events, positions, asset-indexed pools, external snapshots, and AMM-side obligation views.
 - Obligations: obligation records and consume records used by protocol applications to track pending and fulfilled duties between sources and targets.
 - Staking and reward claims: staking positions, pending rewards, reward claims, and address/authority scoped reward history.
