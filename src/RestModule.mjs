@@ -6191,6 +6191,136 @@ export default class RestModule {
 	        try { reply.send({ result: await this.tracManager.tapProtocol.getAmmExternalSnapshot(request.params.pool_id, request.params.snapshot_id) }); }
 	        catch (e) { reply.status(500).send({ error: "Internal Server Error" }); }
 	      });
+	      const perpGetRoute = (path, method, params = []) => {
+	        fastify.get(path, async (request, reply) => {
+	          try {
+	            const args = params.map((param) => request.params[param]);
+	            reply.send({ result: await this.tracManager.tapProtocol[method](...args) });
+	          } catch (e) {
+	            reply.status(500).send({ error: "Internal Server Error" });
+	          }
+	        });
+	      };
+	      const perpListRoute = (path, method, params = []) => {
+	        fastify.get(path, async (request, reply) => {
+	          const { offset, max } = request.query;
+	          try {
+	            const args = params.map((param) => request.params[param]);
+	            reply.send({ result: await this.tracManager.tapProtocol[method](...args, offset, max) });
+	          } catch (e) {
+	            reply.status(500).send({ error: "Internal Server Error" });
+	          }
+	        });
+	      };
+	      const perpAssetFromQuery = (query, prefix) => {
+	        const ns = query[`${prefix}_ns`];
+	        if (String(ns ?? "").toLowerCase() === "tap") {
+	          return { ns, tick: query[`${prefix}_tick`] };
+	        }
+	        return {
+	          ns,
+	          cid: query[`${prefix}_cid`],
+	          ak: query[`${prefix}_ak`],
+	          aid: query[`${prefix}_aid`],
+	        };
+	      };
+	      const perpPairAssetsRoute = (path, method, list = false) => {
+	        fastify.get(path, async (request, reply) => {
+	          const { offset, max } = request.query;
+	          try {
+	            const base = perpAssetFromQuery(request.query, "base");
+	            const quote = perpAssetFromQuery(request.query, "quote");
+	            const result = list
+	              ? await this.tracManager.tapProtocol[method](base, quote, offset, max)
+	              : await this.tracManager.tapProtocol[method](base, quote);
+	            reply.send({ result });
+	          } catch (e) {
+	            reply.status(400).send({ error: "Invalid perp pair asset query" });
+	          }
+	        });
+	      };
+	      perpGetRoute("/getPerpPolicy/:policy_id", "getPerpPolicy", ["policy_id"]);
+	      perpGetRoute("/getPerpPolicyListLength", "getPerpPolicyListLength");
+	      perpListRoute("/getPerpPolicyList", "getPerpPolicyList");
+	      perpGetRoute("/getPerpPolicyEventsByBlockLength/:block", "getPerpPolicyEventsByBlockLength", ["block"]);
+	      perpListRoute("/getPerpPolicyEventsByBlock/:block", "getPerpPolicyEventsByBlock", ["block"]);
+	      perpGetRoute("/getPerpPolicyEventsByTransactionLength/:transaction_hash", "getPerpPolicyEventsByTransactionLength", ["transaction_hash"]);
+	      perpListRoute("/getPerpPolicyEventsByTransaction/:transaction_hash", "getPerpPolicyEventsByTransaction", ["transaction_hash"]);
+	      perpGetRoute("/getPerpGroup/:group_id", "getPerpGroup", ["group_id"]);
+	      perpGetRoute("/getPerpGroupListLength", "getPerpGroupListLength");
+	      perpListRoute("/getPerpGroupList", "getPerpGroupList");
+	      perpGetRoute("/getPerpGroupsByStateLength/:state", "getPerpGroupsByStateLength", ["state"]);
+	      perpListRoute("/getPerpGroupsByState/:state", "getPerpGroupsByState", ["state"]);
+	      perpGetRoute("/getPerpGroupsByStatusLength/:status", "getPerpGroupsByStatusLength", ["status"]);
+	      perpListRoute("/getPerpGroupsByStatus/:status", "getPerpGroupsByStatus", ["status"]);
+	      perpGetRoute("/getPerpGroupsByPolicyLength/:policy_id", "getPerpGroupsByPolicyLength", ["policy_id"]);
+	      perpListRoute("/getPerpGroupsByPolicy/:policy_id", "getPerpGroupsByPolicy", ["policy_id"]);
+	      perpGetRoute("/getPerpGroupsByPairLength/:pair_key", "getPerpGroupsByPairLength", ["pair_key"]);
+	      perpListRoute("/getPerpGroupsByPair/:pair_key", "getPerpGroupsByPair", ["pair_key"]);
+	      perpPairAssetsRoute("/getPerpGroupsByPairAssetsLength", "getPerpGroupsByPairAssetsLength");
+	      perpPairAssetsRoute("/getPerpGroupsByPairAssets", "getPerpGroupsByPairAssets", true);
+	      perpGetRoute("/getPerpGroupsByAddressLength/:address", "getPerpGroupsByAddressLength", ["address"]);
+	      perpListRoute("/getPerpGroupsByAddress/:address", "getPerpGroupsByAddress", ["address"]);
+	      perpGetRoute("/getPerpGroupEventsByBlockLength/:block", "getPerpGroupEventsByBlockLength", ["block"]);
+	      perpListRoute("/getPerpGroupEventsByBlock/:block", "getPerpGroupEventsByBlock", ["block"]);
+	      perpGetRoute("/getPerpGroupEventsByTransactionLength/:transaction_hash", "getPerpGroupEventsByTransactionLength", ["transaction_hash"]);
+	      perpListRoute("/getPerpGroupEventsByTransaction/:transaction_hash", "getPerpGroupEventsByTransaction", ["transaction_hash"]);
+	      perpGetRoute("/getPerpPosition/:position_id", "getPerpPosition", ["position_id"]);
+	      perpGetRoute("/getPerpPositionListLength", "getPerpPositionListLength");
+	      perpListRoute("/getPerpPositionList", "getPerpPositionList");
+	      perpGetRoute("/getPerpPositionsByGroupLength/:group_id", "getPerpPositionsByGroupLength", ["group_id"]);
+	      perpListRoute("/getPerpPositionsByGroup/:group_id", "getPerpPositionsByGroup", ["group_id"]);
+	      perpGetRoute("/getPerpPositionsByAddressLength/:address", "getPerpPositionsByAddressLength", ["address"]);
+	      perpListRoute("/getPerpPositionsByAddress/:address", "getPerpPositionsByAddress", ["address"]);
+	      perpGetRoute("/getPerpJoinEventsByBlockLength/:block", "getPerpJoinEventsByBlockLength", ["block"]);
+	      perpListRoute("/getPerpJoinEventsByBlock/:block", "getPerpJoinEventsByBlock", ["block"]);
+	      perpGetRoute("/getPerpJoinEventsByTransactionLength/:transaction_hash", "getPerpJoinEventsByTransactionLength", ["transaction_hash"]);
+	      perpListRoute("/getPerpJoinEventsByTransaction/:transaction_hash", "getPerpJoinEventsByTransaction", ["transaction_hash"]);
+	      perpGetRoute("/getPerpCancelEventsByBlockLength/:block", "getPerpCancelEventsByBlockLength", ["block"]);
+	      perpListRoute("/getPerpCancelEventsByBlock/:block", "getPerpCancelEventsByBlock", ["block"]);
+	      perpGetRoute("/getPerpActivateEventsByBlockLength/:block", "getPerpActivateEventsByBlockLength", ["block"]);
+	      perpListRoute("/getPerpActivateEventsByBlock/:block", "getPerpActivateEventsByBlock", ["block"]);
+	      perpGetRoute("/getPerpCloseEventsByBlockLength/:block", "getPerpCloseEventsByBlockLength", ["block"]);
+	      perpListRoute("/getPerpCloseEventsByBlock/:block", "getPerpCloseEventsByBlock", ["block"]);
+	      perpGetRoute("/getPerpLiquidateEventsByBlockLength/:block", "getPerpLiquidateEventsByBlockLength", ["block"]);
+	      perpListRoute("/getPerpLiquidateEventsByBlock/:block", "getPerpLiquidateEventsByBlock", ["block"]);
+	      perpGetRoute("/getPerpSettleEventsByBlockLength/:block", "getPerpSettleEventsByBlockLength", ["block"]);
+	      perpListRoute("/getPerpSettleEventsByBlock/:block", "getPerpSettleEventsByBlock", ["block"]);
+	      perpGetRoute("/getPerpPriceCertificate/:certificate_id", "getPerpPriceCertificate", ["certificate_id"]);
+	      perpGetRoute("/getPerpPriceCertificateListLength", "getPerpPriceCertificateListLength");
+	      perpListRoute("/getPerpPriceCertificateList", "getPerpPriceCertificateList");
+	      perpGetRoute("/getPerpExternalEvidence/:evidence_id", "getPerpExternalEvidence", ["evidence_id"]);
+	      perpGetRoute("/getPerpExternalEvidenceListLength", "getPerpExternalEvidenceListLength");
+	      perpListRoute("/getPerpExternalEvidenceList", "getPerpExternalEvidenceList");
+	      perpGetRoute("/getPerpExternalEvidenceByGroupLength/:group_id", "getPerpExternalEvidenceByGroupLength", ["group_id"]);
+	      perpListRoute("/getPerpExternalEvidenceByGroup/:group_id", "getPerpExternalEvidenceByGroup", ["group_id"]);
+	      perpGetRoute("/getPerpExternalEvidenceByPositionLength/:position_id", "getPerpExternalEvidenceByPositionLength", ["position_id"]);
+	      perpListRoute("/getPerpExternalEvidenceByPosition/:position_id", "getPerpExternalEvidenceByPosition", ["position_id"]);
+	      perpGetRoute("/getPerpExternalEvidenceByChainLength/:chain_id", "getPerpExternalEvidenceByChainLength", ["chain_id"]);
+	      perpListRoute("/getPerpExternalEvidenceByChain/:chain_id", "getPerpExternalEvidenceByChain", ["chain_id"]);
+	      perpGetRoute("/getPerpEvidenceEventsByBlockLength/:block", "getPerpEvidenceEventsByBlockLength", ["block"]);
+	      perpListRoute("/getPerpEvidenceEventsByBlock/:block", "getPerpEvidenceEventsByBlock", ["block"]);
+	      perpGetRoute("/getPerpEvidenceEventsByTransactionLength/:transaction_hash", "getPerpEvidenceEventsByTransactionLength", ["transaction_hash"]);
+	      perpListRoute("/getPerpEvidenceEventsByTransaction/:transaction_hash", "getPerpEvidenceEventsByTransaction", ["transaction_hash"]);
+	      perpGetRoute("/getPerpLiquidationListLength", "getPerpLiquidationListLength");
+	      perpListRoute("/getPerpLiquidationList", "getPerpLiquidationList");
+	      perpGetRoute("/getPerpSettlement/:group_id", "getPerpSettlement", ["group_id"]);
+	      perpGetRoute("/getPerpClaim/:position_id", "getPerpClaim", ["position_id"]);
+	      perpGetRoute("/getPerpRefund/:position_id", "getPerpRefund", ["position_id"]);
+	      perpGetRoute("/getPerpClaimsByGroupLength/:group_id", "getPerpClaimsByGroupLength", ["group_id"]);
+	      perpListRoute("/getPerpClaimsByGroup/:group_id", "getPerpClaimsByGroup", ["group_id"]);
+	      perpGetRoute("/getPerpClaimsByAddressLength/:address", "getPerpClaimsByAddressLength", ["address"]);
+	      perpListRoute("/getPerpClaimsByAddress/:address", "getPerpClaimsByAddress", ["address"]);
+	      perpGetRoute("/getPerpRefundsByGroupLength/:group_id", "getPerpRefundsByGroupLength", ["group_id"]);
+	      perpListRoute("/getPerpRefundsByGroup/:group_id", "getPerpRefundsByGroup", ["group_id"]);
+	      perpGetRoute("/getPerpRefundsByAddressLength/:address", "getPerpRefundsByAddressLength", ["address"]);
+	      perpListRoute("/getPerpRefundsByAddress/:address", "getPerpRefundsByAddress", ["address"]);
+	      perpGetRoute("/getPerpBountiesByGroupLength/:group_id", "getPerpBountiesByGroupLength", ["group_id"]);
+	      perpListRoute("/getPerpBountiesByGroup/:group_id", "getPerpBountiesByGroup", ["group_id"]);
+	      perpGetRoute("/getPerpBountiesByAddressLength/:address", "getPerpBountiesByAddressLength", ["address"]);
+	      perpListRoute("/getPerpBountiesByAddress/:address", "getPerpBountiesByAddress", ["address"]);
+	      perpGetRoute("/getPerpEventByBlockLength/:block", "getPerpEventByBlockLength", ["block"]);
+	      perpListRoute("/getPerpEventByBlock/:block", "getPerpEventByBlock", ["block"]);
 	      fastify.get("/getObligation/:obligation_id", async (request, reply) => {
 	        try { reply.send({ result: await this.tracManager.tapProtocol.getObligation(request.params.obligation_id) }); }
 	        catch (e) { reply.status(500).send({ error: "Internal Server Error" }); }

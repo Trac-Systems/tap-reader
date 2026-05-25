@@ -1,3 +1,35 @@
+export function encodePerpKeyPart(value) {
+  return Buffer.from(String(value), "utf8").toString("hex");
+}
+
+export function encodePerpAssetKey(asset) {
+  if (asset === null || typeof asset !== "object") {
+    throw new TypeError("perp asset must be an object");
+  }
+  const ns = String(asset.ns ?? asset.ty ?? "").toLowerCase();
+  if (ns === "tap") {
+    if (typeof asset.tick !== "string") {
+      throw new TypeError("tap perp asset requires tick");
+    }
+    return "tap:" + encodePerpKeyPart(asset.tick.toLowerCase());
+  }
+  const cid = asset.cid;
+  const ak = asset.ak;
+  const aid = asset.aid;
+  if (typeof asset.ns !== "string" || typeof cid !== "string" || typeof ak !== "string" || typeof aid !== "string") {
+    throw new TypeError("external perp asset requires ns, cid, ak, and aid");
+  }
+  return "ext:" + [asset.ns, cid, ak, aid]
+      .map((part) => encodePerpKeyPart(part.toLowerCase()))
+      .join(":");
+}
+
+export function encodePerpPairKey(pairOrBase, maybeQuote) {
+  const base = typeof maybeQuote === "undefined" ? pairOrBase?.base : pairOrBase;
+  const quote = typeof maybeQuote === "undefined" ? pairOrBase?.quote : maybeQuote;
+  return encodePerpAssetKey(base) + "|" + encodePerpAssetKey(quote);
+}
+
 export default class TapProtocol {
   constructor(tracManager) {
     this.tracManager = tracManager;
@@ -1782,6 +1814,347 @@ export default class TapProtocol {
 	    return entry === null ? null : JSON.parse(entry.value);
 	  }
 
+	  async getPerpPolicy(policy_id) {
+	    const entry = await this.tracManager.bee.get("perp/p/" + policy_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getPerpPolicyListLength() {
+	    return this.getLength("perp/pl");
+	  }
+
+	  async getPerpPolicyList(offset = 0, max = 25) {
+	    return this.getListRecords("perp/pl", "perp/pli", offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpPolicyEventsByBlockLength(block) {
+	    return this.getLength("blck/perp/policy/" + block);
+	  }
+
+	  async getPerpPolicyEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getPointerListRecords("blck/perp/policy/" + block, "blcki/perp/policy/" + block, offset, Math.min(max, 25));
+	  }
+
+	  async getPerpPolicyEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/perp/policy/" + transaction_hash);
+	  }
+
+	  async getPerpPolicyEventsByTransaction(transaction_hash, offset = 0, max = 25) {
+	    return this.getPointerListRecords("tx/perp/policy/" + transaction_hash, "txi/perp/policy/" + transaction_hash, offset, Math.min(max, 25));
+	  }
+
+	  async getPerpGroup(group_id) {
+	    const entry = await this.tracManager.bee.get("perp/g/" + group_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getPerpGroupListLength() {
+	    return this.getLength("perp/gl");
+	  }
+
+	  async getPerpGroupList(offset = 0, max = 25) {
+	    return this.getListRecords("perp/gl", "perp/gli", offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpGroupsByStateLength(state) {
+	    return this.getFilteredIdListRecordsLength("perp/gs/" + state, "perp/gsi/" + state, "perp/g", (group) => group?.state === state);
+	  }
+
+	  async getPerpGroupsByState(state, offset = 0, max = 25) {
+	    return this.getFilteredIdListRecords("perp/gs/" + state, "perp/gsi/" + state, "perp/g", offset, Math.min(max, 25), (group) => group?.state === state);
+	  }
+
+	  async getPerpGroupsByPolicyLength(policy_id) {
+	    return this.getLength("perp/gpol/" + policy_id);
+	  }
+
+	  async getPerpGroupsByPolicy(policy_id, offset = 0, max = 25) {
+	    return this.getIdListRecords("perp/gpol/" + policy_id, "perp/gpoli/" + policy_id, "perp/g", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpGroupsByPairLength(pair_key) {
+	    return this.getLength("perp/gpair/" + pair_key);
+	  }
+
+	  async getPerpGroupsByPair(pair_key, offset = 0, max = 25) {
+	    return this.getIdListRecords("perp/gpair/" + pair_key, "perp/gpairi/" + pair_key, "perp/g", offset, Math.min(max, 25));
+	  }
+
+	  getPerpPairKey(pairOrBase, maybeQuote) {
+	    return encodePerpPairKey(pairOrBase, maybeQuote);
+	  }
+
+	  async getPerpGroupsByPairAssetsLength(base, quote) {
+	    return this.getPerpGroupsByPairLength(this.getPerpPairKey(base, quote));
+	  }
+
+	  async getPerpGroupsByPairAssets(base, quote, offset = 0, max = 25) {
+	    return this.getPerpGroupsByPair(this.getPerpPairKey(base, quote), offset, max);
+	  }
+
+	  async getPerpGroupsByStatusLength(status) {
+	    return this.getFilteredIdListRecordsLength("perp/gs/" + status, "perp/gsi/" + status, "perp/g", (group) => group?.state === status);
+	  }
+
+	  async getPerpGroupsByStatus(status, offset = 0, max = 25) {
+	    return this.getFilteredIdListRecords("perp/gs/" + status, "perp/gsi/" + status, "perp/g", offset, Math.min(max, 25), (group) => group?.state === status);
+	  }
+
+	  async getPerpGroupsByAddressLength(address) {
+	    return this.getLength("perp/ga/" + address);
+	  }
+
+	  async getPerpGroupsByAddress(address, offset = 0, max = 25) {
+	    return this.getIdListRecords("perp/ga/" + address, "perp/gai/" + address, "perp/g", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpGroupEventsByBlockLength(block) {
+	    return this.getLength("blck/perp/group/" + block);
+	  }
+
+	  async getPerpGroupEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getPointerListRecords("blck/perp/group/" + block, "blcki/perp/group/" + block, offset, Math.min(max, 25));
+	  }
+
+	  async getPerpGroupEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/perp/group/" + transaction_hash);
+	  }
+
+	  async getPerpGroupEventsByTransaction(transaction_hash, offset = 0, max = 25) {
+	    return this.getPointerListRecords("tx/perp/group/" + transaction_hash, "txi/perp/group/" + transaction_hash, offset, Math.min(max, 25));
+	  }
+
+	  async getPerpPosition(position_id) {
+	    const entry = await this.tracManager.bee.get("perp/pos/" + position_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getPerpPositionListLength() {
+	    return this.getLength("perp/posl");
+	  }
+
+	  async getPerpPositionList(offset = 0, max = 25) {
+	    return this.getListRecords("perp/posl", "perp/posli", offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpPositionsByGroupLength(group_id) {
+	    return this.getLength("perp/pgl/" + group_id);
+	  }
+
+	  async getPerpPositionsByGroup(group_id, offset = 0, max = 25) {
+	    return this.getIdListRecords("perp/pgl/" + group_id, "perp/pgli/" + group_id, "perp/pos", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpPositionsByAddressLength(address) {
+	    return this.getLength("perp/pa/" + address);
+	  }
+
+	  async getPerpPositionsByAddress(address, offset = 0, max = 25) {
+	    return this.getIdListRecords("perp/pa/" + address, "perp/pai/" + address, "perp/pos", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpJoinEventsByBlockLength(block) {
+	    return this.getLength("blck/perp/join/" + block);
+	  }
+
+	  async getPerpJoinEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getPointerListRecords("blck/perp/join/" + block, "blcki/perp/join/" + block, offset, Math.min(max, 25));
+	  }
+
+	  async getPerpJoinEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/perp/join/" + transaction_hash);
+	  }
+
+	  async getPerpJoinEventsByTransaction(transaction_hash, offset = 0, max = 25) {
+	    return this.getPointerListRecords("tx/perp/join/" + transaction_hash, "txi/perp/join/" + transaction_hash, offset, Math.min(max, 25));
+	  }
+
+	  async getPerpCancelEventsByBlockLength(block) {
+	    return this.getLength("blck/perp/cancel/" + block);
+	  }
+
+	  async getPerpCancelEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getIdListRecords("blck/perp/cancel/" + block, "blcki/perp/cancel/" + block, "perp/g", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpActivateEventsByBlockLength(block) {
+	    return this.getLength("blck/perp/activate/" + block);
+	  }
+
+	  async getPerpActivateEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getIdListRecords("blck/perp/activate/" + block, "blcki/perp/activate/" + block, "perp/g", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpCloseEventsByBlockLength(block) {
+	    return this.getLength("blck/perp/close/" + block);
+	  }
+
+	  async getPerpCloseEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getIdListRecords("blck/perp/close/" + block, "blcki/perp/close/" + block, "perp/pos", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpLiquidateEventsByBlockLength(block) {
+	    return this.getLength("blck/perp/liquidate/" + block);
+	  }
+
+	  async getPerpLiquidateEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getIdListRecords("blck/perp/liquidate/" + block, "blcki/perp/liquidate/" + block, "perp/pos", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpSettleEventsByBlockLength(block) {
+	    return this.getLength("blck/perp/settle/" + block);
+	  }
+
+	  async getPerpSettleEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getIdListRecords("blck/perp/settle/" + block, "blcki/perp/settle/" + block, "perp/g", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpPriceCertificate(certificate_id) {
+	    const entry = await this.tracManager.bee.get("perp/c/" + certificate_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getPerpPriceCertificateListLength() {
+	    return this.getLength("perp/certl");
+	  }
+
+	  async getPerpPriceCertificateList(offset = 0, max = 25) {
+	    return this.getListRecords("perp/certl", "perp/certi", offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpExternalEvidence(evidence_id) {
+	    const entry = await this.tracManager.bee.get("perp/e/" + evidence_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getPerpExternalEvidenceListLength() {
+	    return this.getLength("perp/el");
+	  }
+
+	  async getPerpExternalEvidenceList(offset = 0, max = 25) {
+	    return this.getListRecords("perp/el", "perp/eli", offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpExternalEvidenceByGroupLength(group_id) {
+	    return this.getLength("perp/eg/" + group_id);
+	  }
+
+	  async getPerpExternalEvidenceByGroup(group_id, offset = 0, max = 25) {
+	    return this.getIdListRecords("perp/eg/" + group_id, "perp/egi/" + group_id, "perp/e", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpExternalEvidenceByPositionLength(position_id) {
+	    return this.getLength("perp/ep/" + position_id);
+	  }
+
+	  async getPerpExternalEvidenceByPosition(position_id, offset = 0, max = 25) {
+	    return this.getIdListRecords("perp/ep/" + position_id, "perp/epi/" + position_id, "perp/e", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpExternalEvidenceByChainLength(chain_id) {
+	    return this.getLength("perp/ec/" + String(chain_id).toLowerCase());
+	  }
+
+	  async getPerpExternalEvidenceByChain(chain_id, offset = 0, max = 25) {
+	    const cid = String(chain_id).toLowerCase();
+	    return this.getIdListRecords("perp/ec/" + cid, "perp/eci/" + cid, "perp/e", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpEvidenceEventsByBlockLength(block) {
+	    return this.getLength("blck/perp/evidence/" + block);
+	  }
+
+	  async getPerpEvidenceEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getIdListRecords("blck/perp/evidence/" + block, "blcki/perp/evidence/" + block, "perp/e", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpEvidenceEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/perp/evidence/" + transaction_hash);
+	  }
+
+	  async getPerpEvidenceEventsByTransaction(transaction_hash, offset = 0, max = 25) {
+	    return this.getIdListRecords("tx/perp/evidence/" + transaction_hash, "txi/perp/evidence/" + transaction_hash, "perp/e", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpLiquidationListLength() {
+	    return this.getLength("perp/ll");
+	  }
+
+	  async getPerpLiquidationList(offset = 0, max = 25) {
+	    return this.getListRecords("perp/ll", "perp/lli", offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpSettlement(group_id) {
+	    const entry = await this.tracManager.bee.get("perp/st/" + group_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getPerpClaim(position_id) {
+	    const entry = await this.tracManager.bee.get("perp/cl/" + position_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getPerpRefund(position_id) {
+	    const entry = await this.tracManager.bee.get("perp/rf/" + position_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getPerpClaimsByGroupLength(group_id) {
+	    return this.getLength("perp/claimg/" + group_id);
+	  }
+
+	  async getPerpClaimsByGroup(group_id, offset = 0, max = 25) {
+	    return this.getListRecords("perp/claimg/" + group_id, "perp/claimgi/" + group_id, offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpClaimsByAddressLength(address) {
+	    return this.getLength("perp/claima/" + address);
+	  }
+
+	  async getPerpClaimsByAddress(address, offset = 0, max = 25) {
+	    return this.getListRecords("perp/claima/" + address, "perp/claimai/" + address, offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpRefundsByGroupLength(group_id) {
+	    return this.getLength("perp/refundg/" + group_id);
+	  }
+
+	  async getPerpRefundsByGroup(group_id, offset = 0, max = 25) {
+	    return this.getListRecords("perp/refundg/" + group_id, "perp/refundgi/" + group_id, offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpRefundsByAddressLength(address) {
+	    return this.getLength("perp/refunda/" + address);
+	  }
+
+	  async getPerpRefundsByAddress(address, offset = 0, max = 25) {
+	    return this.getListRecords("perp/refunda/" + address, "perp/refundai/" + address, offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpBountiesByGroupLength(group_id) {
+	    return this.getLength("perp/bg/" + group_id);
+	  }
+
+	  async getPerpBountiesByGroup(group_id, offset = 0, max = 25) {
+	    return this.getListRecords("perp/bg/" + group_id, "perp/bgi/" + group_id, offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpBountiesByAddressLength(address) {
+	    return this.getLength("perp/ba/" + address);
+	  }
+
+	  async getPerpBountiesByAddress(address, offset = 0, max = 25) {
+	    return this.getListRecords("perp/ba/" + address, "perp/bai/" + address, offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpEventByBlockLength(block) {
+	    return this.getLength("blck/perp/event/" + block);
+	  }
+
+	  async getPerpEventByBlock(block, offset = 0, max = 25) {
+	    return this.getListRecords("blck/perp/event/" + block, "blcki/perp/event/" + block, offset, Math.min(max, 25), true);
+	  }
+
 	  /// TOKEN ACTION OBLIGATIONS
 	  obligationEntityKey(entity_type, entity_id) {
 	    return entity_type + "/" + entity_id;
@@ -3380,6 +3753,55 @@ export default class TapProtocol {
     for (const ptr of pointers) {
       const entry = await this.tracManager.bee.get(ptr);
       if (entry !== null) out.push(JSON.parse(entry.value));
+    }
+    return out;
+  }
+
+  async getIdListRecords(length_key, iterator_key, record_prefix, offset, max) {
+    const ids = await this.getListRecords(length_key, iterator_key, offset, max, false);
+    if (!Array.isArray(ids)) return ids;
+    const out = [];
+    for (const id of ids) {
+      const entry = await this.tracManager.bee.get(record_prefix + "/" + id);
+      if (entry !== null) out.push(JSON.parse(entry.value));
+    }
+    return out;
+  }
+
+  async getFilteredIdListRecordsLength(length_key, iterator_key, record_prefix, predicate) {
+    const length = await this.getLength(length_key);
+    let count = 0;
+    for (let i = 0; i < length; i++) {
+      const ptr = await this.tracManager.bee.get(iterator_key + "/" + i);
+      if (ptr === null) continue;
+      const entry = await this.tracManager.bee.get(record_prefix + "/" + ptr.value);
+      if (entry === null) continue;
+      const value = JSON.parse(entry.value);
+      if (predicate(value)) count++;
+    }
+    return count;
+  }
+
+  async getFilteredIdListRecords(length_key, iterator_key, record_prefix, offset, max, predicate) {
+    if(typeof offset === "string" && this.isNumeric(offset)) offset = parseInt(''+offset);
+    if(typeof max === "string" && this.isNumeric(max)) max = parseInt(''+max);
+    if(typeof offset !== "string" && !this.isNumeric(offset)) return null;
+    if(typeof max !== "string" && !this.isNumeric(max)) return null;
+    if (max > 500) return "request too large";
+    if (offset < 0) return "invalid offset";
+    const length = await this.getLength(length_key);
+    const out = [];
+    let seen = 0;
+    for (let i = 0; i < length; i++) {
+      const ptr = await this.tracManager.bee.get(iterator_key + "/" + i);
+      if (ptr === null) continue;
+      const entry = await this.tracManager.bee.get(record_prefix + "/" + ptr.value);
+      if (entry === null) continue;
+      const value = JSON.parse(entry.value);
+      if (!predicate(value)) continue;
+      if (seen >= offset && out.length < max) out.push(value);
+      seen++;
+      if (out.length >= max) break;
     }
     return out;
   }
