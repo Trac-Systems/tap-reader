@@ -6551,6 +6551,10 @@ export default class RestModule {
 	      saleListRoute("/getSaleCancels", "getSaleCancels");
 	      saleLengthRoute("/getSaleCancelsByAuthorityLength/:authority_id", "getSaleCancelsByAuthorityLength", ["authority_id"]);
 	      saleListRoute("/getSaleCancelsByAuthority/:authority_id", "getSaleCancelsByAuthority", ["authority_id"]);
+	      saleLengthRoute("/getSaleResolutionsLength", "getSaleResolutionsLength");
+	      saleListRoute("/getSaleResolutions", "getSaleResolutions");
+	      saleLengthRoute("/getSaleResolutionsByAuthorityLength/:authority_id", "getSaleResolutionsByAuthorityLength", ["authority_id"]);
+	      saleListRoute("/getSaleResolutionsByAuthority/:authority_id", "getSaleResolutionsByAuthority", ["authority_id"]);
 	      saleLengthRoute("/getSaleWithdrawalsLength", "getSaleWithdrawalsLength");
 	      saleListRoute("/getSaleWithdrawals", "getSaleWithdrawals");
 	      saleLengthRoute("/getSaleWithdrawalsByAuthorityLength/:authority_id", "getSaleWithdrawalsByAuthorityLength", ["authority_id"]);

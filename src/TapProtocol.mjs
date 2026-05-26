@@ -2443,6 +2443,22 @@ export default class TapProtocol {
 	    return this.getListRecords("scana/" + authority_id, "scanai/" + authority_id, offset, max, true);
 	  }
 
+	  async getSaleResolutionsLength() {
+	    return this.getLength("sresl");
+	  }
+
+	  async getSaleResolutions(offset = 0, max = 500) {
+	    return this.getListRecords("sresl", "sresli", offset, max, true);
+	  }
+
+	  async getSaleResolutionsByAuthorityLength(authority_id) {
+	    return this.getLength("sresa/" + authority_id);
+	  }
+
+	  async getSaleResolutionsByAuthority(authority_id, offset = 0, max = 500) {
+	    return this.getListRecords("sresa/" + authority_id, "sresai/" + authority_id, offset, max, true);
+	  }
+
 	  async getSaleWithdrawalsLength() {
 	    return this.getLength("swdrl");
 	  }
