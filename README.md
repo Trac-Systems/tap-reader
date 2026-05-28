@@ -194,14 +194,14 @@ The REST API exposes the same TAP data through topic-based route families. Each 
 - Obligations: obligation records and consume records used by protocol applications to track pending and fulfilled duties between sources and targets.
 - Staking and reward claims: staking positions, pending rewards, reward claims, and address/authority scoped reward history.
 - Sales: sale status, contributions, claims, refunds, withdrawals, and cancellation history.
-- Perp groups: policy lookup, group discovery, position lookup, accepted price certificates, accepted external evidence, terminal settlement, claim/refund records, bounty records, and block-scoped perp event history.
+- Perp groups: policy lookup, group discovery, position lookup, accepted price certificates, terminal settlement, claim/refund records, bounty records, and block-scoped perp event history.
 - Other TAP endpoints: accumulator and redeem lists used by authority/redeem flows.
 
 ### Perp group routes
 
-Perp routes are grouped by purpose. Policy routes expose operator policy records. Group routes expose current group state and discovery indexes. Position routes expose participant positions. Certificate routes expose accepted state-transition price certificates. External evidence routes expose accepted external settlement-surface evidence. Terminal routes expose settlement, claim, refund, and bounty records. Event routes expose block or transaction scoped history.
+Perp routes are grouped by purpose. Policy routes expose operator policy records. Group routes expose current group state and discovery indexes. Position routes expose participant positions. Certificate routes expose accepted state-transition price certificates. Terminal routes expose settlement, claim, refund, and bounty records. Event routes expose block or transaction scoped history.
 
-External perp evidence currently recognizes `evm-perp-escrow`, `bsc-perp-escrow`, and `solana-perp-program` settlement surfaces. Evidence mode and surface kind must match the committed group collateral terms.
+TAP reader perp endpoints expose TAP-collateral perps only. External-chain perps are chain-local and are not mirrored as TAP TAP mirror evidence.
 
 - `getPerpPolicy`, `getPerpPolicyList`, `getPerpPolicyListLength`
 - `getPerpGroup`, `getPerpGroupList`, `getPerpGroupListLength`
@@ -215,10 +215,6 @@ External perp evidence currently recognizes `evm-perp-escrow`, `bsc-perp-escrow`
 - `getPerpPositionsByGroup`, `getPerpPositionsByGroupLength`
 - `getPerpPositionsByAddress`, `getPerpPositionsByAddressLength`
 - `getPerpPriceCertificate`, `getPerpPriceCertificateList`, `getPerpPriceCertificateListLength`
-- `getPerpExternalEvidence`, `getPerpExternalEvidenceList`, `getPerpExternalEvidenceListLength`
-- `getPerpExternalEvidenceByGroup`, `getPerpExternalEvidenceByGroupLength`
-- `getPerpExternalEvidenceByPosition`, `getPerpExternalEvidenceByPositionLength`
-- `getPerpExternalEvidenceByChain`, `getPerpExternalEvidenceByChainLength`
 - `getPerpLiquidationList`, `getPerpLiquidationListLength`
 - `getPerpSettlement`, `getPerpClaim`, `getPerpRefund`
 - `getPerpClaimsByGroup`, `getPerpClaimsByGroupLength`
@@ -238,8 +234,6 @@ External perp evidence currently recognizes `evm-perp-escrow`, `bsc-perp-escrow`
 - `getPerpCloseEventsByBlock`, `getPerpCloseEventsByBlockLength`
 - `getPerpLiquidateEventsByBlock`, `getPerpLiquidateEventsByBlockLength`
 - `getPerpSettleEventsByBlock`, `getPerpSettleEventsByBlockLength`
-- `getPerpEvidenceEventsByBlock`, `getPerpEvidenceEventsByBlockLength`
-- `getPerpEvidenceEventsByTransaction`, `getPerpEvidenceEventsByTransactionLength`
 - `getPerpEventByBlock`, `getPerpEventByBlockLength`
 
 Pair lookups should prefer `getPerpGroupsByPairAssets` or `getPerpGroupsByPairAssetsLength` with explicit asset objects. Encoded pair-key routes remain available for stored canonical keys, but clients should not build raw slash-delimited keys from ticker or external asset strings.

@@ -2022,60 +2022,6 @@ export default class TapProtocol {
 	    return this.getListRecords("perp/certl", "perp/certi", offset, Math.min(max, 25), true);
 	  }
 
-	  async getPerpExternalEvidence(evidence_id) {
-	    const entry = await this.tracManager.bee.get("perp/e/" + evidence_id);
-	    return entry === null ? null : JSON.parse(entry.value);
-	  }
-
-	  async getPerpExternalEvidenceListLength() {
-	    return this.getLength("perp/el");
-	  }
-
-	  async getPerpExternalEvidenceList(offset = 0, max = 25) {
-	    return this.getListRecords("perp/el", "perp/eli", offset, Math.min(max, 25), true);
-	  }
-
-	  async getPerpExternalEvidenceByGroupLength(group_id) {
-	    return this.getLength("perp/eg/" + group_id);
-	  }
-
-	  async getPerpExternalEvidenceByGroup(group_id, offset = 0, max = 25) {
-	    return this.getIdListRecords("perp/eg/" + group_id, "perp/egi/" + group_id, "perp/e", offset, Math.min(max, 25));
-	  }
-
-	  async getPerpExternalEvidenceByPositionLength(position_id) {
-	    return this.getLength("perp/ep/" + position_id);
-	  }
-
-	  async getPerpExternalEvidenceByPosition(position_id, offset = 0, max = 25) {
-	    return this.getIdListRecords("perp/ep/" + position_id, "perp/epi/" + position_id, "perp/e", offset, Math.min(max, 25));
-	  }
-
-	  async getPerpExternalEvidenceByChainLength(chain_id) {
-	    return this.getLength("perp/ec/" + String(chain_id).toLowerCase());
-	  }
-
-	  async getPerpExternalEvidenceByChain(chain_id, offset = 0, max = 25) {
-	    const cid = String(chain_id).toLowerCase();
-	    return this.getIdListRecords("perp/ec/" + cid, "perp/eci/" + cid, "perp/e", offset, Math.min(max, 25));
-	  }
-
-	  async getPerpEvidenceEventsByBlockLength(block) {
-	    return this.getLength("blck/perp/evidence/" + block);
-	  }
-
-	  async getPerpEvidenceEventsByBlock(block, offset = 0, max = 25) {
-	    return this.getIdListRecords("blck/perp/evidence/" + block, "blcki/perp/evidence/" + block, "perp/e", offset, Math.min(max, 25));
-	  }
-
-	  async getPerpEvidenceEventsByTransactionLength(transaction_hash) {
-	    return this.getLength("tx/perp/evidence/" + transaction_hash);
-	  }
-
-	  async getPerpEvidenceEventsByTransaction(transaction_hash, offset = 0, max = 25) {
-	    return this.getIdListRecords("tx/perp/evidence/" + transaction_hash, "txi/perp/evidence/" + transaction_hash, "perp/e", offset, Math.min(max, 25));
-	  }
-
 	  async getPerpLiquidationListLength() {
 	    return this.getLength("perp/ll");
 	  }
