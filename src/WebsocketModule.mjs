@@ -27,7 +27,85 @@ export default class WebsocketModule {
         let result = null;
 
         try {
-          switch (cmd.func) {
+          const directPerpRoutes = {
+            perpPolicy: ["getPerpPolicy", 1],
+            perpPolicyListLength: ["getPerpPolicyListLength", 0],
+            perpPolicyList: ["getPerpPolicyList", 2],
+            perpPolicyEventsByBlockLength: ["getPerpPolicyEventsByBlockLength", 1],
+            perpPolicyEventsByBlock: ["getPerpPolicyEventsByBlock", 3],
+            perpPolicyEventsByTransactionLength: ["getPerpPolicyEventsByTransactionLength", 1],
+            perpPolicyEventsByTransaction: ["getPerpPolicyEventsByTransaction", 3],
+            perpGroup: ["getPerpGroup", 1],
+            perpGroupListLength: ["getPerpGroupListLength", 0],
+            perpGroupList: ["getPerpGroupList", 2],
+            perpGroupsByStateLength: ["getPerpGroupsByStateLength", 1],
+            perpGroupsByState: ["getPerpGroupsByState", 3],
+            perpGroupsByStatusLength: ["getPerpGroupsByStatusLength", 1],
+            perpGroupsByStatus: ["getPerpGroupsByStatus", 3],
+            perpGroupsByPolicyLength: ["getPerpGroupsByPolicyLength", 1],
+            perpGroupsByPolicy: ["getPerpGroupsByPolicy", 3],
+            perpGroupsByPairLength: ["getPerpGroupsByPairLength", 1],
+            perpGroupsByPair: ["getPerpGroupsByPair", 3],
+            perpGroupsByPairAssetsLength: ["getPerpGroupsByPairAssetsLength", 2],
+            perpGroupsByPairAssets: ["getPerpGroupsByPairAssets", 4],
+            perpGroupsByAddressLength: ["getPerpGroupsByAddressLength", 1],
+            perpGroupsByAddress: ["getPerpGroupsByAddress", 3],
+            perpGroupEventsByBlockLength: ["getPerpGroupEventsByBlockLength", 1],
+            perpGroupEventsByBlock: ["getPerpGroupEventsByBlock", 3],
+            perpGroupEventsByTransactionLength: ["getPerpGroupEventsByTransactionLength", 1],
+            perpGroupEventsByTransaction: ["getPerpGroupEventsByTransaction", 3],
+            perpPosition: ["getPerpPosition", 1],
+            perpPositionListLength: ["getPerpPositionListLength", 0],
+            perpPositionList: ["getPerpPositionList", 2],
+            perpPositionsByGroupLength: ["getPerpPositionsByGroupLength", 1],
+            perpPositionsByGroup: ["getPerpPositionsByGroup", 3],
+            perpPositionsByAddressLength: ["getPerpPositionsByAddressLength", 1],
+            perpPositionsByAddress: ["getPerpPositionsByAddress", 3],
+            perpJoinEventsByBlockLength: ["getPerpJoinEventsByBlockLength", 1],
+            perpJoinEventsByBlock: ["getPerpJoinEventsByBlock", 3],
+            perpJoinEventsByTransactionLength: ["getPerpJoinEventsByTransactionLength", 1],
+            perpJoinEventsByTransaction: ["getPerpJoinEventsByTransaction", 3],
+            perpCancelEventsByBlockLength: ["getPerpCancelEventsByBlockLength", 1],
+            perpCancelEventsByBlock: ["getPerpCancelEventsByBlock", 3],
+            perpActivateEventsByBlockLength: ["getPerpActivateEventsByBlockLength", 1],
+            perpActivateEventsByBlock: ["getPerpActivateEventsByBlock", 3],
+            perpCloseEventsByBlockLength: ["getPerpCloseEventsByBlockLength", 1],
+            perpCloseEventsByBlock: ["getPerpCloseEventsByBlock", 3],
+            perpLiquidateEventsByBlockLength: ["getPerpLiquidateEventsByBlockLength", 1],
+            perpLiquidateEventsByBlock: ["getPerpLiquidateEventsByBlock", 3],
+            perpSettleEventsByBlockLength: ["getPerpSettleEventsByBlockLength", 1],
+            perpSettleEventsByBlock: ["getPerpSettleEventsByBlock", 3],
+            perpPriceCertificate: ["getPerpPriceCertificate", 1],
+            perpPriceCertificateListLength: ["getPerpPriceCertificateListLength", 0],
+            perpPriceCertificateList: ["getPerpPriceCertificateList", 2],
+            perpLiquidationListLength: ["getPerpLiquidationListLength", 0],
+            perpLiquidationList: ["getPerpLiquidationList", 2],
+            perpSettlement: ["getPerpSettlement", 1],
+            perpClaim: ["getPerpClaim", 1],
+            perpRefund: ["getPerpRefund", 1],
+            perpClaimsByGroupLength: ["getPerpClaimsByGroupLength", 1],
+            perpClaimsByGroup: ["getPerpClaimsByGroup", 3],
+            perpClaimsByAddressLength: ["getPerpClaimsByAddressLength", 1],
+            perpClaimsByAddress: ["getPerpClaimsByAddress", 3],
+            perpRefundsByGroupLength: ["getPerpRefundsByGroupLength", 1],
+            perpRefundsByGroup: ["getPerpRefundsByGroup", 3],
+            perpRefundsByAddressLength: ["getPerpRefundsByAddressLength", 1],
+            perpRefundsByAddress: ["getPerpRefundsByAddress", 3],
+            perpBountiesByGroupLength: ["getPerpBountiesByGroupLength", 1],
+            perpBountiesByGroup: ["getPerpBountiesByGroup", 3],
+            perpBountiesByAddressLength: ["getPerpBountiesByAddressLength", 1],
+            perpBountiesByAddress: ["getPerpBountiesByAddress", 3],
+            perpEventByBlockLength: ["getPerpEventByBlockLength", 1],
+            perpEventByBlock: ["getPerpEventByBlock", 3],
+          };
+          if (Object.prototype.hasOwnProperty.call(directPerpRoutes, cmd.func)) {
+            const [method, argCount] = directPerpRoutes[cmd.func];
+            if (cmd.args.length != argCount) {
+              this.invalidCmd(cmd, socket);
+              return;
+            }
+            result = await this.tracManager.tapProtocol[method](...cmd.args);
+          } else switch (cmd.func) {
 
             case "transferredListLength":
               if (cmd.args.length != 1) {
@@ -998,7 +1076,7 @@ export default class WebsocketModule {
                 return;
               }
               result =
-                  await this.tracManager.tapProtocol.getPrivilegeAuthIsVerified(
+                  await this.tracManager.tapProtocol.getPrivilegeAuthorityIsVerified(
                       cmd.args[0],
                       cmd.args[1],
                       cmd.args[2],

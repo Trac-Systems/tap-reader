@@ -1,3 +1,35 @@
+export function encodePerpKeyPart(value) {
+  return Buffer.from(String(value), "utf8").toString("hex");
+}
+
+export function encodePerpAssetKey(asset) {
+  if (asset === null || typeof asset !== "object") {
+    throw new TypeError("perp asset must be an object");
+  }
+  const ns = String(asset.ns ?? asset.ty ?? "").toLowerCase();
+  if (ns === "tap") {
+    if (typeof asset.tick !== "string") {
+      throw new TypeError("tap perp asset requires tick");
+    }
+    return "tap:" + encodePerpKeyPart(asset.tick.toLowerCase());
+  }
+  const cid = asset.cid;
+  const ak = asset.ak;
+  const aid = asset.aid;
+  if (typeof asset.ns !== "string" || typeof cid !== "string" || typeof ak !== "string" || typeof aid !== "string") {
+    throw new TypeError("external perp asset requires ns, cid, ak, and aid");
+  }
+  return "ext:" + [asset.ns, cid, ak, aid]
+      .map((part) => encodePerpKeyPart(part.toLowerCase()))
+      .join(":");
+}
+
+export function encodePerpPairKey(pairOrBase, maybeQuote) {
+  const base = typeof maybeQuote === "undefined" ? pairOrBase?.base : pairOrBase;
+  const quote = typeof maybeQuote === "undefined" ? pairOrBase?.quote : maybeQuote;
+  return encodePerpAssetKey(base) + "|" + encodePerpAssetKey(quote);
+}
+
 export default class TapProtocol {
   constructor(tracManager) {
     this.tracManager = tracManager;
@@ -1430,15 +1462,1011 @@ export default class TapProtocol {
     return null;
   }
 
-  async getSingleTransferable(inscription_id) {
-    let transferable = await this.tracManager.bee.get('tamt/' + inscription_id);
-    if (transferable !== null) {
-      return transferable.value;
-    }
-    return null;
-  }
+	  async getSingleTransferable(inscription_id) {
+	    let transferable = await this.tracManager.bee.get('tamt/' + inscription_id);
+	    if (transferable !== null) {
+	      return transferable.value;
+	    }
+	    return null;
+	  }
 
-  /**
+	  /// TOKEN ACTION LOCKS
+	  async getLock(lock_id) {
+	    const lock = await this.tracManager.bee.get("l/" + lock_id);
+	    return lock === null ? null : JSON.parse(lock.value);
+	  }
+
+	  async getLockConsume(lock_id) {
+	    const consume = await this.tracManager.bee.get("lc/" + lock_id);
+	    return consume === null ? null : JSON.parse(consume.value);
+	  }
+
+	  async getLockedBalance(address, ticker) {
+	    const locked = await this.tracManager.bee.get(
+	        "ll/" + address + "/" + JSON.stringify(ticker.toLowerCase())
+	    );
+	    return locked === null ? "0" : locked.value;
+	  }
+
+	  async getLockListLength() {
+	    return this.getLength("sl");
+	  }
+
+	  async getLockList(offset = 0, max = 500) {
+	    return this.getListRecords("sl", "sli", offset, max, true);
+	  }
+
+	  async getLockConsumeListLength() {
+	    return this.getLength("slc");
+	  }
+
+	  async getLockConsumeList(offset = 0, max = 500) {
+	    return this.getListRecords("slc", "slci", offset, max, true);
+	  }
+
+	  async getLocksByKindLength(kind) {
+	    return this.getLength("lk/" + kind.toLowerCase());
+	  }
+
+	  async getLocksByKind(kind, offset = 0, max = 500) {
+	    const k = kind.toLowerCase();
+	    return this.getListRecords("lk/" + k, "lki/" + k, offset, max, true);
+	  }
+
+	  async getDelegationCancel(auth, nonce) {
+	    const cancel = await this.tracManager.bee.get("tdcr/" + auth + "/" + nonce);
+	    return cancel === null ? null : JSON.parse(cancel.value);
+	  }
+
+	  async getDelegationCancelListLength() {
+	    return this.getLength("sftdc");
+	  }
+
+	  async getDelegationCancelList(offset = 0, max = 500) {
+	    return this.getListRecords("sftdc", "sftdci", offset, max, true);
+	  }
+
+	  async getAccountLocksLength(address) {
+	    return this.getLength("la/" + address);
+	  }
+
+	  async getAccountLocks(address, offset = 0, max = 500) {
+	    return this.getListRecords("la/" + address, "lai/" + address, offset, max, true);
+	  }
+
+	  async getAccountLocksByKindLength(address, kind) {
+	    return this.getLength("lak/" + address + "/" + kind.toLowerCase());
+	  }
+
+	  async getAccountLocksByKind(address, kind, offset = 0, max = 500) {
+	    const k = kind.toLowerCase();
+	    return this.getListRecords("lak/" + address + "/" + k, "laki/" + address + "/" + k, offset, max, true);
+	  }
+
+	  async getAccountDelegationCancelListLength(address) {
+	    return this.getLength("tdca/" + address);
+	  }
+
+	  async getAccountDelegationCancelList(address, offset = 0, max = 500) {
+	    return this.getListRecords("tdca/" + address, "tdcai/" + address, offset, max, true);
+	  }
+
+	  async getAuthDelegationCancelListLength(auth) {
+	    return this.getLength("tdcath/" + auth);
+	  }
+
+	  async getAuthDelegationCancelList(auth, offset = 0, max = 500) {
+	    return this.getListRecords("tdcath/" + auth, "tdcathi/" + auth, offset, max, true);
+	  }
+
+	  async getTickerLocksLength(ticker) {
+	    return this.getLength("lt/" + JSON.stringify(ticker.toLowerCase()));
+	  }
+
+	  async getTickerLocks(ticker, offset = 0, max = 500) {
+	    const tick = JSON.stringify(ticker.toLowerCase());
+	    return this.getListRecords("lt/" + tick, "lti/" + tick, offset, max, true);
+	  }
+
+	  async getTickerLocksByKindLength(ticker, kind) {
+	    return this.getLength("ltk/" + JSON.stringify(ticker.toLowerCase()) + "/" + kind.toLowerCase());
+	  }
+
+	  async getTickerLocksByKind(ticker, kind, offset = 0, max = 500) {
+	    const tick = JSON.stringify(ticker.toLowerCase());
+	    const k = kind.toLowerCase();
+	    return this.getListRecords("ltk/" + tick + "/" + k, "ltki/" + tick + "/" + k, offset, max, true);
+	  }
+
+	  async getAccountLockConsumesLength(address) {
+	    return this.getLength("lca/" + address);
+	  }
+
+	  async getAccountLockConsumes(address, offset = 0, max = 500) {
+	    return this.getListRecords("lca/" + address, "lcai/" + address, offset, max, true);
+	  }
+
+	  async getTickerLockConsumesLength(ticker) {
+	    return this.getLength("lct/" + JSON.stringify(ticker.toLowerCase()));
+	  }
+
+	  async getTickerLockConsumes(ticker, offset = 0, max = 500) {
+	    const tick = JSON.stringify(ticker.toLowerCase());
+	    return this.getListRecords("lct/" + tick, "lcti/" + tick, offset, max, true);
+	  }
+
+	  async getLockConsumesByKindLength(kind) {
+	    return this.getLength("lck/" + kind.toLowerCase());
+	  }
+
+	  async getLockConsumesByKind(kind, offset = 0, max = 500) {
+	    const k = kind.toLowerCase();
+	    return this.getListRecords("lck/" + k, "lcki/" + k, offset, max, true);
+	  }
+
+	  async getAccountLockConsumesByKindLength(address, kind) {
+	    return this.getLength("lcak/" + address + "/" + kind.toLowerCase());
+	  }
+
+	  async getAccountLockConsumesByKind(address, kind, offset = 0, max = 500) {
+	    const k = kind.toLowerCase();
+	    return this.getListRecords("lcak/" + address + "/" + k, "lcaki/" + address + "/" + k, offset, max, true);
+	  }
+
+	  async getTickerLockConsumesByKindLength(ticker, kind) {
+	    return this.getLength("lctk/" + JSON.stringify(ticker.toLowerCase()) + "/" + kind.toLowerCase());
+	  }
+
+	  async getTickerLockConsumesByKind(ticker, kind, offset = 0, max = 500) {
+	    const tick = JSON.stringify(ticker.toLowerCase());
+	    const k = kind.toLowerCase();
+	    return this.getListRecords("lctk/" + tick + "/" + k, "lctki/" + tick + "/" + k, offset, max, true);
+	  }
+
+	  async getLockEventsByBlockLength(block) {
+	    return this.getLength("blck/lck/" + block);
+	  }
+
+	  async getLockEventsByBlock(block, offset = 0, max = 500) {
+	    const pointers = await this.getListRecords("blck/lck/" + block, "blcki/lck/" + block, offset, max, false);
+	    if (!Array.isArray(pointers)) return pointers;
+	    const out = [];
+	    for (const ptr of pointers) {
+	      const entry = await this.tracManager.bee.get(ptr);
+	      if (entry !== null) out.push(JSON.parse(entry.value));
+	    }
+	    return out;
+	  }
+
+	  async getLockConsumeEventsByBlockLength(block) {
+	    return this.getLength("blck/lckc/" + block);
+	  }
+
+	  async getLockConsumeEventsByBlock(block, offset = 0, max = 500) {
+	    const pointers = await this.getListRecords("blck/lckc/" + block, "blcki/lckc/" + block, offset, max, false);
+	    if (!Array.isArray(pointers)) return pointers;
+	    const out = [];
+	    for (const ptr of pointers) {
+	      const entry = await this.tracManager.bee.get(ptr);
+	      if (entry !== null) out.push(JSON.parse(entry.value));
+	    }
+	    return out;
+	  }
+
+	  async getDelegationCancelEventsByBlockLength(block) {
+	    return this.getLength("blck/tdc/" + block);
+	  }
+
+	  async getDelegationCancelEventsByBlock(block, offset = 0, max = 500) {
+	    const pointers = await this.getListRecords("blck/tdc/" + block, "blcki/tdc/" + block, offset, max, false);
+	    if (!Array.isArray(pointers)) return pointers;
+	    const out = [];
+	    for (const ptr of pointers) {
+	      const entry = await this.tracManager.bee.get(ptr);
+	      if (entry !== null) out.push(JSON.parse(entry.value));
+	    }
+	    return out;
+	  }
+
+	  async getLockEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/lck/" + transaction_hash);
+	  }
+
+	  async getLockEventsByTransaction(transaction_hash, offset = 0, max = 500) {
+	    const pointers = await this.getListRecords("tx/lck/" + transaction_hash, "txi/lck/" + transaction_hash, offset, max, false);
+	    if (!Array.isArray(pointers)) return pointers;
+	    const out = [];
+	    for (const ptr of pointers) {
+	      const entry = await this.tracManager.bee.get(ptr);
+	      if (entry !== null) out.push(JSON.parse(entry.value));
+	    }
+	    return out;
+	  }
+
+	  async getLockConsumeEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/lckc/" + transaction_hash);
+	  }
+
+	  async getLockConsumeEventsByTransaction(transaction_hash, offset = 0, max = 500) {
+	    const pointers = await this.getListRecords("tx/lckc/" + transaction_hash, "txi/lckc/" + transaction_hash, offset, max, false);
+	    if (!Array.isArray(pointers)) return pointers;
+	    const out = [];
+	    for (const ptr of pointers) {
+	      const entry = await this.tracManager.bee.get(ptr);
+	      if (entry !== null) out.push(JSON.parse(entry.value));
+	    }
+	    return out;
+	  }
+
+	  /// TOKEN AUTHORITY CONFIG / STAKING
+	  async getAuthorityById(authority_id) {
+	    const entry = await this.tracManager.bee.get("ah/" + authority_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getAuthorityListLength() {
+	    return this.getLength("ahl");
+	  }
+
+	  async getAuthorityList(offset = 0, max = 500) {
+	    return this.getListRecords("ahl", "ahli", offset, max, true);
+	  }
+
+	  async getAuthoritiesByKindLength(kind) {
+	    return this.getLength("ahk/" + kind);
+	  }
+
+	  async getAuthoritiesByKind(kind, offset = 0, max = 500) {
+	    return this.getListRecords("ahk/" + kind, "ahki/" + kind, offset, max, true);
+	  }
+
+	  async getAuthorityBalanceByTick(authority_id, ticker) {
+	    const tick = JSON.stringify(ticker.toLowerCase());
+	    const entry = await this.tracManager.bee.get("ab/" + authority_id + "/" + tick);
+	    return entry === null ? "0" : entry.value;
+	  }
+
+	  async getAuthorityBalancesLength(authority_id) {
+	    return this.getLength("abl/" + authority_id);
+	  }
+
+	  async getAuthorityBalances(authority_id, offset = 0, max = 500) {
+	    const ticks = await this.getListRecords("abl/" + authority_id, "abli/" + authority_id, offset, max, true);
+	    if (!Array.isArray(ticks)) return ticks;
+	    const out = [];
+	    for (const tick of ticks) {
+	      const balance = await this.tracManager.bee.get("ab/" + authority_id + "/" + JSON.stringify(String(tick).toLowerCase()));
+	      out.push({ tick, bal: balance === null ? "0" : balance.value });
+	    }
+	    return out;
+	  }
+
+	  async getAmmPool(pool_id) {
+	    const entry = await this.tracManager.bee.get("amm/" + pool_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getAmmPoolListLength() {
+	    return this.getLength("amml");
+	  }
+
+	  async getAmmPoolList(offset = 0, max = 25) {
+	    return this.getPointerListRecords("amml", "ammli", offset, Math.min(max, 25));
+	  }
+
+	  async getAmmPoolsByAssetLength(asset_key) {
+	    return this.getLength("ammat/" + asset_key);
+	  }
+
+	  async getAmmPoolsByAsset(asset_key, offset = 0, max = 25) {
+	    return this.getPointerListRecords("ammat/" + asset_key, "ammati/" + asset_key, offset, Math.min(max, 25));
+	  }
+
+	  async getAmmPosition(pool_id, target_type, target) {
+	    const entry = await this.tracManager.bee.get("ammpr/" + pool_id + "/" + target_type + "/" + target);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getAmmPositionsByTargetLength(target_type, target) {
+	    return this.getLength("amma/" + target_type + "/" + target);
+	  }
+
+	  async getAmmPositionsByTarget(target_type, target, offset = 0, max = 25) {
+	    return this.getPointerListRecords(
+	        "amma/" + target_type + "/" + target,
+	        "ammai/" + target_type + "/" + target,
+	        offset,
+	        Math.min(max, 25)
+	    );
+	  }
+
+	  async getAmmEventsByPoolLength(pool_id) {
+	    return this.getLength("amme/" + pool_id);
+	  }
+
+	  async getAmmEventsByPool(pool_id, offset = 0, max = 25) {
+	    return this.getListRecords("amme/" + pool_id, "ammei/" + pool_id, offset, Math.min(max, 25), true);
+	  }
+
+	  async getAmmEventsByBlockLength(block) {
+	    return this.getLength("ammbe/" + block);
+	  }
+
+	  async getAmmEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getListRecords("ammbe/" + block, "ammbei/" + block, offset, Math.min(max, 25), true);
+	  }
+
+	  async getAmmEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/amm/" + transaction_hash);
+	  }
+
+	  async getAmmEventsByTransaction(transaction_hash, offset = 0, max = 25) {
+	    return this.getPointerListRecords(
+	        "tx/amm/" + transaction_hash,
+	        "txi/amm/" + transaction_hash,
+	        offset,
+	        Math.min(max, 25)
+	    );
+	  }
+
+	  async getAmmExternalSnapshot(pool_id, snapshot_id) {
+	    const entry = await this.tracManager.bee.get("amms/" + pool_id + "/" + snapshot_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getPerpPolicy(policy_id) {
+	    const entry = await this.tracManager.bee.get("perp/p/" + policy_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getPerpPolicyListLength() {
+	    return this.getLength("perp/pl");
+	  }
+
+	  async getPerpPolicyList(offset = 0, max = 25) {
+	    return this.getListRecords("perp/pl", "perp/pli", offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpPolicyEventsByBlockLength(block) {
+	    return this.getLength("blck/perp/policy/" + block);
+	  }
+
+	  async getPerpPolicyEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getPointerListRecords("blck/perp/policy/" + block, "blcki/perp/policy/" + block, offset, Math.min(max, 25));
+	  }
+
+	  async getPerpPolicyEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/perp/policy/" + transaction_hash);
+	  }
+
+	  async getPerpPolicyEventsByTransaction(transaction_hash, offset = 0, max = 25) {
+	    return this.getPointerListRecords("tx/perp/policy/" + transaction_hash, "txi/perp/policy/" + transaction_hash, offset, Math.min(max, 25));
+	  }
+
+	  async getPerpGroup(group_id) {
+	    const entry = await this.tracManager.bee.get("perp/g/" + group_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getPerpGroupListLength() {
+	    return this.getLength("perp/gl");
+	  }
+
+	  async getPerpGroupList(offset = 0, max = 25) {
+	    return this.getListRecords("perp/gl", "perp/gli", offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpGroupsByStateLength(state) {
+	    return this.getFilteredIdListRecordsLength("perp/gs/" + state, "perp/gsi/" + state, "perp/g", (group) => group?.state === state);
+	  }
+
+	  async getPerpGroupsByState(state, offset = 0, max = 25) {
+	    return this.getFilteredIdListRecords("perp/gs/" + state, "perp/gsi/" + state, "perp/g", offset, Math.min(max, 25), (group) => group?.state === state);
+	  }
+
+	  async getPerpGroupsByPolicyLength(policy_id) {
+	    return this.getLength("perp/gpol/" + policy_id);
+	  }
+
+	  async getPerpGroupsByPolicy(policy_id, offset = 0, max = 25) {
+	    return this.getIdListRecords("perp/gpol/" + policy_id, "perp/gpoli/" + policy_id, "perp/g", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpGroupsByPairLength(pair_key) {
+	    return this.getLength("perp/gpair/" + pair_key);
+	  }
+
+	  async getPerpGroupsByPair(pair_key, offset = 0, max = 25) {
+	    return this.getIdListRecords("perp/gpair/" + pair_key, "perp/gpairi/" + pair_key, "perp/g", offset, Math.min(max, 25));
+	  }
+
+	  getPerpPairKey(pairOrBase, maybeQuote) {
+	    return encodePerpPairKey(pairOrBase, maybeQuote);
+	  }
+
+	  async getPerpGroupsByPairAssetsLength(base, quote) {
+	    return this.getPerpGroupsByPairLength(this.getPerpPairKey(base, quote));
+	  }
+
+	  async getPerpGroupsByPairAssets(base, quote, offset = 0, max = 25) {
+	    return this.getPerpGroupsByPair(this.getPerpPairKey(base, quote), offset, max);
+	  }
+
+	  async getPerpGroupsByStatusLength(status) {
+	    return this.getFilteredIdListRecordsLength("perp/gs/" + status, "perp/gsi/" + status, "perp/g", (group) => group?.state === status);
+	  }
+
+	  async getPerpGroupsByStatus(status, offset = 0, max = 25) {
+	    return this.getFilteredIdListRecords("perp/gs/" + status, "perp/gsi/" + status, "perp/g", offset, Math.min(max, 25), (group) => group?.state === status);
+	  }
+
+	  async getPerpGroupsByAddressLength(address) {
+	    return this.getLength("perp/ga/" + address);
+	  }
+
+	  async getPerpGroupsByAddress(address, offset = 0, max = 25) {
+	    return this.getIdListRecords("perp/ga/" + address, "perp/gai/" + address, "perp/g", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpGroupEventsByBlockLength(block) {
+	    return this.getLength("blck/perp/group/" + block);
+	  }
+
+	  async getPerpGroupEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getPointerListRecords("blck/perp/group/" + block, "blcki/perp/group/" + block, offset, Math.min(max, 25));
+	  }
+
+	  async getPerpGroupEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/perp/group/" + transaction_hash);
+	  }
+
+	  async getPerpGroupEventsByTransaction(transaction_hash, offset = 0, max = 25) {
+	    return this.getPointerListRecords("tx/perp/group/" + transaction_hash, "txi/perp/group/" + transaction_hash, offset, Math.min(max, 25));
+	  }
+
+	  async getPerpPosition(position_id) {
+	    const entry = await this.tracManager.bee.get("perp/pos/" + position_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getPerpPositionListLength() {
+	    return this.getLength("perp/posl");
+	  }
+
+	  async getPerpPositionList(offset = 0, max = 25) {
+	    return this.getListRecords("perp/posl", "perp/posli", offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpPositionsByGroupLength(group_id) {
+	    return this.getLength("perp/pgl/" + group_id);
+	  }
+
+	  async getPerpPositionsByGroup(group_id, offset = 0, max = 25) {
+	    return this.getIdListRecords("perp/pgl/" + group_id, "perp/pgli/" + group_id, "perp/pos", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpPositionsByAddressLength(address) {
+	    return this.getLength("perp/pa/" + address);
+	  }
+
+	  async getPerpPositionsByAddress(address, offset = 0, max = 25) {
+	    return this.getIdListRecords("perp/pa/" + address, "perp/pai/" + address, "perp/pos", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpJoinEventsByBlockLength(block) {
+	    return this.getLength("blck/perp/join/" + block);
+	  }
+
+	  async getPerpJoinEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getPointerListRecords("blck/perp/join/" + block, "blcki/perp/join/" + block, offset, Math.min(max, 25));
+	  }
+
+	  async getPerpJoinEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/perp/join/" + transaction_hash);
+	  }
+
+	  async getPerpJoinEventsByTransaction(transaction_hash, offset = 0, max = 25) {
+	    return this.getPointerListRecords("tx/perp/join/" + transaction_hash, "txi/perp/join/" + transaction_hash, offset, Math.min(max, 25));
+	  }
+
+	  async getPerpCancelEventsByBlockLength(block) {
+	    return this.getLength("blck/perp/cancel/" + block);
+	  }
+
+	  async getPerpCancelEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getIdListRecords("blck/perp/cancel/" + block, "blcki/perp/cancel/" + block, "perp/g", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpActivateEventsByBlockLength(block) {
+	    return this.getLength("blck/perp/activate/" + block);
+	  }
+
+	  async getPerpActivateEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getIdListRecords("blck/perp/activate/" + block, "blcki/perp/activate/" + block, "perp/g", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpCloseEventsByBlockLength(block) {
+	    return this.getLength("blck/perp/close/" + block);
+	  }
+
+	  async getPerpCloseEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getIdListRecords("blck/perp/close/" + block, "blcki/perp/close/" + block, "perp/pos", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpLiquidateEventsByBlockLength(block) {
+	    return this.getLength("blck/perp/liquidate/" + block);
+	  }
+
+	  async getPerpLiquidateEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getIdListRecords("blck/perp/liquidate/" + block, "blcki/perp/liquidate/" + block, "perp/pos", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpSettleEventsByBlockLength(block) {
+	    return this.getLength("blck/perp/settle/" + block);
+	  }
+
+	  async getPerpSettleEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getIdListRecords("blck/perp/settle/" + block, "blcki/perp/settle/" + block, "perp/g", offset, Math.min(max, 25));
+	  }
+
+	  async getPerpPriceCertificate(certificate_id) {
+	    const entry = await this.tracManager.bee.get("perp/c/" + certificate_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getPerpPriceCertificateListLength() {
+	    return this.getLength("perp/certl");
+	  }
+
+	  async getPerpPriceCertificateList(offset = 0, max = 25) {
+	    return this.getListRecords("perp/certl", "perp/certi", offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpLiquidationListLength() {
+	    return this.getLength("perp/ll");
+	  }
+
+	  async getPerpLiquidationList(offset = 0, max = 25) {
+	    return this.getListRecords("perp/ll", "perp/lli", offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpSettlement(group_id) {
+	    const entry = await this.tracManager.bee.get("perp/st/" + group_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getPerpClaim(position_id) {
+	    const entry = await this.tracManager.bee.get("perp/cl/" + position_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getPerpRefund(position_id) {
+	    const entry = await this.tracManager.bee.get("perp/rf/" + position_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getPerpClaimsByGroupLength(group_id) {
+	    return this.getLength("perp/claimg/" + group_id);
+	  }
+
+	  async getPerpClaimsByGroup(group_id, offset = 0, max = 25) {
+	    return this.getListRecords("perp/claimg/" + group_id, "perp/claimgi/" + group_id, offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpClaimsByAddressLength(address) {
+	    return this.getLength("perp/claima/" + address);
+	  }
+
+	  async getPerpClaimsByAddress(address, offset = 0, max = 25) {
+	    return this.getListRecords("perp/claima/" + address, "perp/claimai/" + address, offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpRefundsByGroupLength(group_id) {
+	    return this.getLength("perp/refundg/" + group_id);
+	  }
+
+	  async getPerpRefundsByGroup(group_id, offset = 0, max = 25) {
+	    return this.getListRecords("perp/refundg/" + group_id, "perp/refundgi/" + group_id, offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpRefundsByAddressLength(address) {
+	    return this.getLength("perp/refunda/" + address);
+	  }
+
+	  async getPerpRefundsByAddress(address, offset = 0, max = 25) {
+	    return this.getListRecords("perp/refunda/" + address, "perp/refundai/" + address, offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpBountiesByGroupLength(group_id) {
+	    return this.getLength("perp/bg/" + group_id);
+	  }
+
+	  async getPerpBountiesByGroup(group_id, offset = 0, max = 25) {
+	    return this.getListRecords("perp/bg/" + group_id, "perp/bgi/" + group_id, offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpBountiesByAddressLength(address) {
+	    return this.getLength("perp/ba/" + address);
+	  }
+
+	  async getPerpBountiesByAddress(address, offset = 0, max = 25) {
+	    return this.getListRecords("perp/ba/" + address, "perp/bai/" + address, offset, Math.min(max, 25), true);
+	  }
+
+	  async getPerpEventByBlockLength(block) {
+	    return this.getLength("blck/perp/event/" + block);
+	  }
+
+	  async getPerpEventByBlock(block, offset = 0, max = 25) {
+	    return this.getListRecords("blck/perp/event/" + block, "blcki/perp/event/" + block, offset, Math.min(max, 25), true);
+	  }
+
+	  /// TOKEN ACTION OBLIGATIONS
+	  obligationEntityKey(entity_type, entity_id) {
+	    return entity_type + "/" + entity_id;
+	  }
+
+	  ammObligationEntityKey(pool_id, side) {
+	    return "amm/" + pool_id + "/" + side;
+	  }
+
+	  async getObligation(obligation_id) {
+	    const entry = await this.tracManager.bee.get("ob/" + obligation_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getObligationConsume(obligation_id) {
+	    const entry = await this.tracManager.bee.get("obc/" + obligation_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getObligationLockedBalance(source_type, source_id, ticker) {
+	    const tick = JSON.stringify(ticker.toLowerCase());
+	    const entry = await this.tracManager.bee.get(
+	        "oll/" + this.obligationEntityKey(source_type, source_id) + "/" + tick
+	    );
+	    return entry === null ? "0" : entry.value;
+	  }
+
+	  async getAmmObligationLockedBalance(pool_id, side, ticker) {
+	    const tick = JSON.stringify(ticker.toLowerCase());
+	    const entry = await this.tracManager.bee.get(
+	        "oll/" + this.ammObligationEntityKey(pool_id, side) + "/" + tick
+	    );
+	    return entry === null ? "0" : entry.value;
+	  }
+
+	  async getObligationListLength() {
+	    return this.getLength("obl");
+	  }
+
+	  async getObligationList(offset = 0, max = 25) {
+	    return this.getListRecords("obl", "obli", offset, Math.min(max, 25), true);
+	  }
+
+	  async getObligationConsumeListLength() {
+	    return this.getLength("obcl");
+	  }
+
+	  async getObligationConsumeList(offset = 0, max = 25) {
+	    return this.getListRecords("obcl", "obcli", offset, Math.min(max, 25), true);
+	  }
+
+	  async getObligationsBySourceLength(source_type, source_id) {
+	    return this.getLength("obsrc/" + this.obligationEntityKey(source_type, source_id));
+	  }
+
+	  async getObligationsBySource(source_type, source_id, offset = 0, max = 25) {
+	    const key = this.obligationEntityKey(source_type, source_id);
+	    return this.getListRecords("obsrc/" + key, "obsrci/" + key, offset, Math.min(max, 25), true);
+	  }
+
+	  async getAmmObligationsBySourceLength(pool_id, side) {
+	    return this.getLength("obsrc/" + this.ammObligationEntityKey(pool_id, side));
+	  }
+
+	  async getAmmObligationsBySource(pool_id, side, offset = 0, max = 25) {
+	    const key = this.ammObligationEntityKey(pool_id, side);
+	    return this.getListRecords("obsrc/" + key, "obsrci/" + key, offset, Math.min(max, 25), true);
+	  }
+
+	  async getObligationsByTargetLength(target_type, target_id) {
+	    return this.getLength("oba/" + this.obligationEntityKey(target_type, target_id));
+	  }
+
+	  async getObligationsByTarget(target_type, target_id, offset = 0, max = 25) {
+	    const key = this.obligationEntityKey(target_type, target_id);
+	    return this.getListRecords("oba/" + key, "obai/" + key, offset, Math.min(max, 25), true);
+	  }
+
+	  async getAmmObligationsByTargetLength(pool_id, side) {
+	    return this.getLength("oba/" + this.ammObligationEntityKey(pool_id, side));
+	  }
+
+	  async getAmmObligationsByTarget(pool_id, side, offset = 0, max = 25) {
+	    const key = this.ammObligationEntityKey(pool_id, side);
+	    return this.getListRecords("oba/" + key, "obai/" + key, offset, Math.min(max, 25), true);
+	  }
+
+	  async getObligationsByContextLength(context_key) {
+	    return this.getLength("obctx/" + context_key);
+	  }
+
+	  async getObligationsByContext(context_key, offset = 0, max = 25) {
+	    return this.getListRecords("obctx/" + context_key, "obctxi/" + context_key, offset, Math.min(max, 25), true);
+	  }
+
+	  async getObligationEventsByBlockLength(block) {
+	    return this.getLength("blck/ob/" + block);
+	  }
+
+	  async getObligationEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getPointerListRecords("blck/ob/" + block, "blcki/ob/" + block, offset, Math.min(max, 25));
+	  }
+
+	  async getObligationConsumeEventsByBlockLength(block) {
+	    return this.getLength("blck/obc/" + block);
+	  }
+
+	  async getObligationConsumeEventsByBlock(block, offset = 0, max = 25) {
+	    return this.getPointerListRecords("blck/obc/" + block, "blcki/obc/" + block, offset, Math.min(max, 25));
+	  }
+
+	  async getObligationEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/ob/" + transaction_hash);
+	  }
+
+	  async getObligationEventsByTransaction(transaction_hash, offset = 0, max = 25) {
+	    return this.getPointerListRecords(
+	        "tx/ob/" + transaction_hash,
+	        "txi/ob/" + transaction_hash,
+	        offset,
+	        Math.min(max, 25)
+	    );
+	  }
+
+	  async getObligationConsumeEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/obc/" + transaction_hash);
+	  }
+
+	  async getObligationConsumeEventsByTransaction(transaction_hash, offset = 0, max = 25) {
+	    return this.getPointerListRecords(
+	        "tx/obc/" + transaction_hash,
+	        "txi/obc/" + transaction_hash,
+	        offset,
+	        Math.min(max, 25)
+	    );
+	  }
+
+	  async getStakePositionById(position_id) {
+	    const entry = await this.tracManager.bee.get("sp/" + position_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getStakePositionsByAddressLength(address) {
+	    return this.getLength("spa/" + address);
+	  }
+
+	  async getStakePositionsByAddress(address, offset = 0, max = 500) {
+	    return this.getListRecords("spa/" + address, "spai/" + address, offset, max, true);
+	  }
+
+	  async getStakePositionsByAuthorityLength(authority_id) {
+	    return this.getLength("sph/" + authority_id);
+	  }
+
+	  async getStakePositionsByAuthority(authority_id, offset = 0, max = 500) {
+	    return this.getListRecords("sph/" + authority_id, "sphi/" + authority_id, offset, max, true);
+	  }
+
+	  async getRewardClaimListLength() {
+	    return this.getLength("rcl");
+	  }
+
+	  async getRewardClaimList(offset = 0, max = 500) {
+	    return this.getListRecords("rcl", "rcli", offset, max, true);
+	  }
+
+	  async getRewardClaimsByAddressLength(address) {
+	    return this.getLength("rca/" + address);
+	  }
+
+	  async getRewardClaimsByAddress(address, offset = 0, max = 500) {
+	    return this.getListRecords("rca/" + address, "rcai/" + address, offset, max, true);
+	  }
+
+	  async getRewardClaimsByAuthorityLength(authority_id) {
+	    return this.getLength("rch/" + authority_id);
+	  }
+
+	  async getRewardClaimsByAuthority(authority_id, offset = 0, max = 500) {
+	    return this.getListRecords("rch/" + authority_id, "rchi/" + authority_id, offset, max, true);
+	  }
+
+	  async getSaleStatus(authority_id) {
+	    const entry = await this.tracManager.bee.get("sale/" + authority_id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getSaleContributionsLength() {
+	    return this.getLength("sconl");
+	  }
+
+	  async getSaleContribution(id) {
+	    const entry = await this.tracManager.bee.get("scon/" + id);
+	    return entry === null ? null : JSON.parse(entry.value);
+	  }
+
+	  async getSaleContributions(offset = 0, max = 500) {
+	    return this.getListRecords("sconl", "sconli", offset, max, true);
+	  }
+
+	  async getSaleContributionsByAuthorityLength(authority_id) {
+	    return this.getLength("scona/" + authority_id);
+	  }
+
+	  async getSaleContributionsByAuthority(authority_id, offset = 0, max = 500) {
+	    return this.getListRecords("scona/" + authority_id, "sconai/" + authority_id, offset, max, true);
+	  }
+
+	  async getSaleContributionsByAddressLength(address) {
+	    return this.getLength("sconaddr/" + address);
+	  }
+
+	  async getSaleContributionsByAddress(address, offset = 0, max = 500) {
+	    return this.getListRecords("sconaddr/" + address, "sconaddri/" + address, offset, max, true);
+	  }
+
+	  async getSaleContributionsByClaimLength(address) {
+	    return this.getLength("sconcl/" + address);
+	  }
+
+	  async getSaleContributionsByClaim(address, offset = 0, max = 500) {
+	    return this.getListRecords("sconcl/" + address, "sconcli/" + address, offset, max, true);
+	  }
+
+	  async getSaleClaimsLength() {
+	    return this.getLength("sclaiml");
+	  }
+
+	  async getSaleClaims(offset = 0, max = 500) {
+	    return this.getListRecords("sclaiml", "sclaimli", offset, max, true);
+	  }
+
+	  async getSaleClaimsByAuthorityLength(authority_id) {
+	    return this.getLength("scla/" + authority_id);
+	  }
+
+	  async getSaleClaimsByAuthority(authority_id, offset = 0, max = 500) {
+	    return this.getListRecords("scla/" + authority_id, "sclai/" + authority_id, offset, max, true);
+	  }
+
+	  async getSaleClaimsByAddressLength(address) {
+	    return this.getLength("scladdr/" + address);
+	  }
+
+	  async getSaleClaimsByAddress(address, offset = 0, max = 500) {
+	    return this.getListRecords("scladdr/" + address, "scladdri/" + address, offset, max, true);
+	  }
+
+	  async getSaleRefundsLength() {
+	    return this.getLength("srefl");
+	  }
+
+	  async getSaleRefunds(offset = 0, max = 500) {
+	    return this.getListRecords("srefl", "srefli", offset, max, true);
+	  }
+
+	  async getSaleRefundsByAuthorityLength(authority_id) {
+	    return this.getLength("srefa/" + authority_id);
+	  }
+
+	  async getSaleRefundsByAuthority(authority_id, offset = 0, max = 500) {
+	    return this.getListRecords("srefa/" + authority_id, "srefai/" + authority_id, offset, max, true);
+	  }
+
+	  async getSaleRefundsByAddressLength(address) {
+	    return this.getLength("srefaddr/" + address);
+	  }
+
+	  async getSaleRefundsByAddress(address, offset = 0, max = 500) {
+	    return this.getListRecords("srefaddr/" + address, "srefaddri/" + address, offset, max, true);
+	  }
+
+	  async getSaleCancelsLength() {
+	    return this.getLength("scanl");
+	  }
+
+	  async getSaleCancels(offset = 0, max = 500) {
+	    return this.getListRecords("scanl", "scanli", offset, max, true);
+	  }
+
+	  async getSaleCancelsByAuthorityLength(authority_id) {
+	    return this.getLength("scana/" + authority_id);
+	  }
+
+	  async getSaleCancelsByAuthority(authority_id, offset = 0, max = 500) {
+	    return this.getListRecords("scana/" + authority_id, "scanai/" + authority_id, offset, max, true);
+	  }
+
+	  async getSaleResolutionsLength() {
+	    return this.getLength("sresl");
+	  }
+
+	  async getSaleResolutions(offset = 0, max = 500) {
+	    return this.getListRecords("sresl", "sresli", offset, max, true);
+	  }
+
+	  async getSaleResolutionsByAuthorityLength(authority_id) {
+	    return this.getLength("sresa/" + authority_id);
+	  }
+
+	  async getSaleResolutionsByAuthority(authority_id, offset = 0, max = 500) {
+	    return this.getListRecords("sresa/" + authority_id, "sresai/" + authority_id, offset, max, true);
+	  }
+
+	  async getSaleWithdrawalsLength() {
+	    return this.getLength("swdrl");
+	  }
+
+	  async getSaleWithdrawals(offset = 0, max = 500) {
+	    return this.getListRecords("swdrl", "swdrli", offset, max, true);
+	  }
+
+	  async getSaleWithdrawalsByAuthorityLength(authority_id) {
+	    return this.getLength("swdra/" + authority_id);
+	  }
+
+	  async getSaleWithdrawalsByAuthority(authority_id, offset = 0, max = 500) {
+	    return this.getListRecords("swdra/" + authority_id, "swdrai/" + authority_id, offset, max, true);
+	  }
+
+	  async getPendingRewardsByPosition(position_id) {
+	    const position = await this.getStakePositionById(position_id);
+	    if (position === null || position.status !== "open") return [];
+	    const authority = await this.getAuthorityById(position.auth);
+	    if (authority === null || !Array.isArray(authority.rt)) return [];
+	    const precision = 1000000000000000000n;
+	    const shares = BigInt(position.shares || "0");
+	    const out = [];
+	    let rewardTicks = authority.rt;
+	    if (rewardTicks.length === 0) {
+	      rewardTicks = [];
+	      const length = await this.getAuthorityBalancesLength(position.auth);
+	      for (let offset = 0; offset < length; offset += 25) {
+	        const balances = await this.getAuthorityBalances(position.auth, offset, Math.min(25, length - offset));
+	        if (!Array.isArray(balances)) return balances;
+	        rewardTicks.push(...balances.map((entry) => entry.tick));
+	      }
+	    }
+	    for (const rewardTick of rewardTicks) {
+	      const tick = String(rewardTick).toLowerCase();
+	      const tickKey = JSON.stringify(tick);
+	      const accEntry = await this.tracManager.bee.get("ahrps/" + position.auth + "/" + tickKey);
+	      const acc = accEntry === null ? 0n : BigInt(accEntry.value);
+	      const paid = position.debt && typeof position.debt[tick] !== "undefined" ? BigInt(position.debt[tick]) : 0n;
+	      const pending = shares * acc / precision - paid;
+	      out.push({ auth: position.auth, pos: position.id, rt: tick, amt: (pending > 0n ? pending : 0n).toString() });
+	    }
+	    return out;
+	  }
+
+	  async getDelegationCancelEventsByTransactionLength(transaction_hash) {
+	    return this.getLength("tx/tdc/" + transaction_hash);
+	  }
+
+	  async getDelegationCancelEventsByTransaction(transaction_hash, offset = 0, max = 500) {
+	    const pointers = await this.getListRecords("tx/tdc/" + transaction_hash, "txi/tdc/" + transaction_hash, offset, max, false);
+	    if (!Array.isArray(pointers)) return pointers;
+	    const out = [];
+	    for (const ptr of pointers) {
+	      const entry = await this.tracManager.bee.get(ptr);
+	      if (entry !== null) out.push(JSON.parse(entry.value));
+	    }
+	    return out;
+	  }
+
+	  /**
    * Gets the total number of holders for a given ticker.
    * @param {string} ticker - The ticker for which to retrieve the number of holders.
    * @returns {Promise<number>} The number of holders for the specified ticker.
@@ -2677,6 +3705,66 @@ export default class TapProtocol {
       j++;
     }
 
+    return out;
+  }
+
+  async getPointerListRecords(length_key, iterator_key, offset, max) {
+    const pointers = await this.getListRecords(length_key, iterator_key, offset, max, false);
+    if (!Array.isArray(pointers)) return pointers;
+    const out = [];
+    for (const ptr of pointers) {
+      const entry = await this.tracManager.bee.get(ptr);
+      if (entry !== null) out.push(JSON.parse(entry.value));
+    }
+    return out;
+  }
+
+  async getIdListRecords(length_key, iterator_key, record_prefix, offset, max) {
+    const ids = await this.getListRecords(length_key, iterator_key, offset, max, false);
+    if (!Array.isArray(ids)) return ids;
+    const out = [];
+    for (const id of ids) {
+      const entry = await this.tracManager.bee.get(record_prefix + "/" + id);
+      if (entry !== null) out.push(JSON.parse(entry.value));
+    }
+    return out;
+  }
+
+  async getFilteredIdListRecordsLength(length_key, iterator_key, record_prefix, predicate) {
+    const length = await this.getLength(length_key);
+    let count = 0;
+    for (let i = 0; i < length; i++) {
+      const ptr = await this.tracManager.bee.get(iterator_key + "/" + i);
+      if (ptr === null) continue;
+      const entry = await this.tracManager.bee.get(record_prefix + "/" + ptr.value);
+      if (entry === null) continue;
+      const value = JSON.parse(entry.value);
+      if (predicate(value)) count++;
+    }
+    return count;
+  }
+
+  async getFilteredIdListRecords(length_key, iterator_key, record_prefix, offset, max, predicate) {
+    if(typeof offset === "string" && this.isNumeric(offset)) offset = parseInt(''+offset);
+    if(typeof max === "string" && this.isNumeric(max)) max = parseInt(''+max);
+    if(typeof offset !== "string" && !this.isNumeric(offset)) return null;
+    if(typeof max !== "string" && !this.isNumeric(max)) return null;
+    if (max > 500) return "request too large";
+    if (offset < 0) return "invalid offset";
+    const length = await this.getLength(length_key);
+    const out = [];
+    let seen = 0;
+    for (let i = 0; i < length; i++) {
+      const ptr = await this.tracManager.bee.get(iterator_key + "/" + i);
+      if (ptr === null) continue;
+      const entry = await this.tracManager.bee.get(record_prefix + "/" + ptr.value);
+      if (entry === null) continue;
+      const value = JSON.parse(entry.value);
+      if (!predicate(value)) continue;
+      if (seen >= offset && out.length < max) out.push(value);
+      seen++;
+      if (out.length >= max) break;
+    }
     return out;
   }
   /**

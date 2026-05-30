@@ -15,10 +15,10 @@
         { "name": "X-Powered-By", "value": "TracCore" },
         { "name": "Access-Control-Allow-Origin", "value": "*" }
     ],
-    "enableWebsockets": true,
+    "enableWebsockets": false,
     "websocketPort": 5095,
     "websocketCORS": "*",
     "channel": "53b2c0e70485790d7f086edbbbb8e624a165667bc74b12034d9774c2f3ce503c",
     "enableBlockDownloader": true,
-    "host" : "0.0.0.0"
+    "host" : "localhost"
 }

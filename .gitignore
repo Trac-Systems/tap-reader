@@ -2,4 +2,11 @@
 /tap-reader/
 tapstore/
 node_modules/
+node_modules
 /cert/
+.DS_Store
+.env
+.env.*
+*.log
+config/local*.json
+config/production*.json
