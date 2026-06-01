@@ -125,7 +125,7 @@ Just swap out the given domain in that endpoint example above with your websocke
 
 > Distributed MAINNET Data Channel "53b2c0e70485790d7f086edbbbb8e624a165667bc74b12034d9774c2f3ce503c" is the currently active LIVE channel for TAP Protocol.
 
-> Distributed TESTNET Data Channel "f505c35965a89d62cb4144f9523fc4ede43186c7c37a66b77388eaede210e051" is the currently active TEST channel for TAP Protocol.
+> Distributed TESTNET Data Channel "2862a61fd10bc64bcbd8074ba14a8e2d5afc75146802bcc253a66758d06ff464" is the currently active TEST channel for TAP Protocol.
 
 ## Doge
 
